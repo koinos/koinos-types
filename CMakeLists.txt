@@ -38,14 +38,16 @@ if(${CMAKE_GENERATOR} MATCHES "Xcode")
   set(CMAKE_XCODE_GENERATE_SCHEME YES)
 endif()
 
-if (COVERAGE)
-  include(CodeCoverage)
-  append_coverage_compiler_flags()
-  setup_target_for_coverage_lcov(
-     NAME coverage
-     LCOV_ARGS "--no-external"
-     EXECUTABLE koinos_tests
-     EXCLUDE "libraries/vendor/*")
+if (NOT TARGET coverage)
+  if (COVERAGE)
+    include(CodeCoverage)
+    append_coverage_compiler_flags()
+    setup_target_for_coverage_lcov(
+       NAME coverage
+       LCOV_ARGS "--no-external"
+       EXECUTABLE koinos_types_tests
+       EXCLUDE "libraries/vendor/*")
+  endif()
 endif()
 
 add_subdirectory(libraries)
