@@ -51,3 +51,4 @@ if (NOT TARGET coverage)
 endif()
 
 add_subdirectory(libraries)
+add_subdirectory(tests)

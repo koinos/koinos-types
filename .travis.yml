@@ -1,0 +1,38 @@
+language: c++
+
+cache:
+- ccache
+- pip
+
+jobs:
+  include:
+    - os: osx
+      osx_image: xcode11.3
+      compiler: clang
+      env: RUN_TYPE=coverage
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env: RUN_TYPE=test
+    - os: osx
+      osx_image: xcode11.3
+      compiler: clang
+      env: RUN_TYPE=test
+
+
+before_install:
+  - ci/before_install.sh
+
+install:
+  - ci/install.sh
+
+script:
+  - ci/build.sh && ci/test.sh
+
+after_success:
+  - ci/after_success.sh
+
+notifications:
+  slack:
+    secure: AzhMztfB/P6kXb18ky/9HzO2PXHlPmcc5UF+oXrKmTi+rqnWBKXfXILO9ZwbMQr81b2y6CL64XE7s6kcChzgLewxrkckKI0BA2FT65i5CzrzXyHWDk+2bbOT0NB09CDEccxFj+EMC6481/HKOfhdbwO6w8lIgFSsUmUuxrKBJJqeLMmiy+asXAXn1skyQjkqRP4k/MpKA5nY4JYpnd0lTZUOXypxDZ5uqFOfSls6AlXZIoOuKFS43xXuTjH68wxk7eD15HSu+JF+fqyrSLpB+vUShOf3/8D2VYB9l0Xv2qjkW4kAhcUGs5KepAepj+V5Wnq4MnKbKeuamKIknvDbzupAoA0ciGgZ4O4HZr2pmWYO1Kk7VyBhb1gptNpqTkfAVpQqbhn4JIagCmOJ/X0gFic4DK8YORKxoKk7th2mxO/jm6RAtyyy6RFJUZkBa0iyHmaZLRGMyGtZaqbOaG3mmI19c/6ipEJe2PRhOEjvpjMj98LDftTrX2QnvtapKVG60G0MDjr9fowDtcEB2CK5lCKHj+/r7WsuHuuKx5SAGBmz1hG6pekv1qKF6kJIOiC9KYatV4SkZBDgOd9n4M6whKyj+tO0I3WfiSDVOVHUe0ZFROVLXcV1nZvKS5E5px61DOLCBDAfjnAWi7pZHLzkARMb8t/yeC1TZahGuLhlaLs=
+    on_success: never
