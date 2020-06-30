@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/open-orchard/koinos-types.svg?token=299mUDbUKyJPxqjj5R9G&branch=master)](https://travis-ci.com/open-orchard/koinos-types) [![Coverage Status](https://coveralls.io/repos/github/open-orchard/koinos-types/badge.svg?branch=master&t=oZ3L9T)](https://coveralls.io/github/open-orchard/koinos-types?branch=master)
+
 # koinos-types
 
 ## Base Types
