@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
    test_variant from_bin;
    from_binary( ss, from_bin );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_REQUIRE_EQUAL( v, 10 ); },
       []( int32_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
 
    from_binary( ss, from_bin );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( int32_t v ){ BOOST_REQUIRE_EQUAL( v, 20 ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }

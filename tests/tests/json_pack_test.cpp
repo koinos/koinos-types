@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
    test_variant from_j;
    from_json( j, from_j );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_REQUIRE_EQUAL( v, 10 ); },
       []( int32_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
    j["type"] = 0;
    from_json( j, from_j );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_REQUIRE_EQUAL( v, 10 ); },
       []( int32_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
 
    from_json( j, from_j );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( int32_t v ){ BOOST_REQUIRE_EQUAL( v, 20 ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE( variant_test )
    j["type"] = 1;
    from_json( j, from_j );
 
-   std::visit( koinos::overloaded {
+   std::visit( koinos::types::overloaded {
       []( int16_t v ){ BOOST_FAIL( "variant contains unexpected type" ); },
       []( int32_t v ){ BOOST_REQUIRE_EQUAL( v, 20 ); },
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
