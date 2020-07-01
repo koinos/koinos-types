@@ -780,11 +780,6 @@ inline variable_blob to_variable_blob( const T& t )
    return v;
 }
 
-inline void from_variable_blob( const variable_blob& v, std::string& s )
-{
-   s = std::string( v.data(), v.size() );
-}
-
 template< typename T >
 inline void from_variable_blob( const variable_blob& v, T& t )
 {

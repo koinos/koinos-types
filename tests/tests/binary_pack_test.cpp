@@ -477,11 +477,11 @@ BOOST_AUTO_TEST_CASE( to_variable_blob_test )
    BOOST_TEST_MESSAGE( "Testing string to vl_blob" );
    std::string foobar = "foobar";
    variable_blob expected;
-   expected = {0x66, 0x6F, 0x6F, 0x62, 0x61, 0x72};
+   expected = {0x06, 0x66, 0x6F, 0x6F, 0x62, 0x61, 0x72};
    variable_blob result = to_variable_blob( foobar );
 
-   BOOST_REQUIRE( result.size() == foobar.size() );
-   BOOST_REQUIRE( memcmp( result.data(), foobar.c_str(), foobar.size() ) == 0 );
+   BOOST_REQUIRE( result.size() == expected.size() );
+   BOOST_REQUIRE( memcmp( result.data(), expected.data(), expected.size() ) == 0 );
 
    std::string result_str = from_variable_blob< std::string >( result );
    BOOST_REQUIRE_EQUAL( foobar, result_str );
