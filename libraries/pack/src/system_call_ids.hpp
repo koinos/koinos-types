@@ -15,8 +15,10 @@ enum class system_call_id
    db_get_object = 0x9766a8fb,
    db_get_next_object = 0x99a398e8,
    db_get_prev_object = 0x9bd3767c,
+   execute_contract = 0x98c12cfe,
    get_contract_args_size = 0x9b0d8fd9,
    get_contract_args = 0x9fbba198,
+   set_contract_return = 0x9f49cdea,
    exit_contract = 0x98df75b0
 };
 

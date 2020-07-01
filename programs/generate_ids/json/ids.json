@@ -49,12 +49,20 @@
    "thunk_id": "0x8d57e8fd"
   },
   {
+   "name": "execute_contract",
+   "thunk_id": "0x8a43fe83"
+  },
+  {
    "name": "get_contract_args_size",
    "thunk_id": "0x83378e86"
   },
   {
    "name": "get_contract_args",
    "thunk_id": "0x8e189d86"
+  },
+  {
+   "name": "set_contract_return",
+   "thunk_id": "0x86b86275"
   },
   {
    "name": "exit_contract",
@@ -111,12 +119,20 @@
    "system_call_id": "0x9bd3767c"
   },
   {
+   "name": "execute_contract",
+   "system_call_id": "0x98c12cfe"
+  },
+  {
    "name": "get_contract_args_size",
    "system_call_id": "0x9b0d8fd9"
   },
   {
    "name": "get_contract_args",
    "system_call_id": "0x9fbba198"
+  },
+  {
+   "name": "set_contract_return",
+   "system_call_id": "0x9f49cdea"
   },
   {
    "name": "exit_contract",

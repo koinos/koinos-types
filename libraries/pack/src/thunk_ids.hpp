@@ -15,8 +15,10 @@ enum class thunk_id
    db_get_object = 0x8862a0d8,
    db_get_next_object = 0x86e45047,
    db_get_prev_object = 0x8d57e8fd,
+   execute_contract = 0x8a43fe83,
    get_contract_args_size = 0x83378e86,
    get_contract_args = 0x8e189d86,
+   set_contract_return = 0x86b86275,
    exit_contract = 0x81f61f9f
 };
 
