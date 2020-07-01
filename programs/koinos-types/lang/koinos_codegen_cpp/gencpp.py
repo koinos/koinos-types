@@ -91,7 +91,13 @@ def generate_cpp(schema):
     result_files = collections.OrderedDict()
     result["files"] = result_files
 
-    template_names = ["classes.hpp.j2"]
+    template_names = [
+        "classes.hpp.j2",
+        "thunk_ids.hpp.j2",
+        "system_call_ids.hpp.j2",
+        "thunk_ids.h.j2",
+        "system_call_ids.h.j2",
+        ]
 
     for template_name in template_names:
         j2_template = env.get_template(template_name)

@@ -15,6 +15,8 @@ set(KOINOS_REFLECT_SOURCES
    "${KOINOS_REFLECT_SRC_DIR}/submit.hpp"
    "${KOINOS_REFLECT_SRC_DIR}/system_calls.hpp"
    "${KOINOS_REFLECT_SRC_DIR}/thunks.hpp"
+   "${KOINOS_REFLECT_SRC_DIR}/system_call_ids.hpp"
+   "${KOINOS_REFLECT_SRC_DIR}/thunk_ids.hpp"
    )
 
 set(KOINOS_SCHEMA_DIR
@@ -27,6 +29,11 @@ set(KOINOS_SCHEMA_FILES
 
 set(KOINOS_PACK_GEN_FILES
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/classes.hpp"
+
+   "${KOINOS_PACK_GEN_DIR}/koinos/pack/thunk_ids.hpp"
+   "${KOINOS_PACK_GEN_DIR}/koinos/pack/system_call_ids.hpp"
+   "${KOINOS_PACK_GEN_DIR}/koinos/pack/thunk_ids.h"
+   "${KOINOS_PACK_GEN_DIR}/koinos/pack/system_call_ids.h"
 
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/basetypes.hpp"
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/binary_fwd.hpp"

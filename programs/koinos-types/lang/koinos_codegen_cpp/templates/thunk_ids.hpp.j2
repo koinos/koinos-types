@@ -1,0 +1,17 @@
+#pragma once
+
+#include <cstdint>
+
+namespace koinos { namespace types { namespace thunks {
+
+enum class thunk_id : uint32_t
+{
+{%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
+   {{ thunk.name }} = 0x{{ "{:08x}".format(thunk.value) }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+
+} } } // koinos::types::thunks
