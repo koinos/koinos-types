@@ -86,15 +86,26 @@ def generate_cpp(schema):
         print(name)
         import json
         print(json.dumps(val))
-    classes_j2 = env.get_template("classes.j2")
-    # json_j2 = env.get_template("json.j2")
-    # import json
-    # print(json.dumps([decl for decl in schema["decls"] if decl[1]["info"]["type"] == "Typedef"][0]))
+
     result = collections.OrderedDict()
     result_files = collections.OrderedDict()
     result["files"] = result_files
-    result_files["classes.hpp"] = classes_j2.render(ctx)
-    # result_files["json.py"] = json_j2.render(ctx)
+
+    template_dir = "templates"
+
+    for root, dirs, files in os.walk(template_dir):
+        for j2_filename in files:
+            base, ext = os.splitext(j2_filename)
+            if ext != ".j2":
+                continue
+            j2_filename = os.path.join(root, j2_filename)
+            j2_relname = os.path.relpath(j2_filename, template_dir)
+            j2_template = env.get_template(j2_relname)
+
+            out_filename = os.path.join(root, base)
+            out_relname = os.path.relpath(out_filename, template_dir)
+
+            result_files[out_relname] = j2_template.render(ctx)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
@@ -104,7 +115,6 @@ def generate_cpp(schema):
             with open(filepath, "r") as f:
                 content = f.read()
             result_files[os.path.join("rt", relpath)] = content
-    #result_files["serializers.py"] = serializers_j2.render(ctx)
     return result
 
 def setup(app):
