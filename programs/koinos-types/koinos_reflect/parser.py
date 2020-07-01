@@ -273,24 +273,26 @@ class Parser:
         return result
 
     def parse_int_literal(self):
-        tok = self.expect("UINT")
+        tok = self.lexer.read()
         text = tok.text.replace("'", "")
         text = text.lower()
         if tok.text == "0":
             value = 0
-        elif tok.text.startswith("0b"):
-            value = int(tok.text[2:], 2)
-        elif tok.text.startswith("0x"):
+        elif tok.ttype == "HEX_UINT":
             value = int(tok.text[2:], 16)
-        elif tok.text.startswith("0"):
+        elif tok.ttype == "BIN_UINT":
+            value = int(tok.text[2:], 2)
+        elif tok.ttype == "OCT_UINT":
             value = int(tok.text[1:], 8)
-        else:
+        elif tok.ttype == "DEC_UINT":
             value = int(tok.text)
+        else:
+            raise ParseError("Parse error:  Expected integer, got {}".format(tok.ttype))
         return IntLiteral(value=value)
 
     def parse_targ(self):
         tok = self.peek()
-        if tok.ttype == "UINT":
+        if tok.ttype in ["HEX_UINT", "BIN_UINT", "OCT_UINT", "DEC_UINT"]:
             return self.parse_int_literal()
         return self.parse_typeref()
 

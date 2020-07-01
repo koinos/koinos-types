@@ -38,12 +38,11 @@ def define_regexes():
     DEC_UINT = r"[1-9](?:[']?[0-9])*"
     HEX_UINT = r"0[xX][0-9a-fA-F](?:[']?[0-9a-fA-F])*"
 
-    UINT = r"(?:{BIN_UINT}|{OCT_UINT}|{DEC_UINT}|{HEX_UINT})".format(**locals())
-
     tokens = ["WS", "DOC_COMMENT", "CPP_COMMENT", "C_COMMENT",
        "KW_TYPEDEF", "KW_STRUCT", "KW_NS", "KW_ENUM", "KW_CLASS", "KW_KOINOS_BASETYPE",
-       "ID", "LT", "GT", "LBRACE", "RBRACE", "SEMI", "COMMA", "QUAL", "LPAREN", "RPAREN", "ASSIGN",
-       "UINT"]
+       "HEX_UINT", "BIN_UINT", "OCT_UINT", "DEC_UINT",
+       "ID", "LT", "GT", "LBRACE", "RBRACE", "SEMI", "COMMA", "QUAL", "LPAREN", "RPAREN", "ASSIGN"
+       ]
     result = []
     for name in tokens:
         result.append((name, re.compile(locals()[name])))
