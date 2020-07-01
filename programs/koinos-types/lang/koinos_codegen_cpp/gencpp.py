@@ -91,21 +91,12 @@ def generate_cpp(schema):
     result_files = collections.OrderedDict()
     result["files"] = result_files
 
-    template_dir = "templates"
+    template_names = ["classes.hpp.j2"]
 
-    for root, dirs, files in os.walk(template_dir):
-        for j2_filename in files:
-            base, ext = os.splitext(j2_filename)
-            if ext != ".j2":
-                continue
-            j2_filename = os.path.join(root, j2_filename)
-            j2_relname = os.path.relpath(j2_filename, template_dir)
-            j2_template = env.get_template(j2_relname)
-
-            out_filename = os.path.join(root, base)
-            out_relname = os.path.relpath(out_filename, template_dir)
-
-            result_files[out_relname] = j2_template.render(ctx)
+    for template_name in template_names:
+        j2_template = env.get_template(template_name)
+        out_filename = os.path.splitext(template_name)[0]
+        result_files[out_filename] = j2_template.render(ctx)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
