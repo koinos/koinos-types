@@ -1,0 +1,14 @@
+
+namespace koinos { namespace types { namespace thunks {
+
+enum class thunk_id
+{
+{%- for thunk in thunks %}
+   {{ thunk.name }} = {{ thunk.thunk_id }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+
+} } } // koinos::types::thunks

@@ -2,6 +2,7 @@
 build
 Testing
 libraries/pack/gen
+out
 
 # Mac files
 .DS_Store

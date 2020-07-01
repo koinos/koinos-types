@@ -1,0 +1,14 @@
+
+namespace koinos { namespace types { namespace system {
+
+enum class system_call_id
+{
+{%- for system_call in system_calls %}
+   {{ system_call.name }} = {{ system_call.system_call_id }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+
+} } } // koinos::types::system

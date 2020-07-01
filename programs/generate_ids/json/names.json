@@ -1,0 +1,38 @@
+{
+   "thunk_names" :
+   [
+      "prints",
+      "verify_block_header",
+      "apply_block",
+      "apply_transaction",
+      "apply_reserved_operation",
+      "apply_upload_contract_operation",
+      "apply_execute_contract_operation",
+      "apply_set_system_call_operation",
+      "db_put_object",
+      "db_get_object",
+      "db_get_next_object",
+      "db_get_prev_object",
+      "get_contract_args_size",
+      "get_contract_args",
+      "exit_contract"
+   ],
+   "system_call_names" :
+   [
+      "prints",
+      "verify_block_header",
+      "apply_block",
+      "apply_transaction",
+      "apply_reserved_operation",
+      "apply_upload_contract_operation",
+      "apply_execute_contract_operation",
+      "apply_set_system_call_operation",
+      "db_put_object",
+      "db_get_object",
+      "db_get_next_object",
+      "db_get_prev_object",
+      "get_contract_args_size",
+      "get_contract_args",
+      "exit_contract"
+   ]
+}
