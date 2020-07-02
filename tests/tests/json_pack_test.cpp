@@ -1,7 +1,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <koinos/test/pack_fixture.hpp>
+#include <koinos/tests/pack_fixture.hpp>
 
 #include <koinos/pack/rt/json.hpp>
 
