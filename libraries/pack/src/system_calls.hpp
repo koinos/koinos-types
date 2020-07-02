@@ -2,6 +2,7 @@
 namespace koinos { namespace types { namespace system {
 
 typedef uint32 thunk_id_type;
+typedef uint32 system_call_id_type;
 
 struct system_call_target_reserved {};
 
