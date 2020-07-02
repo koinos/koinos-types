@@ -5,8 +5,9 @@ cache:
 - pip
 - directories:
    - $HOME/Library/Caches/Homebrew
-   - /usr/local/Homebrew
-
+   - /usr/local/Homebrew/
+   # used in OSX custom build script dealing with local bottle caching
+   - $HOME/local_bottle_metadata
 jobs:
   include:
     - os: osx
@@ -36,8 +37,8 @@ after_success:
   - ci/after_success.sh
 
 before_cache:
-   - rm /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cast/homebrew-cask
-   - brew cleanup
+  - ci/before_cache.sh
+
 
 notifications:
   slack:

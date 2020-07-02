@@ -24,6 +24,15 @@ elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
       gflags \
       ccache
 
+   brew update cmake \
+      boost \
+      openssl \
+      zlib \
+      snappy \
+      bzip2 \
+      gflags \
+      ccache
+
    if [ "$RUN_TYPE" = "coverage" ]; then
       brew install lcov
       sudo gem install coveralls-lcov
