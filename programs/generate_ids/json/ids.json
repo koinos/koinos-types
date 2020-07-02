@@ -1,0 +1,142 @@
+{
+ "thunks": [
+  {
+   "name": "prints",
+   "thunk_id": "0x8f6df54d"
+  },
+  {
+   "name": "verify_block_header",
+   "thunk_id": "0x8d425aac"
+  },
+  {
+   "name": "apply_block",
+   "thunk_id": "0x8d6d31a8"
+  },
+  {
+   "name": "apply_transaction",
+   "thunk_id": "0x8981b0df"
+  },
+  {
+   "name": "apply_reserved_operation",
+   "thunk_id": "0x8b3c14f6"
+  },
+  {
+   "name": "apply_upload_contract_operation",
+   "thunk_id": "0x8882a55e"
+  },
+  {
+   "name": "apply_execute_contract_operation",
+   "thunk_id": "0x85e882eb"
+  },
+  {
+   "name": "apply_set_system_call_operation",
+   "thunk_id": "0x86f92c8c"
+  },
+  {
+   "name": "db_put_object",
+   "thunk_id": "0x82038de5"
+  },
+  {
+   "name": "db_get_object",
+   "thunk_id": "0x8862a0d8"
+  },
+  {
+   "name": "db_get_next_object",
+   "thunk_id": "0x86e45047"
+  },
+  {
+   "name": "db_get_prev_object",
+   "thunk_id": "0x8d57e8fd"
+  },
+  {
+   "name": "execute_contract",
+   "thunk_id": "0x8a43fe83"
+  },
+  {
+   "name": "get_contract_args_size",
+   "thunk_id": "0x83378e86"
+  },
+  {
+   "name": "get_contract_args",
+   "thunk_id": "0x8e189d86"
+  },
+  {
+   "name": "set_contract_return",
+   "thunk_id": "0x86b86275"
+  },
+  {
+   "name": "exit_contract",
+   "thunk_id": "0x81f61f9f"
+  }
+ ],
+ "system_calls": [
+  {
+   "name": "prints",
+   "system_call_id": "0x9b229941"
+  },
+  {
+   "name": "verify_block_header",
+   "system_call_id": "0x9625504e"
+  },
+  {
+   "name": "apply_block",
+   "system_call_id": "0x94ab4ff5"
+  },
+  {
+   "name": "apply_transaction",
+   "system_call_id": "0x9d8b55da"
+  },
+  {
+   "name": "apply_reserved_operation",
+   "system_call_id": "0x9aa85924"
+  },
+  {
+   "name": "apply_upload_contract_operation",
+   "system_call_id": "0x9e6ea937"
+  },
+  {
+   "name": "apply_execute_contract_operation",
+   "system_call_id": "0x92184686"
+  },
+  {
+   "name": "apply_set_system_call_operation",
+   "system_call_id": "0x9579a45c"
+  },
+  {
+   "name": "db_put_object",
+   "system_call_id": "0x971ec7a2"
+  },
+  {
+   "name": "db_get_object",
+   "system_call_id": "0x9766a8fb"
+  },
+  {
+   "name": "db_get_next_object",
+   "system_call_id": "0x99a398e8"
+  },
+  {
+   "name": "db_get_prev_object",
+   "system_call_id": "0x9bd3767c"
+  },
+  {
+   "name": "execute_contract",
+   "system_call_id": "0x98c12cfe"
+  },
+  {
+   "name": "get_contract_args_size",
+   "system_call_id": "0x9b0d8fd9"
+  },
+  {
+   "name": "get_contract_args",
+   "system_call_id": "0x9fbba198"
+  },
+  {
+   "name": "set_contract_return",
+   "system_call_id": "0x9f49cdea"
+  },
+  {
+   "name": "exit_contract",
+   "system_call_id": "0x98df75b0"
+  }
+ ]
+}

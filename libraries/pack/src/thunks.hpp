@@ -110,4 +110,11 @@ struct set_contract_return_args
 
 typedef void_type set_contract_return_ret;
 
+struct exit_contract_args
+{
+   types::uint8   exit_code;
+};
+
+typedef void_type exit_contract_ret;
+
 } } } // koinos::types::thunks

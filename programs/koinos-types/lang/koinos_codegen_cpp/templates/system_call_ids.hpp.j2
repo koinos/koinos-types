@@ -1,0 +1,17 @@
+#pragma once
+
+#include <cstdint>
+
+namespace koinos { namespace types { namespace system {
+
+enum class system_call_id : uint32_t
+{
+{%- for system_call in decls_by_name["koinos::types::system::system_call_id"]["entries"] %}
+   {{ system_call.name }} = 0x{{ "{:08x}".format(system_call.value) }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+
+} } } // koinos::types::system
