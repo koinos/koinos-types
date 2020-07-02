@@ -763,32 +763,6 @@ inline void from_binary( Stream& s, T& v, uint32_t depth )
    detail::binary::if_enum< typename reflector< T >::is_enum >::from_binary( s, v, depth );
 }
 
-inline void to_variable_blob( variable_blob& v, const std::string& s, bool append = false )
-{
-   if( !append )
-      v.clear();
-   v.insert( v.end(), s.begin(), s.end() );
-}
-
-inline void to_variable_blob( variable_blob& v, const std::string&& s, bool append = false )
-{
-   to_variable_blob( v, s, append );
-}
-
-inline variable_blob to_variable_blob( const std::string& s )
-{
-   variable_blob v;
-   to_variable_blob( v, s );
-   return v;
-}
-
-inline variable_blob to_variable_blob( const std::string&& s )
-{
-   variable_blob v;
-   to_variable_blob( v, s );
-   return v;
-}
-
 template< typename T >
 inline void to_variable_blob( variable_blob& v, const T& t, bool append = false )
 {
@@ -806,11 +780,6 @@ inline variable_blob to_variable_blob( const T& t )
    return v;
 }
 
-inline void from_variable_blob( const variable_blob& v, std::string& s )
-{
-   s = std::string( v.data(), v.size() );
-}
-
 template< typename T >
 inline void from_variable_blob( const variable_blob& v, T& t )
 {
@@ -824,14 +793,6 @@ inline T from_variable_blob( const variable_blob& v )
    T t;
    from_variable_blob( v, t );
    return t;
-}
-
-template<>
-inline std::string from_variable_blob< std::string >( const variable_blob& v )
-{
-   std::string s;
-   from_variable_blob( v, s );
-   return s;
 }
 
 template< typename T, size_t N >

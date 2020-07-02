@@ -44,8 +44,6 @@ set(KOINOS_PACK_GEN_FILES
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/json.hpp"
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/pack_fwd.hpp"
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/reflect.hpp"
-   "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/string_fwd.hpp"
-   "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/string.hpp"
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/typename.hpp"
    "${KOINOS_PACK_GEN_DIR}/koinos/pack/rt/varint.hpp"
 

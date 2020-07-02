@@ -9,7 +9,7 @@ INCLUDE(CTest)
 ENABLE_TESTING()
 
 file(GLOB UNIT_TESTS "tests/*.cpp")
-file(GLOB TEST_FIXTURES "test_fixtures/*.hpp")
+file(GLOB_RECURSE TEST_FIXTURES "include/*.hpp")
 
 include(BoostTestTargets.cmake)
 
@@ -56,4 +56,7 @@ add_boost_test( koinos_types_tests
 )
 
 target_link_libraries(koinos_types_tests koinos_types ${PLATFORM_SPECIFIC_LIBS})
-
+target_include_directories(koinos_types_tests PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>  # <prefix>/include
+)
