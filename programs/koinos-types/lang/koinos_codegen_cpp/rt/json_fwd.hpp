@@ -7,13 +7,13 @@
 #include <ostream>
 #include <type_traits>
 
-#define KOINOS_DECLARE_PRIMITIVE_JSON_SERIALIZER( type )      \
-inline void to_json( json& j, type t );                       \
-inline void from_json( json& j, type& t, uint32_t depth = 0 );\
+#define KOINOS_DECLARE_PRIMITIVE_JSON_SERIALIZER( type )            \
+inline void to_json( json& j, type t );                             \
+inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 
-#define KOINOS_DECLARE_BASE_JSON_SERIALIZER( type )           \
-inline void to_json( json& j, const type& t );                \
-inline void from_json( json& j, type& t, uint32_t depth = 0 );\
+#define KOINOS_DECLARE_BASE_JSON_SERIALIZER( type )                 \
+inline void to_json( json& j, const type& t );                      \
+inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 
 namespace koinos::pack {
 
@@ -52,32 +52,32 @@ KOINOS_DECLARE_BASE_JSON_SERIALIZER( std::string )
 template< size_t N >
 inline void to_json( json& s, const fixed_blob< N >& v );
 template< size_t N >
-inline void from_json( json& s, fixed_blob< N >& v, uint32_t depth = 0 );
+inline void from_json( const json& s, fixed_blob< N >& v, uint32_t depth = 0 );
 
 template< typename T >
 inline void to_json( json& s, const std::vector< T >& v );
 template< typename T >
-inline void from_json( json& s, std::vector< T >& v, uint32_t depth = 0 );
+inline void from_json( const json& s, std::vector< T >& v, uint32_t depth = 0 );
 
 template< typename T, size_t N >
 inline void to_json( json& s, const std::array< T, N >& v );
 template< typename T, size_t N >
-inline void from_json( json& s, std::array< T, N >& v, uint32_t depth = 0 );
+inline void from_json( const json& s, std::array< T, N >& v, uint32_t depth = 0 );
 
 template< typename... T >
 inline void to_json( json& s, const std::variant< T... >& v );
 template< typename... T >
-inline void from_json( json& s, std::variant< T... >& v, uint32_t depth = 0 );
+inline void from_json( const json& s, std::variant< T... >& v, uint32_t depth = 0 );
 
 template< typename T >
 inline void to_json( json& s, const std::optional< T >& v );
 template< typename T >
-inline void from_json( json& s, std::optional< T >& v, uint32_t depth = 0 );
+inline void from_json( const json& s, std::optional< T >& v, uint32_t depth = 0 );
 
 template< typename T >
 inline void to_json( json& s, const T& v );
 template< typename T >
-inline void from_json( json& s, T& v, uint32_t depth = 0 );
+inline void from_json( const json& s, T& v, uint32_t depth = 0 );
 
 template< typename = void, typename T = void > struct jsonifiable : std::false_type {};
 
