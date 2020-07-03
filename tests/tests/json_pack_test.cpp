@@ -392,6 +392,18 @@ BOOST_AUTO_TEST_CASE( reflect_test )
    BOOST_REQUIRE( memcmp( (char*)from_j.vals.data(), (char*)to_j.vals.data(), sizeof(uint32_t) * to_j.vals.size() ) == 0 );
 }
 
+BOOST_AUTO_TEST_CASE( empty_case_test )
+{
+   //
+   // Empty vector<T>        should be []
+   // Empty set<T>           should be []
+   // Empty array< T, N >    should be []
+   // Empty optional         should be null
+   // Empty multihash_vector should be []
+   // Empty struct           should be {}
+   //
+}
+
 /*
 ( depth_test )
 {

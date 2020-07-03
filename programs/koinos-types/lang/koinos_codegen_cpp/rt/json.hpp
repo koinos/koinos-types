@@ -179,6 +179,7 @@ inline void from_json( const json& j, bool& v, uint32_t depth ) { v = j.template
 template< typename T >
 inline void to_json( json& j, const vector< T >& v )
 {
+   j = json::array();
    for( const T& t : v )
    {
       json tmp;
@@ -244,6 +245,7 @@ inline void from_json( const json& j, std::string& s )
 template< typename T >
 inline void to_json( json& j, const set< T >& v )
 {
+   j = json::array();
    for( const T& t : v )
    {
       json tmp;
@@ -272,6 +274,7 @@ inline void from_json( const json& j, set< T >& v, uint32_t depth )
 template< typename T, size_t N >
 inline void to_json( json& j, const array< T, N >& v )
 {
+   j = json::array();
    for( const T& t : v )
    {
       json tmp;
@@ -381,7 +384,14 @@ inline void from_json( const json& j, variant< Ts... >& v, uint32_t depth )
 template< typename T >
 inline void to_json( json& j, const optional< T >& v )
 {
-   if( v.has_value() ) to_json( j, *v );
+   if( v.has_value() )
+   {
+      to_json( j, *v );
+   }
+   else
+   {
+      j = json(nullptr);
+   }
 }
 
 template< typename T >
@@ -425,6 +435,7 @@ inline void from_json( const json& j, multihash_type& v, uint32_t depth )
 inline void to_json( json& j, const multihash_vector& v )
 {
    j[ "hash" ] = v.hash_id;
+   j[ "digests" ] = json::array();
    for( const auto& d : v.digests )
    {
       json tmp;
@@ -467,7 +478,9 @@ namespace detail::json {
       to_json_object_visitor( const Class& _c, Json& _j ) :
          c(_c),
          j(_j)
-      {}
+      {
+         j = Json::object();
+      }
 
       template< typename T, typename C, T(C::*p) >
       void operator()( const char* name )const
