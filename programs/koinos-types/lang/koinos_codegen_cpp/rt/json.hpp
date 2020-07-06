@@ -259,7 +259,7 @@ inline void from_json( const json& j, set< T >& v, uint32_t depth )
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
    if( !(j.is_array()) ) throw json_type_mismatch( "Unexpected JSON type: Array Expected" );
    v.clear();
-   for( json& obj : j )
+   for( const json& obj : j )
    {
       T tmp;
       from_json( obj, tmp, depth );
@@ -425,7 +425,7 @@ inline void from_json( const json& j, multihash_type& v, uint32_t depth )
 inline void to_json( json& j, const multihash_vector& v )
 {
    j[ "hash" ] = v.hash_id;
-      for( const auto& d : v.digests )
+   for( const auto& d : v.digests )
    {
       json tmp;
       to_json( tmp, d );
