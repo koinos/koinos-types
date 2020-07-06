@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 
    json j;
    to_json( j, to_j );
-   std::string expected = "{\"ext\":null,\"id\":\"z19rwEskdm1\",\"key\":{\"digest\":\"zt1Zv2yaZ\",\"hash\":1},\"vals\":[108]}";
+   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":{\"digest\":\"zt1Zv2yaZ\",\"hash\":1},\"vals\":[108]}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    test_object from_j;
@@ -399,9 +399,27 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
    // Empty set<T>           should be []
    // Empty array< T, N >    should be []
    // Empty optional         should be null
-   // Empty multihash_vector should be []
+   // Empty multihash_vector should be {"digests":[],"hash":0}
    // Empty struct           should be {}
    //
+   std::string json_earray = "[]";
+   std::string json_eobject = "{}";
+   std::string json_null = "null";
+   std::string json_emhv = "{\"digests\":[],\"hash\":0}";
+
+   std::vector< uint32_t >   empty_vector;
+   std::set< uint32_t >      empty_set;
+   std::array< uint32_t, 0 > empty_array;
+   std::optional< uint32_t > empty_optional;
+   multihash_vector          empty_mhv;
+   extensions                empty_struct;
+
+   { json j; to_json( j, empty_vector   ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
+   { json j; to_json( j, empty_set      ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
+   { json j; to_json( j, empty_array    ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
+   { json j; to_json( j, empty_optional ); BOOST_REQUIRE_EQUAL( j.dump(), json_null    ); }
+   { json j; to_json( j, empty_mhv      ); BOOST_REQUIRE_EQUAL( j.dump(), json_emhv    ); }
+   { json j; to_json( j, empty_struct   ); BOOST_REQUIRE_EQUAL( j.dump(), json_eobject ); }
 }
 
 /*
