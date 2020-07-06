@@ -18,7 +18,7 @@ inline void to_json( json& j, int_type v )                                      
 {                                                                                            \
    j = int64_t( v );                                                                         \
 }                                                                                            \
-inline void from_json( json& j, int_type& v, uint32_t depth )                                \
+inline void from_json( const json& j, int_type& v, uint32_t depth )                          \
 {                                                                                            \
    int64_t tmp = j.template get< int64_t >();                                                \
    if( !(tmp <= static_cast< int64_t >( std::numeric_limits< int_type >::max() )             \
@@ -32,7 +32,7 @@ inline void to_json( json& j, int_type v )                                      
 {                                                                                            \
    j = uint64_t( v );                                                                        \
 }                                                                                            \
-inline void from_json( json& j, int_type& v, uint32_t depth )                                \
+inline void from_json( const json& j, int_type& v, uint32_t depth )                          \
 {                                                                                            \
    uint64_t tmp = j.template get< uint64_t >();                                              \
    if( !(tmp <= static_cast< uint64_t >( std::numeric_limits< int_type >::max())) )          \
@@ -40,62 +40,62 @@ inline void from_json( json& j, int_type& v, uint32_t depth )                   
    v = static_cast< int_type >( tmp );                                                       \
 }
 
-#define JSON_SIGNED_BOOST_INT_SERIALIZER( int_type )              \
-inline void to_json( json& j, const int_type& v )                 \
-{                                                                 \
-   if( v > JSON_MAX_SAFE_INTEGER || v < JSON_MIN_SAFE_INTEGER )   \
-   {                                                              \
-      j = v.str();                                                \
-   }                                                              \
-   else                                                           \
-   {                                                              \
-      j = v.template convert_to< int64_t >();                     \
-   }                                                              \
-}                                                                 \
-inline void from_json( json& j, int_type& v, uint32_t depth )     \
-{                                                                 \
-   if( j.is_string() )                                            \
-   {                                                              \
-      v = int_type( j.template get< string >() );                 \
-   }                                                              \
-   else                                                           \
-   {                                                              \
-      v = j.template get< int64_t >();                            \
-   }                                                              \
+#define JSON_SIGNED_BOOST_INT_SERIALIZER( int_type )                 \
+inline void to_json( json& j, const int_type& v )                    \
+{                                                                    \
+   if( v > JSON_MAX_SAFE_INTEGER || v < JSON_MIN_SAFE_INTEGER )      \
+   {                                                                 \
+      j = v.str();                                                   \
+   }                                                                 \
+   else                                                              \
+   {                                                                 \
+      j = v.template convert_to< int64_t >();                        \
+   }                                                                 \
+}                                                                    \
+inline void from_json( const json& j, int_type& v, uint32_t depth )  \
+{                                                                    \
+   if( j.is_string() )                                               \
+   {                                                                 \
+      v = int_type( j.template get< string >() );                    \
+   }                                                                 \
+   else                                                              \
+   {                                                                 \
+      v = j.template get< int64_t >();                               \
+   }                                                                 \
 }
 
-#define JSON_UNSIGNED_BOOST_INT_SERIALIZER( int_type )            \
-inline void to_json( json& j, const int_type& v )                 \
-{                                                                 \
-   if( v > JSON_MAX_SAFE_INTEGER )                                \
-   {                                                              \
-      j = v.str();                                                \
-   }                                                              \
-   else                                                           \
-   {                                                              \
-      j = v.template convert_to< uint64_t >();                    \
-   }                                                              \
-}                                                                 \
-inline void from_json( json& j, int_type& v, uint32_t depth )     \
-{                                                                 \
-   if( j.is_string() )                                            \
-   {                                                              \
-      v = int_type( j.template get< string >() );                 \
-   }                                                              \
-   else                                                           \
-   {                                                              \
-      v = j.template get< uint64_t >();                           \
-   }                                                              \
+#define JSON_UNSIGNED_BOOST_INT_SERIALIZER( int_type )               \
+inline void to_json( json& j, const int_type& v )                    \
+{                                                                    \
+   if( v > JSON_MAX_SAFE_INTEGER )                                   \
+   {                                                                 \
+      j = v.str();                                                   \
+   }                                                                 \
+   else                                                              \
+   {                                                                 \
+      j = v.template convert_to< uint64_t >();                       \
+   }                                                                 \
+}                                                                    \
+inline void from_json( const json& j, int_type& v, uint32_t depth )  \
+{                                                                    \
+   if( j.is_string() )                                               \
+   {                                                                 \
+      v = int_type( j.template get< string >() );                    \
+   }                                                                 \
+   else                                                              \
+   {                                                                 \
+      v = j.template get< uint64_t >();                              \
+   }                                                                 \
 }
 
-#define JSON_BOOST_STRONG_TYPEDEF_SERIALIZER( type )      \
-inline void to_json( json& j, const type& v )             \
-{                                                         \
-   to_json( j, v.t );                                     \
-}                                                         \
-inline void from_json( json& j, type& v, uint32_t depth ) \
-{                                                         \
-   from_json( j, v.t, depth );                            \
+#define JSON_BOOST_STRONG_TYPEDEF_SERIALIZER( type )                 \
+inline void to_json( json& j, const type& v )                        \
+{                                                                    \
+   to_json( j, v.t );                                                \
+}                                                                    \
+inline void from_json( const json& j, type& v, uint32_t depth )      \
+{                                                                    \
+   from_json( j, v.t, depth );                                       \
 }
 
 namespace koinos::pack
@@ -127,7 +127,7 @@ inline void to_json( json& j, int64_t v )
    }
 }
 
-inline void from_json( json& j, int64_t& v, uint32_t depth )
+inline void from_json( const json& j, int64_t& v, uint32_t depth )
 {
    if( j.is_string() )
    {
@@ -151,7 +151,7 @@ inline void to_json( json& j, uint64_t v )
    }
 }
 
-inline void from_json( json& j, uint64_t& v, uint32_t depth )
+inline void from_json( const json& j, uint64_t& v, uint32_t depth )
 {
    if( j.is_string() )
    {
@@ -173,7 +173,7 @@ JSON_UNSIGNED_BOOST_INT_SERIALIZER( uint256_t )
 // bool
 
 inline void to_json( json& j, bool v ) { j = v; }
-inline void from_json( json& j, bool& v, uint32_t depth ) { v = j.template get< bool >(); }
+inline void from_json( const json& j, bool& v, uint32_t depth ) { v = j.template get< bool >(); }
 
 // vector< T >
 template< typename T >
@@ -188,13 +188,13 @@ inline void to_json( json& j, const vector< T >& v )
 }
 
 template< typename T >
-inline void from_json( json& j, vector< T >& v, uint32_t depth )
+inline void from_json( const json& j, vector< T >& v, uint32_t depth )
 {
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
    if( !(j.is_array()) ) throw json_type_mismatch( "Unexpected JSON type: Array Expected" );
    v.clear();
-   for( json& obj : j )
+   for( const json& obj : j )
    {
       T tmp;
       from_json( obj, tmp, depth );
@@ -210,7 +210,7 @@ inline void to_json( json& j, const variable_blob& v )
    j = std::move( 'z' + base58 );
 }
 
-inline void from_json( json& j, variable_blob& v, uint32_t depth )
+inline void from_json( const json& j, variable_blob& v, uint32_t depth )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
    v.clear();
@@ -234,7 +234,7 @@ inline void to_json( json& j, const std::string& s )
    j = s;
 }
 
-inline void from_json( json& j, std::string& s )
+inline void from_json( const json& j, std::string& s )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
    s = j.template get< string >();
@@ -253,13 +253,13 @@ inline void to_json( json& j, const set< T >& v )
 }
 
 template< typename T >
-inline void from_json( json& j, set< T >& v, uint32_t depth )
+inline void from_json( const json& j, set< T >& v, uint32_t depth )
 {
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
    if( !(j.is_array()) ) throw json_type_mismatch( "Unexpected JSON type: Array Expected" );
    v.clear();
-   for( json& obj : j )
+   for( const json& obj : j )
    {
       T tmp;
       from_json( obj, tmp, depth );
@@ -281,7 +281,7 @@ inline void to_json( json& j, const array< T, N >& v )
 }
 
 template< typename T, size_t N >
-inline void from_json( json& j, array< T, N >& v, uint32_t depth )
+inline void from_json( const json& j, array< T, N >& v, uint32_t depth )
 {
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
@@ -303,7 +303,7 @@ inline void to_json( json& j, const fixed_blob< N >& v )
 }
 
 template< size_t N >
-inline void from_json( json& j, fixed_blob< N >& v, uint32_t depth )
+inline void from_json( const json& j, fixed_blob< N >& v, uint32_t depth )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
 
@@ -334,7 +334,7 @@ inline void to_json( json& j, const variant< Ts... >& v )
 }
 
 template< typename... Ts >
-inline void from_json( json& j, variant< Ts... >& v, uint32_t depth )
+inline void from_json( const json& j, variant< Ts... >& v, uint32_t depth )
 {
    static std::map< string, int64_t > to_tag = []()
    {
@@ -385,7 +385,7 @@ inline void to_json( json& j, const optional< T >& v )
 }
 
 template< typename T >
-inline void from_json( json& j, optional< T >& v, uint32_t depth )
+inline void from_json( const json& j, optional< T >& v, uint32_t depth )
 {
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
@@ -410,7 +410,7 @@ inline void to_json( json& j, const multihash_type& v )
    j[ "digest" ] = std::move( tmp );
 }
 
-inline void from_json( json& j, multihash_type& v, uint32_t depth )
+inline void from_json( const json& j, multihash_type& v, uint32_t depth )
 {
    if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
    if( !(j.size() == 2) ) throw json_type_mismatch( "Multihash JSON type must only contain two fields" );
@@ -425,7 +425,7 @@ inline void from_json( json& j, multihash_type& v, uint32_t depth )
 inline void to_json( json& j, const multihash_vector& v )
 {
    j[ "hash" ] = v.hash_id;
-      for( const auto& d : v.digests )
+   for( const auto& d : v.digests )
    {
       json tmp;
       to_json( tmp, d );
@@ -433,17 +433,17 @@ inline void to_json( json& j, const multihash_vector& v )
    }
 }
 
-inline void from_json( json& j, multihash_vector& v, uint32_t depth )
+inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
 {
    if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
    if( !(j.size() == 2) ) throw json_type_mismatch( "MultihashVector JSON type must only contain two fields" );
    if( !(j.contains( "hash" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'hash'" );
    if( !(j.contains( "digests" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'digests'" );
 
-   json& digests = j[ "digests" ];
+   const json& digests = j[ "digests" ];
 
    if( !(digests.is_array()) ) throw json_type_mismatch( "MultihashVector field 'digest' must be an array" );
-   for( json& d : digests )
+   for( const json& d : digests )
    {
       variable_blob tmp;
       from_json( d, tmp );
@@ -483,7 +483,7 @@ namespace detail::json {
    template< typename Json, typename Class >
    struct from_json_object_visitor
    {
-      from_json_object_visitor( Class& _c, Json& _j ) :
+      from_json_object_visitor( Class& _c, const Json& _j ) :
          c(_c),
          j(_j)
       {}
@@ -498,7 +498,7 @@ namespace detail::json {
 
       private:
          Class& c;
-         Json&  j;
+         const Json&  j;
    };
 
    // if_class is only called if type is not reflected
@@ -508,7 +508,7 @@ namespace detail::json {
       template< typename Json, typename T >
       static inline void to_json( Json& j, const T& v ) { j = v; }
       template< typename Json, typename T >
-      static inline void from_json( Json& j, T& v, uint32_t depth ) { v = j.template get< T >(); }
+      static inline void from_json( const Json& j, T& v, uint32_t depth ) { v = j.template get< T >(); }
    };
 
    template<>
@@ -521,7 +521,7 @@ namespace detail::json {
       }
 
       template< typename Json, typename T >
-      static inline void from_json( Json& j, T& v, uint32_t )
+      static inline void from_json( const Json& j, T& v, uint32_t )
       {
          v = j.template get< T >();
       }
@@ -538,7 +538,7 @@ namespace detail::json {
       }
 
       template< typename Json, typename T >
-      static inline void from_json( Json& j, T& v, uint32_t depth )
+      static inline void from_json( const Json& j, T& v, uint32_t depth )
       {
          reflector< T >::visit( from_json_object_visitor< Json, T >( v, j ) );
       }
@@ -554,7 +554,7 @@ namespace detail::json {
       }
 
       template< typename Json, typename T >
-      static inline void from_json( Json& j, T& v, uint32_t depth )
+      static inline void from_json( const Json& j, T& v, uint32_t depth )
       {
          depth++;
          if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
@@ -573,7 +573,7 @@ void to_json( json& j, const T& v )
 }
 
 template< typename T >
-void from_json( json& j, T& v, uint32_t depth )
+void from_json( const json& j, T& v, uint32_t depth )
 {
    detail::json::if_enum< typename reflector< T >::is_enum >::from_json( j, v, depth );
 }
