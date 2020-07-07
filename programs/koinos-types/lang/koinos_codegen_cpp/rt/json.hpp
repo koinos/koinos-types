@@ -234,7 +234,7 @@ inline void to_json( json& j, const std::string& s )
    j = s;
 }
 
-inline void from_json( const json& j, std::string& s )
+inline void from_json( const json& j, std::string& s, uint32_t depth )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
    s = j.template get< string >();
