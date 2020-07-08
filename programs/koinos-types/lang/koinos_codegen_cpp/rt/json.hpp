@@ -331,7 +331,7 @@ inline void to_json( json& j, const variant< Ts... >& v )
 {
    std::visit( [&]( auto& arg ){
       using variant_type = std::decay_t< decltype(arg) >;
-      trim_typename_namespace( j[ "type" ], get_typename< variant_type >::name() );
+      j["type"] = get_typename< variant_type >::name();
       to_json( j[ "value" ], arg );
    }, v );
 }

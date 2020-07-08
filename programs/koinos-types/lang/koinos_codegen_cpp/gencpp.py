@@ -65,6 +65,7 @@ def template_raise(cause):
 def generate_cpp(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
+            keep_trailing_newline=True,
         )
     env.filters["classname_case"] = classname_case
     env.filters["simple_name"] = simple_name
