@@ -94,3 +94,19 @@ namespace {{ new_ns }} {
 KOINOS_DEFINE_JSON_STREAM_OPERATOR( {{ decl_ns }} )
 {% endif -%}
 {%- endfor %}
+
+// For each registered struct type t, call macro F(t)
+#define KOINOS_FOR_EACH_STRUCT_TYPE( F )
+{%- for name, decl in decls_by_name.items() -%}
+{%- if decl["info"]["type"] == "Struct" %} \
+F( {{ name|cpp_namespace }}::{{ decl["name"]|simple_name|classname_case }} )
+{%- endif -%}
+{%- endfor %}
+
+// For each registered type t that is a typedef of a variant, call macro F(t)
+#define KOINOS_FOR_EACH_VARIANT_TYPE( F )
+{%- for name, decl in decls_by_name.items() -%}
+{%- if decl["info"]["type"] == "Typedef" and decl["tref"]["name"] == ["std", "variant"] %} \
+F( {{ name|cpp_namespace }}::{{ decl["name"]|simple_name|classname_case }} )
+{%- endif -%}
+{%- endfor %}
