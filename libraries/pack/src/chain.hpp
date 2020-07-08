@@ -6,4 +6,4 @@ namespace koinos { namespace types { namespace protocol {
       koinos::types::block_height_type height;
    };
 
-}}} // koinos::types::protocol
+} } } // koinos::types::protocol

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import hashlib
-import json
 import sys
 
 def do_hash(name, prefix_value):
