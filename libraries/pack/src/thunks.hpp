@@ -117,4 +117,8 @@ struct exit_contract_args
 
 typedef void_type exit_contract_ret;
 
+typedef void_type get_head_info_args;
+
+typedef protocol::head_info get_head_info_ret;
+
 } } } // koinos::types::thunks
