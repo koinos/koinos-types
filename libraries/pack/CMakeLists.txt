@@ -17,7 +17,6 @@ set(KOINOS_REFLECT_SOURCES
    "${KOINOS_REFLECT_SRC_DIR}/thunks.hpp"
    "${KOINOS_REFLECT_SRC_DIR}/system_call_ids.hpp"
    "${KOINOS_REFLECT_SRC_DIR}/thunk_ids.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/chain.hpp"
    )
 
 set(KOINOS_SCHEMA_DIR

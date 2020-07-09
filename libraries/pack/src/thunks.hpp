@@ -119,6 +119,10 @@ typedef void_type exit_contract_ret;
 
 typedef void_type get_head_info_args;
 
-typedef protocol::head_info get_head_info_ret;
+struct head_info_ret
+{
+   koinos::types::multihash_type id;
+   koinos::types::block_height_type height;
+};
 
 } } } // koinos::types::thunks
