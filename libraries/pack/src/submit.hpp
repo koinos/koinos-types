@@ -68,11 +68,7 @@ typedef std::variant<
 
 typedef query_submission_result query_error;
 
-struct get_head_info_result
-{
-   types::multihash_type    id;
-   types::block_height_type height;
-};
+typedef types::system::head_info get_head_info_result;
 
 typedef std::variant<
    query_error,
