@@ -1,6 +1,7 @@
 
 namespace koinos { namespace types { namespace thunks {
 
+// Use generate_ids.py to generate the thunk id
 enum class thunk_id
 {
    prints = 0x8f6df54d,
@@ -19,7 +20,8 @@ enum class thunk_id
    get_contract_args_size = 0x83378e86,
    get_contract_args = 0x8e189d86,
    set_contract_return = 0x86b86275,
-   exit_contract = 0x81f61f9f
+   exit_contract = 0x81f61f9f,
+   get_head_info = 0x89df34c4
 };
 
 } } } // koinos::types::thunks

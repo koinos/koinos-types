@@ -97,7 +97,7 @@ typedef types::variable_blob execute_contract_ret;
 
 typedef void_type get_contract_args_size_args;
 
-typedef types::int32 get_contract_args_size_ret;
+typedef types::uint32 get_contract_args_size_ret;
 
 typedef void_type get_contract_args_args;
 
@@ -116,5 +116,9 @@ struct exit_contract_args
 };
 
 typedef void_type exit_contract_ret;
+
+typedef void_type get_head_info_args;
+
+typedef system::head_info get_head_info_ret;
 
 } } } // koinos::types::thunks

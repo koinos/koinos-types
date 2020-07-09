@@ -1,6 +1,7 @@
 
 namespace koinos { namespace types { namespace system {
 
+// Use generate_ids.py to generate the system call id
 enum class system_call_id
 {
    prints = 0x9b229941,
@@ -19,7 +20,8 @@ enum class system_call_id
    get_contract_args_size = 0x9b0d8fd9,
    get_contract_args = 0x9fbba198,
    set_contract_return = 0x9f49cdea,
-   exit_contract = 0x98df75b0
+   exit_contract = 0x98df75b0,
+   get_head_info = 0x956fb22d
 };
 
 } } } // koinos::types::system
