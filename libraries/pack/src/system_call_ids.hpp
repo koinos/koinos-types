@@ -21,7 +21,8 @@ enum class system_call_id
    get_contract_args = 0x9fbba198,
    set_contract_return = 0x9f49cdea,
    exit_contract = 0x98df75b0,
-   get_head_info = 0x956fb22d
+   get_head_info = 0x956fb22d,
+   hash = 0x99770e04
 };
 
 } } } // koinos::types::system

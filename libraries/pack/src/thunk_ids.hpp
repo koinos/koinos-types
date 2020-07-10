@@ -21,7 +21,8 @@ enum class thunk_id
    get_contract_args = 0x8e189d86,
    set_contract_return = 0x86b86275,
    exit_contract = 0x81f61f9f,
-   get_head_info = 0x89df34c4
+   get_head_info = 0x89df34c4,
+   hash = 0x8aaaf547
 };
 
 } } } // koinos::types::thunks
