@@ -105,6 +105,7 @@ class EnumEntry:
 class EnumClass:
     name: str
     entries: List[EnumEntry]
+    tref: Typeref
     doc: str
     info: OrderedDict = field(default_factory=info_factory("EnumClass"))
 
@@ -212,6 +213,8 @@ class Parser:
         self.expect("KW_ENUM")
         self.expect("KW_CLASS")
         name = self.expect("ID")
+        self.expect("COLON")
+        tref = self.parse_typeref()
         self.expect("LBRACE")
         next_value = 0
         entries = []
@@ -236,7 +239,7 @@ class Parser:
             need_comma = True
         self.expect("RBRACE")
         semi = self.expect("SEMI")
-        return EnumClass(name=name.text, entries=entries, doc=semi.doc)
+        return EnumClass(name=name.text, entries=entries, tref=tref, doc=semi.doc)
 
     def parse_basetype(self):
         basetype = self.expect("KW_KOINOS_BASETYPE")

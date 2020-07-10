@@ -40,7 +40,7 @@ def walk(listener, node):
         subnodes = node.decls
     elif isinstance(node, parser.EnumClass):
         f = listener.process_enum
-        subnodes = node.entries
+        subnodes = [node.tref] + node.entries
     elif isinstance(node, parser.BaseType):
         f = listener.process_basetype
         subnodes = []
