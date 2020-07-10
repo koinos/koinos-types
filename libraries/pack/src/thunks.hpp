@@ -121,4 +121,13 @@ typedef void_type get_head_info_args;
 
 typedef system::head_info get_head_info_ret;
 
+struct hash_args
+{
+   types::uint64        code;
+   types::variable_blob obj;
+   types::uint64        size;
+};
+
+typedef types::multihash_type hash_ret;
+
 } } } // koinos::types::thunks
