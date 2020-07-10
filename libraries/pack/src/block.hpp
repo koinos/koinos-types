@@ -1,6 +1,6 @@
 namespace koinos { namespace types { namespace protocol {
 
-enum class header_hash_index
+enum class header_hash_index : uint32
 {
    /**
     * Hash of the previous block.

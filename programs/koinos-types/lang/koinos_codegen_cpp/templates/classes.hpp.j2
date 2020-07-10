@@ -41,6 +41,30 @@ KOINOS_REFLECT( {{ name|cpp_namespace }}::{{ decl["name"]|simple_name|classname_
 )
 {% endmacro -%}
 
+{%- macro enum_class_decl(decl) -%}
+enum class {{ decl["name"]|simple_name|classname_case }} : {{ typeref(decl["tref"]) }}
+{
+{%- for entry in decl["entries"] %}
+   {{ entry.name }} = {{ entry.value }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+{% endmacro -%}
+
+{%- macro enum_class_decl_hex(decl) -%}
+enum class {{ decl["name"]|simple_name|classname_case }} : {{ typeref(decl["tref"]) }}
+{
+{%- for entry in decl["entries"] %}
+   {{ entry.name }} = 0x{{ "{:08x}".format(entry.value) }}
+{%- if not loop.last -%}
+,
+{%- endif -%}
+{%- endfor %}
+};
+{% endmacro -%}
+
 {%- macro update_ns( new_ns ) -%}
 {%- if ns.current_ns != new_ns -%}
 {%- if ns.current_ns != "" -%}
@@ -71,9 +95,10 @@ namespace {{ new_ns }} {
 {{ update_ns( name|cpp_namespace ) }}
 {{ struct_decl( decl ) }}
 {% elif decl["info"]["type"] == "EnumClass" -%}
+{%- if not decl["name"].endswith("_id"): -%}
 {{ update_ns( name|cpp_namespace ) }}
-
-{% set ns.current_ns = name|cpp_namespace -%}
+{{ enum_class_decl( decl ) }}
+{%- endif -%}
 {%- endif -%}
 
 {% endfor %}
