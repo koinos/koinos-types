@@ -86,5 +86,5 @@ add_library(koinos_types ${KOINOS_PACK_GEN_FILES}
    ${CMAKE_CURRENT_SOURCE_DIR}/pack.cpp
    )
 
-target_link_libraries(koinos_types INTERFACE nlohmann_json ${Boost_LIBRARIES} )
-target_include_directories(koinos_types INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/gen" "${CMAKE_CURRENT_BINARY_DIR}/gen" ${Boost_INCLUDE_DIR})
+target_link_libraries(koinos_types INTERFACE nlohmann_json Boost::headers )
+target_include_directories(koinos_types INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/gen" "${CMAKE_CURRENT_BINARY_DIR}/gen" )
