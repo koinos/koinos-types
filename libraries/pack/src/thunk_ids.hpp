@@ -2,7 +2,7 @@
 namespace koinos { namespace types { namespace thunks {
 
 // Use generate_ids.py to generate the thunk id
-enum class thunk_id
+enum class thunk_id : uint32
 {
    prints = 0x8f6df54d,
    verify_block_header = 0x8d425aac,

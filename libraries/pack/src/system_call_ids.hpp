@@ -2,7 +2,7 @@
 namespace koinos { namespace types { namespace system {
 
 // Use generate_ids.py to generate the system call id
-enum class system_call_id
+enum class system_call_id : uint32
 {
    prints = 0x9b229941,
    verify_block_header = 0x9625504e,

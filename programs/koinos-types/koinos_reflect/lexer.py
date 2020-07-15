@@ -32,6 +32,7 @@ def define_regexes():
     LPAREN = r"[(]"
     RPAREN = r"[)]"
     ASSIGN = r"[=]"
+    COLON = r"[:]"
 
     BIN_UINT = r"0[bB][01](?:[']?[01])*"
     OCT_UINT = r"0(?:[']?[0-7])*"
@@ -41,7 +42,7 @@ def define_regexes():
     tokens = ["WS", "DOC_COMMENT", "CPP_COMMENT", "C_COMMENT",
        "KW_TYPEDEF", "KW_STRUCT", "KW_NS", "KW_ENUM", "KW_CLASS", "KW_KOINOS_BASETYPE",
        "HEX_UINT", "BIN_UINT", "OCT_UINT", "DEC_UINT",
-       "ID", "LT", "GT", "LBRACE", "RBRACE", "SEMI", "COMMA", "QUAL", "LPAREN", "RPAREN", "ASSIGN"
+       "ID", "LT", "GT", "LBRACE", "RBRACE", "SEMI", "COMMA",  "QUAL", "LPAREN", "RPAREN", "ASSIGN", "COLON",
        ]
     result = []
     for name in tokens:
