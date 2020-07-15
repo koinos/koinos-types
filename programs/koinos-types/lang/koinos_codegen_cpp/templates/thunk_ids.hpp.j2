@@ -1,10 +1,13 @@
+
+{%- import "macros.j2" as mac -%}
+
 #pragma once
 
 #include <cstdint>
 
 namespace koinos { namespace types { namespace thunks {
 
-enum class thunk_id : {{ decls_by_name["koinos::types::thunks::thunk_id"]["tref"] }}
+enum class thunk_id : {{ mac.typeref( decls_by_name["koinos::types::thunks::thunk_id"]["tref"] ) }}
 {
 {%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
    {{ thunk.name }} = 0x{{ "{:08x}".format(thunk.value) }}
