@@ -27,7 +27,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas" )
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
-option( BUILD_TYPE_TESTS "Build Koinos-Types unit tests" ON )
+option( BUILD_KOINOS_TYPES_TESTS "Build Koinos-Types unit tests" ON )
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_NO_BOOST_CMAKE ON)
@@ -54,6 +54,6 @@ endif()
 
 add_subdirectory(libraries)
 
-if( BUILD_TYPES_TESTS )
+if( BUILD_KOINOS_TYPES_TESTS )
    add_subdirectory(tests)
 endif()
