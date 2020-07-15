@@ -27,6 +27,9 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas" )
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
+option( BUILD_KOINOS_TYPES_TESTS "Build Koinos-Types unit tests" ON )
+option( INSTALL_KOINOS_TYPES_HEADERS "Install Koinos-Types headers" OFF )
+
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_NO_BOOST_CMAKE ON)
 if( NOT( Boost_VERSION_MACRO LESS 106900 ) )
@@ -51,4 +54,7 @@ if (NOT TARGET coverage)
 endif()
 
 add_subdirectory(libraries)
-add_subdirectory(tests)
+
+if( BUILD_KOINOS_TYPES_TESTS )
+   add_subdirectory(tests)
+endif()

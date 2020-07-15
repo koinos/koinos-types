@@ -86,5 +86,12 @@ add_library(koinos_types ${KOINOS_PACK_GEN_FILES}
    ${CMAKE_CURRENT_SOURCE_DIR}/pack.cpp
    )
 
-target_link_libraries(koinos_types INTERFACE nlohmann_json ${Boost_LIBRARIES} )
-target_include_directories(koinos_types INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/gen" "${CMAKE_CURRENT_BINARY_DIR}/gen" ${Boost_INCLUDE_DIR})
+# We specifically do not want to link to boost, only include boost headers.
+# Any boost library that is not header only must be build against wasm.
+# It is easier to simply to utilize those libraries. Most boost libraries are header only.
+target_link_libraries(koinos_types INTERFACE nlohmann_json )
+target_include_directories(koinos_types INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/gen" "${CMAKE_CURRENT_BINARY_DIR}/gen" ${Boost_INCLUDE_DIR} )
+
+if( INSTALL_KOINOS_TYPES_HEADERS )
+   install( DIRECTORY ${KOINOS_PACK_GEN_DIR}/ DESTINATION include )
+endif()
