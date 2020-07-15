@@ -14,11 +14,22 @@ struct reserved_submission {};
 
 struct block_submission
 {
-   block_topology                                topology;
+   block_topology                             topology;
 
-   types::variable_blob                       header_bytes;
-   std::vector< types::variable_blob >        transactions_bytes;
-   std::vector< types::variable_blob >        passives_bytes;
+   /**
+    * block_parts[0].active_data     -> active_block_data
+    * block_parts[0].passive_data    -> passive_block_data
+    * block_parts[0].sig_data        -> sig_block_data
+    *
+    * block_parts[1..n].active_data  -> active_transaction_data (transaction_type)
+    * block_parts[1..n].passive_data -> passive_transaction_data
+    * block_parts[1..n].sig_data     -> sig_transaction_data
+    */
+   std::vector< system::block_part >          block_parts;
+
+   boolean                                    verify_passive_data;
+   boolean                                    verify_block_signature;
+   boolean                                    verify_transaction_signatures;
 };
 
 struct transaction_submission

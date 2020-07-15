@@ -22,7 +22,9 @@ enum class system_call_id : uint32
    set_contract_return = 0x9f49cdea,
    exit_contract = 0x98df75b0,
    get_head_info = 0x956fb22d,
-   hash = 0x99770e04
+   hash = 0x99770e04,
+   verify_block_sig = 0x95836910,
+   verify_merkle_root = 0x996e24b9
 };
 
 } } } // koinos::types::system
