@@ -22,7 +22,9 @@ enum class thunk_id : uint32
    set_contract_return = 0x86b86275,
    exit_contract = 0x81f61f9f,
    get_head_info = 0x89df34c4,
-   hash = 0x8aaaf547
+   hash = 0x8aaaf547,
+   verify_block_sig = 0x89254037,
+   verify_merkle_root = 0x8ed9ddcb
 };
 
 } } } // koinos::types::thunks

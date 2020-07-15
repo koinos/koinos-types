@@ -10,24 +10,35 @@ struct prints_args
 
 typedef void_type prints_ret;
 
-struct verify_block_header_args
+struct verify_block_sig_args
 {
-   types::fixed_blob< 65 > sig;
-   types::multihash_type   digest;
+   variable_blob                              sig_data;
+   multihash_type                             digest;
 };
 
-typedef types::boolean verify_block_header_ret;
+typedef types::boolean verify_block_sig_ret;
+
+struct verify_merkle_root_args
+{
+   multihash_type                             root;
+   std::vector< multihash_type >              hashes;
+};
+
+typedef types::boolean verify_merkle_root_ret;
 
 struct apply_block_args
 {
-   types::protocol::active_block_data block;
+   std::vector< types::system::block_part >   block_parts;
+   types::boolean                             enable_check_passive_data;
+   types::boolean                             enable_check_block_signature;
+   types::boolean                             enable_check_transaction_signatures;
 };
 
 typedef void_type apply_block_ret;
 
 struct apply_transaction_args
 {
-   types::protocol::transaction_type trx;
+   types::variable_blob                       tx_blob;
 };
 
 typedef void_type apply_transaction_ret;

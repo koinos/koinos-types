@@ -12,7 +12,7 @@ def do_hash(name, prefix_value):
 def get_thunk_id(name):
     return do_hash("thunk_id::"+name, 8)
 
-# Thunk ID is 9 followed by top 28 bits of H("system_call_id::"+name)
+# System call ID is 9 followed by top 28 bits of H("system_call_id::"+name)
 def get_system_call_id(name):
     return do_hash("system_call_id::"+name, 9)
 

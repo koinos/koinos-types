@@ -13,9 +13,10 @@ enum class header_hash_index : uint32
    transaction_merkle_root_hash_index = 1,
 
    /**
-    * Hash of Merkle root of segwit data.
+    * Hash of Merkle root of passive data.
+    * Includes transaction passives, transaction signatures and block passives.
     */
-   segwit_merkle_root_hash_index = 2,
+   passive_data_merkle_root_hash_index = 2,
 
    /**
     * Number of header hashes.
@@ -44,7 +45,7 @@ struct active_block_data
    /**
     * Vector of opaque transactions in the block.
     */
-   std::vector< variable_blob >              transactions;
+   std::vector< variable_blob >   transactions;
 
    /**
     * A zero byte at the end, reserved for protocol expansion.
@@ -52,19 +53,38 @@ struct active_block_data
    unused_extensions_type         extensions;
 };
 
-struct passive_block_data
+struct passive_block_data {};
+
+struct passive_transaction_data {};
+
+struct sig_block_data
 {
-  signature_type block_signature;
+   signature_type                 block_signature;
 };
 
-// TODO: Do we need this?
+struct sig_transaction_data
+{
+   signature_type                 transaction_signature;
+};
+
 struct block_header
 {
-   // Block data that can read and write state
-   variable_blob      active_bytes;
+   /**
+    * Block data that can read and write state
+    * Deserializes as active_block_data
+    */
+   variable_blob                  active_bytes;
 
-   // Block data that can only read state
-   multihash_type     passive_merkle_root;
+   /**
+    * Block data that can only read state
+    *
+    * Element 0     :     passive_block_data
+    * Element 1     :     sig_block_data
+    *
+    * Element 2*i+2 :     passive_transaction_data for i-th transaction
+    * Element 2*i+3 :     sig_transaction_data     for i-th transaction
+    */
+   multihash_type                 passive_sig_merkle_root;
 };
 
 struct reserved_operation
