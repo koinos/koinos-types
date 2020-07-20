@@ -25,7 +25,7 @@ struct block_submission
     * block_parts[1..n].passive_data -> passive_transaction_data
     * block_parts[1..n].sig_data     -> sig_transaction_data
     */
-   std::vector< system::block_part >          block_parts;
+   protocol::block                            block;
 
    boolean                                    verify_passive_data;
    boolean                                    verify_block_signature;

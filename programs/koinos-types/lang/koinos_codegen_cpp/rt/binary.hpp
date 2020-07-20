@@ -1,6 +1,7 @@
 #pragma once
 #include <koinos/pack/rt/binary_fwd.hpp>
 #include <koinos/pack/rt/exceptions.hpp>
+#include <koinos/pack/rt/opaque.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 #include <koinos/pack/rt/typename.hpp>
 #include <koinos/pack/rt/util/variant_helpers.hpp>
@@ -508,6 +509,22 @@ inline void from_binary( Stream& s, multihash_vector& v, uint32_t depth )
    }
 }
 
+template< typename Stream, typename T >
+inline void to_binary( Stream& s, const types::opaque< T >& v )
+{
+   to_binary( s, variable_blob( v ) );
+}
+
+template< typename Stream, typename T >
+inline void from_binary( Stream& s, types::opaque< T >& v, uint32_t depth )
+{
+   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+
+   variable_blob blob;
+   from_binary( s, blob );
+   v = std::move( blob );
+}
+
 namespace detail
 {
    // Minimal vectorstream implementations for internal serialization to a variable_blob
@@ -764,7 +781,7 @@ inline void from_binary( Stream& s, T& v, uint32_t depth )
 }
 
 template< typename T >
-inline void to_variable_blob( variable_blob& v, const T& t, bool append = false )
+inline void to_variable_blob( variable_blob& v, const T& t, bool append )
 {
    if( !append )
       v.clear();

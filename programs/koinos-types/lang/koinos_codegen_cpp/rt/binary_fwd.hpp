@@ -79,4 +79,26 @@ inline void to_binary( Stream& s, const T& v );
 template< typename Stream, typename T >
 inline void from_binary( Stream& s, T& v, uint32_t depth = 0 );
 
+template< typename T >
+inline void to_variable_blob( variable_blob& v, const T& t, bool append = false );
+template< typename T >
+inline variable_blob to_variable_blob( const T& t );
+
+template< typename T >
+inline void from_variable_blob( const variable_blob& v, T& t );
+template< typename T >
+inline T from_variable_blob( const variable_blob& v );
+
+template< typename T, size_t N >
+inline void from_fixed_blob( const fixed_blob< N >& f, T& t );
+template< typename T, size_t N >
+inline T from_fixed_blob( const fixed_blob< N >& f );
+
+template< typename T >
+inline void to_c_str( char* c, size_t l, const T& t );
+template< typename T >
+inline void from_c_str( const char* c, size_t l, T& t );
+template< typename T >
+inline T from_c_str( const char* c, size_t l );
+
 } // koinos::pack

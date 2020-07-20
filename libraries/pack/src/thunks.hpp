@@ -28,17 +28,17 @@ typedef types::boolean verify_merkle_root_ret;
 
 struct apply_block_args
 {
-   std::vector< types::system::block_part >   block_parts;
-   types::boolean                             enable_check_passive_data;
-   types::boolean                             enable_check_block_signature;
-   types::boolean                             enable_check_transaction_signatures;
+   protocol::block                             block;
+   types::boolean                              enable_check_passive_data;
+   types::boolean                              enable_check_block_signature;
+   types::boolean                              enable_check_transaction_signatures;
 };
 
 typedef void_type apply_block_ret;
 
 struct apply_transaction_args
 {
-   types::variable_blob                       tx_blob;
+   types::variable_blob                        tx_blob;
 };
 
 typedef void_type apply_transaction_ret;
