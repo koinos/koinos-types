@@ -364,10 +364,10 @@ BOOST_AUTO_TEST_CASE( fixed_blob_test )
    }
 }
 
-BOOST_AUTO_TEST_CASE( multihash_type_test )
+BOOST_AUTO_TEST_CASE( multihash_test )
 {
-   multihash_type to_bin;
-   to_bin.hash_id = 1;
+   multihash to_bin;
+   to_bin.id = unsigned_int( 1 );
    to_bin.digest = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
 
    std::stringstream ss;
@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE( multihash_type_test )
    vector< uint8_t > expected = { 0x01, 0x06, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
    REQUIRE_DEEP_EQUAL( ss, expected );
 
-   multihash_type from_bin;
+   multihash from_bin;
    from_binary( ss, from_bin );
    BOOST_REQUIRE_EQUAL( to_bin.digest.size(), from_bin.digest.size() );
    for( size_t i = 0; i < to_bin.digest.size(); ++i )
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE( multihash_type_test )
 BOOST_AUTO_TEST_CASE( multihash_vector_test )
 {
    multihash_vector to_bin;
-   to_bin.hash_id = 1;
+   to_bin.id = unsigned_int( 1 );
    variable_blob digest_a;
    digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
    variable_blob digest_b;
@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE( multihash_vector_test )
 
    multihash_vector from_bin;
    from_binary( ss, from_bin );
-   BOOST_REQUIRE_EQUAL( to_bin.hash_id, from_bin.hash_id );
+   BOOST_REQUIRE_EQUAL( to_bin.id, from_bin.id );
    BOOST_REQUIRE_EQUAL( to_bin.digests.size(), from_bin.digests.size() );
    BOOST_REQUIRE_EQUAL( to_bin.digests[0].size(), from_bin.digests[0].size() );
    BOOST_REQUIRE_EQUAL( to_bin.digests[1].size(), from_bin.digests[1].size() );
@@ -425,7 +425,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 {
    test_object to_bin;
    to_bin.id = { 0, 4, 8, 15, 16, 23, 42, 0 };
-   to_bin.key.hash_id = 1;
+   to_bin.key.id = unsigned_int( 1 );
    to_bin.key.digest = { 'f', 'o', 'o', 'b', 'a', 'r' };
    to_bin.vals = { 108 };
 
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE( to_variable_blob_test )
    // Using the same data from reflect_test
    test_object obj;
    obj.id = { 0, 4, 8, 15, 16, 23, 42, 0 };
-   obj.key.hash_id = 1;
+   obj.key.id = unsigned_int( 1 );
    obj.key.digest = { 'f', 'o', 'o', 'b', 'a', 'r' };
    obj.vals = { 108 };
 

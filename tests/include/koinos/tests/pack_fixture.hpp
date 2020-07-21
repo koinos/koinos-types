@@ -16,7 +16,7 @@ struct extensions {};
 struct test_object
 {
    koinos::types::fixed_blob< 8 > id;
-   koinos::types::multihash_type  key;
+   koinos::types::multihash       key;
    std::vector< uint32_t >        vals;
    extensions                     ext;
 };

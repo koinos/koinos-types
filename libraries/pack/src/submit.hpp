@@ -5,9 +5,9 @@ namespace koinos { namespace types { namespace rpc {
 
 struct block_topology
 {
-   types::multihash_type                 id;
+   types::multihash                      id;
    types::block_height_type              height;
-   types::multihash_type                 previous;
+   types::multihash                      previous;
 };
 
 struct reserved_submission {};

@@ -84,7 +84,7 @@ struct block_header
     * Element 2*i+2 :     passive_transaction_data for i-th transaction
     * Element 2*i+3 :     sig_transaction_data     for i-th transaction
     */
-   multihash_type                 passive_sig_merkle_root;
+   multihash                      passive_sig_merkle_root;
 };
 
 struct reserved_operation
@@ -152,7 +152,7 @@ struct reserved_segwit
 
 struct block_ref_segwit
 {
-   multihash_type                 ref_block_id;
+   multihash                      ref_block_id;
    block_height_type              ref_block_height;
    unused_extensions_type         extensions;
 };
@@ -171,13 +171,13 @@ struct signatures_segwit
 
 struct contract_source_segwit
 {
-   multihash_type                 sourcehash;
+   multihash                      sourcehash;
    unused_extensions_type         extensions;
 };
 
 struct custom_segwit
 {
-   multihash_type                 world;
+   multihash                      world;
    variable_blob                  custom_data;
    unused_extensions_type         extensions;
 };

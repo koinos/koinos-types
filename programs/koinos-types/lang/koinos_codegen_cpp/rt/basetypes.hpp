@@ -14,6 +14,8 @@
 #include <variant>
 #include <vector>
 
+#include <koinos/pack/rt/varint.hpp>
+
 namespace koinos::types {
 
    using std::array;
@@ -69,15 +71,15 @@ namespace koinos::types {
    BOOST_STRONG_TYPEDEF( uint64_t, timestamp_type );
    BOOST_STRONG_TYPEDEF( uint64_t, block_height_type );
 
-   struct multihash_type
+   struct multihash
    {
-      uint64_t       hash_id = 0;
-      variable_blob  digest;
+      pack::unsigned_int id = 0;
+      variable_blob      digest;
    };
 
    struct multihash_vector
    {
-      uint64_t                     hash_id = 0;
+      pack::unsigned_int           id = 0;
       std::vector< variable_blob > digests;
    };
 

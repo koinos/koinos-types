@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 namespace koinos::pack {
 
 /* signed_int and unsigned_int are dumb wrappers around 64 bit integer types
@@ -18,6 +20,17 @@ struct signed_int
    int64_t value = 0;
 };
 
+static bool operator==( const signed_int &v1, const signed_int &v2 )
+{
+    return v1.value == v2.value;
+}
+
+static std::ostream& operator<<( std::ostream& os, const signed_int& v )
+{
+    os << v.value;
+    return os;
+}
+
 struct unsigned_int
 {
    unsigned_int( uint64_t v ) :
@@ -28,5 +41,16 @@ struct unsigned_int
 
    uint64_t value = 0;
 };
+
+static bool operator==( const unsigned_int &v1, const unsigned_int &v2 )
+{
+    return v1.value == v2.value;
+}
+
+static std::ostream& operator<<( std::ostream& os, const unsigned_int& v )
+{
+    os << v.value;
+    return os;
+}
 
 } // koinos::pack

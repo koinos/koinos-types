@@ -306,10 +306,10 @@ void hex_to_vector(
    }
 }
 
-BOOST_AUTO_TEST_CASE( multihash_type_test )
+BOOST_AUTO_TEST_CASE( multihash_test )
 {
-   multihash_type to_j;
-   to_j.hash_id = 1;
+   multihash to_j;
+   to_j.id = 1;
    to_j.digest = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
 
    json j;
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE( multihash_type_test )
    std::string expected = "{\"digest\":\"z31SRtpx1\",\"hash\":1}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
-   multihash_type from_j;
+   multihash from_j;
    from_json( j, from_j );
    BOOST_REQUIRE_EQUAL( to_j.digest.size(), from_j.digest.size() );
    for( size_t i = 0; i < to_j.digest.size(); ++i )
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE( multihash_type_test )
    }
 
    to_j.digest.clear();
-   to_j.hash_id = 4640;
+   to_j.id = 4640;
    hex_to_vector( to_j.digest, {
       0xBA, 0x78, 0x16, 0xBF, 0x8F, 0x01, 0xCF, 0xEA,
       0x41, 0x41, 0x40, 0xDE, 0x5D, 0xAE, 0x22, 0x23,
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE( multihash_type_test )
 BOOST_AUTO_TEST_CASE( multihash_vector_test )
 {
    multihash_vector to_j;
-   to_j.hash_id = 1;
+   to_j.id = 1;
    variable_blob digest_a;
    digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
    variable_blob digest_b;
@@ -359,7 +359,7 @@ BOOST_AUTO_TEST_CASE( multihash_vector_test )
 
    multihash_vector from_j;
    from_json( j, from_j );
-   BOOST_REQUIRE_EQUAL( to_j.hash_id, from_j.hash_id );
+   BOOST_REQUIRE_EQUAL( to_j.id, from_j.id );
    BOOST_REQUIRE_EQUAL( to_j.digests.size(), from_j.digests.size() );
    BOOST_REQUIRE_EQUAL( to_j.digests[0].size(), from_j.digests[0].size() );
    BOOST_REQUIRE_EQUAL( to_j.digests[1].size(), from_j.digests[1].size() );
@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 {
    test_object to_j;
    to_j.id = { 0, 4, 8, 15, 16, 23, 42, 0 };
-   to_j.key.hash_id = 1;
+   to_j.key.id = 1;
    to_j.key.digest = { 'f', 'o', 'o', 'b', 'a', 'r' };
    to_j.vals = { 108 };
 

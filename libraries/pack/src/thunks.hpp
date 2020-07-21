@@ -13,15 +13,15 @@ typedef void_type prints_ret;
 struct verify_block_sig_args
 {
    variable_blob                              sig_data;
-   multihash_type                             digest;
+   multihash                                  digest;
 };
 
 typedef types::boolean verify_block_sig_ret;
 
 struct verify_merkle_root_args
 {
-   multihash_type                             root;
-   std::vector< multihash_type >              hashes;
+   multihash                                  root;
+   std::vector< multihash >                   hashes;
 };
 
 typedef types::boolean verify_merkle_root_ret;
@@ -139,6 +139,6 @@ struct hash_args
    types::uint64        size;
 };
 
-typedef types::multihash_type hash_ret;
+typedef types::multihash hash_ret;
 
 } } } // koinos::types::thunks

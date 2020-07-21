@@ -412,29 +412,29 @@ inline void from_json( const json& j, optional< T >& v, uint32_t depth )
 }
 
 // multihash
-inline void to_json( json& j, const multihash_type& v )
+inline void to_json( json& j, const multihash& v )
 {
    json tmp;
    to_json( tmp, v.digest );
-   j[ "hash" ] = v.hash_id;
+   j[ "hash" ] = v.id.value;
    j[ "digest" ] = std::move( tmp );
 }
 
-inline void from_json( const json& j, multihash_type& v, uint32_t depth )
+inline void from_json( const json& j, multihash& v, uint32_t depth )
 {
    if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
    if( !(j.size() == 2) ) throw json_type_mismatch( "Multihash JSON type must only contain two fields" );
    if( !(j.contains( "hash" )) ) throw json_type_mismatch( "Multihash JSON type must contain field 'hash'" );
    if( !(j.contains( "digest" )) ) throw json_type_mismatch( "Multihash JSON type must contain field 'digest'" );
 
-   v.hash_id = j[ "hash" ].get< uint64_t >();
+   v.id = unsigned_int( j[ "hash" ].get< uint64_t >() );
    from_json( j[ "digest" ], v.digest );
 }
 
 // multihash vector
 inline void to_json( json& j, const multihash_vector& v )
 {
-   j[ "hash" ] = v.hash_id;
+   j[ "hash" ] = v.id.value;
    j[ "digests" ] = json::array();
    for( const auto& d : v.digests )
    {
@@ -461,7 +461,7 @@ inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
       v.digests.emplace_back( std::move( tmp ) );
    }
 
-   v.hash_id = j[ "hash" ].get< uint64_t >();
+   v.id = unsigned_int( j[ "hash" ].get< uint64_t >() );
 }
 
 namespace detail::json {
