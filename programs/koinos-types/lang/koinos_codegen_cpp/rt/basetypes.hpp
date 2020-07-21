@@ -77,10 +77,4 @@ namespace koinos::types {
       variable_blob      digest;
    };
 
-   struct multihash_vector
-   {
-      pack::unsigned_int           id = 0;
-      std::vector< variable_blob > digests;
-   };
-
 } // koinos::types

@@ -431,39 +431,6 @@ inline void from_json( const json& j, multihash& v, uint32_t depth )
    from_json( j[ "digest" ], v.digest );
 }
 
-// multihash vector
-inline void to_json( json& j, const multihash_vector& v )
-{
-   j[ "hash" ] = v.id.value;
-   j[ "digests" ] = json::array();
-   for( const auto& d : v.digests )
-   {
-      json tmp;
-      to_json( tmp, d );
-      j[ "digests" ].emplace_back( std::move( tmp ) );
-   }
-}
-
-inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
-{
-   if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
-   if( !(j.size() == 2) ) throw json_type_mismatch( "MultihashVector JSON type must only contain two fields" );
-   if( !(j.contains( "hash" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'hash'" );
-   if( !(j.contains( "digests" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'digests'" );
-
-   const json& digests = j[ "digests" ];
-
-   if( !(digests.is_array()) ) throw json_type_mismatch( "MultihashVector field 'digest' must be an array" );
-   for( const json& d : digests )
-   {
-      variable_blob tmp;
-      from_json( d, tmp );
-      v.digests.emplace_back( std::move( tmp ) );
-   }
-
-   v.id = unsigned_int( j[ "hash" ].get< uint64_t >() );
-}
-
 namespace detail::json {
 
    template< typename T > std::true_type is_class_helper( void(T::*)() );

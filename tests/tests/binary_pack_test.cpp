@@ -385,42 +385,6 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    }
 }
 
-BOOST_AUTO_TEST_CASE( multihash_vector_test )
-{
-   multihash_vector to_bin;
-   to_bin.id = unsigned_int( 1 );
-   variable_blob digest_a;
-   digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
-   variable_blob digest_b;
-   digest_b = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-   to_bin.digests.push_back( digest_a );
-   to_bin.digests.push_back( digest_b );
-
-   std::stringstream ss;
-   to_binary( ss, to_bin );
-
-   vector< uint8_t > expected = {
-      0x01, // hash_id
-      0x06, // hash length
-      0x02, // num hashes
-      0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A, // digest_a
-      0x01, 0x02, 0x03, 0x04, 0x05, 0x06  // digest_b
-   };
-   REQUIRE_DEEP_EQUAL( ss, expected );
-
-   multihash_vector from_bin;
-   from_binary( ss, from_bin );
-   BOOST_REQUIRE_EQUAL( to_bin.id, from_bin.id );
-   BOOST_REQUIRE_EQUAL( to_bin.digests.size(), from_bin.digests.size() );
-   BOOST_REQUIRE_EQUAL( to_bin.digests[0].size(), from_bin.digests[0].size() );
-   BOOST_REQUIRE_EQUAL( to_bin.digests[1].size(), from_bin.digests[1].size() );
-   for( size_t i = 0; i < to_bin.digests[0].size(); ++i )
-   {
-      BOOST_REQUIRE_EQUAL( to_bin.digests[0][i], from_bin.digests[0][i] );
-      BOOST_REQUIRE_EQUAL( to_bin.digests[1][i], from_bin.digests[1][i] );
-   }
-}
-
 BOOST_AUTO_TEST_CASE( reflect_test )
 {
    test_object to_bin;

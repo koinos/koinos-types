@@ -340,36 +340,6 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 }
 
-BOOST_AUTO_TEST_CASE( multihash_vector_test )
-{
-   multihash_vector to_j;
-   to_j.id = 1;
-   variable_blob digest_a;
-   digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
-   variable_blob digest_b;
-   digest_b = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-   to_j.digests.push_back( digest_a );
-   to_j.digests.push_back( digest_b );
-
-   json j;
-   to_json( j, to_j );
-
-   std::string expected = "{\"digests\":[\"z31SRtpx1\",\"zW7LcTy7\"],\"hash\":1}";
-   BOOST_REQUIRE_EQUAL( j.dump(), expected );
-
-   multihash_vector from_j;
-   from_json( j, from_j );
-   BOOST_REQUIRE_EQUAL( to_j.id, from_j.id );
-   BOOST_REQUIRE_EQUAL( to_j.digests.size(), from_j.digests.size() );
-   BOOST_REQUIRE_EQUAL( to_j.digests[0].size(), from_j.digests[0].size() );
-   BOOST_REQUIRE_EQUAL( to_j.digests[1].size(), from_j.digests[1].size() );
-   for( size_t i = 0; i < to_j.digests[0].size(); ++i )
-   {
-      BOOST_REQUIRE_EQUAL( to_j.digests[0][i], from_j.digests[0][i] );
-      BOOST_REQUIRE_EQUAL( to_j.digests[1][i], from_j.digests[1][i] );
-   }
-}
-
 BOOST_AUTO_TEST_CASE( reflect_test )
 {
    test_object to_j;
@@ -399,7 +369,6 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
    // Empty set<T>           should be []
    // Empty array< T, N >    should be []
    // Empty optional         should be null
-   // Empty multihash_vector should be {"digests":[],"hash":0}
    // Empty struct           should be {}
    //
    std::string json_earray = "[]";
@@ -411,14 +380,12 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
    std::set< uint32_t >      empty_set;
    std::array< uint32_t, 0 > empty_array;
    std::optional< uint32_t > empty_optional;
-   multihash_vector          empty_mhv;
    extensions                empty_struct;
 
    { json j; to_json( j, empty_vector   ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_set      ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_array    ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_optional ); BOOST_REQUIRE_EQUAL( j.dump(), json_null    ); }
-   { json j; to_json( j, empty_mhv      ); BOOST_REQUIRE_EQUAL( j.dump(), json_emhv    ); }
    { json j; to_json( j, empty_struct   ); BOOST_REQUIRE_EQUAL( j.dump(), json_eobject ); }
 }
 

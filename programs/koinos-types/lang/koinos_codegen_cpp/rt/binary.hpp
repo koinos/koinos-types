@@ -462,52 +462,6 @@ inline void from_binary( Stream& s, multihash& v, uint32_t depth )
    v.id = id.value;
 }
 
-/* Multihash Vector:
- *
- * A varint hash function (key), followed by a varint digest size in bytes, followed by a varint
- * size of the vector, followed by that many digests each of the specified digest size.
- */
-
-template< typename Stream >
-inline void to_binary( Stream& s, const multihash_vector& v )
-{
-   size_t size = v.digests.size() ? v.digests[0].size() : 0;
-   for( size_t i = 0; i < v.digests.size(); ++i )
-   {
-      if( !(v.digests[i].size() == size) ) throw parse_error( "Multihash vector digest size mismatch when packing" );
-   }
-
-   to_binary( s, unsigned_int( v.id ) );
-   to_binary( s, unsigned_int( size ) );
-   to_binary( s, unsigned_int( v.digests.size() ) );
-   for( size_t i = 0; i < v.digests.size(); ++i )
-   {
-      s.write( &(v.digests[i].front()), size );
-   }
-}
-
-template< typename Stream >
-inline void from_binary( Stream& s, multihash_vector& v, uint32_t depth )
-{
-   unsigned_int id, digest_size, num_digests;
-   from_binary( s, id );
-   from_binary( s, digest_size );
-   from_binary( s, num_digests );
-
-   if( !(uint128_t( digest_size.value ) * num_digests.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Array allocation exceeded" );
-
-   v.id = id.value;
-   v.digests.reserve( num_digests.value );
-
-   for( size_t i = 0; i < num_digests.value; ++i )
-   {
-      v.digests.emplace_back( variable_blob() );
-      v.digests[i].resize( digest_size.value );
-      s.read( v.digests[i].data(), digest_size.value );
-      if( !(s.good()) ) throw stream_error( "Error reading from stream" );
-   }
-}
-
 namespace detail
 {
    // Minimal vectorstream implementations for internal serialization to a variable_blob

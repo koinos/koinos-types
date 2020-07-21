@@ -26,11 +26,9 @@ enum class header_hash_index : uint32
 
 struct active_block_data
 {
-   /**
-    * Hashes included in the header.
-    * All hashes must use the same algorithm.
-    */
-   multihash_vector               header_hashes;
+   multihash                      previous_id;
+   multihash                      transaction_merkle_root;
+   multihash                      passive_merkle_root;
 
    /**
     * Block height.  The genesis block has height=1.
