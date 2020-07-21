@@ -1,5 +1,6 @@
 #pragma once
 #include <koinos/pack/rt/binary_fwd.hpp>
+#include <koinos/pack/rt/exceptions.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 
 namespace koinos { namespace types {
@@ -23,137 +24,144 @@ template< typename T >
 class opaque
 {
    private:
-      std::optional< T > native;
-      variable_blob      blob;
-      bool               valid, dirty = false;
+      std::optional< T >               native;
+      std::optional< variable_blob >   blob;
+      bool locked = true; // Do not allow modification by default, except for defacult constructor
 
    public:
       using type = T;
 
-      opaque() : native( T() ), valid( true ), dirty( true ) {}
-      opaque( const T& t ) : native( t ) {}
-      opaque( T&& t ) : native( t ) {}
+      opaque() : native( T() ), locked( false ) {}
+      opaque( const T& t ) : native( t ), locked( true ) {}
+      opaque( T&& t ) : native( t ), locked( true ) {}
+      opaque( const variable_blob& v ) : blob( v ), locked( true ) {}
+      opaque( variable_blob&& v ) : blob( std::move( v ) ), locked( true ) {}
 
-      opaque( const variable_blob& v ) : blob( v )
+      bool unbox() const
       {
-         try
+         if( !native && blob )
          {
-            native = pack::from_variable_blob< T >( blob );
-            valid = true;
+            try
+            {
+               const_cast< std::optional< T >& >( native ).emplace( pack::from_variable_blob< T >( *blob ) );
+            }
+            catch( ... ) { return false; }
          }
-         catch( ... ) {}
+
+         return true;
       }
 
-      opaque( variable_blob&& v ) : blob( v )
+      void box() const
       {
-         try
+         if( native && !blob )
          {
-            native = pack::from_variable_blob< T >( blob );
-            valid = true;
+            const_cast< std::optional< variable_blob >& >( blob ).emplace( pack::to_variable_blob( *native ) );
+            const_cast< std::optional< T >& >( native ).reset();
          }
-         catch( ... ) {}
       }
 
-      operator variable_blob&()
+      bool is_unboxed() const
       {
-         if( valid && dirty ) pack::to_variable_blob< T >( blob, native );
-         return blob;
-      }
-
-      operator const variable_blob&() const
-      {
-         // Assert !dirty
-         return blob;
+         return native;
       }
 
       const variable_blob& get_blob() const
       {
-         // Assert !dirty
-         return blob;
+         if( native && !blob )
+         {
+            const_cast< std::optional< variable_blob >& >( blob ) = pack::to_variable_blob( *native );
+         }
+         return *blob;
       }
 
-      operator const T&() const
+      operator const variable_blob&() const
       {
+         return get_blob();
+      }
+
+      void lock()
+      {
+         locked = true;
+      }
+
+      void unlock()
+      {
+         locked = false;
+      }
+
+      bool is_locked() const
+      {
+         return locked;
+      }
+
+      T& get_native()
+      {
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
+         return *native;
+      }
+
+      const T& get_const_native() const
+      {
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return *native;
       }
 
       T& operator*()
       {
-         // TODO: Assert
-         dirty = true;
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
+         blob.reset();
          return *native;
       }
 
       constexpr const T& operator*() const
       {
-         // TODO: Assert
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return *native;
       }
 
       T* operator->()
       {
-         // TODO: Assert
-         dirty = true;
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
+         blob.reset();
          return &(*native);
       }
 
       constexpr const T* operator->() const
       {
-         // TODO: Assert
+         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return &(*native);
       }
 
       variable_blob& operator=( const variable_blob& other )
       {
          blob = other;
-         try
-         {
-            native = pack::from_variable_blob< T >( blob );
-            valid = true;
-         }
-         catch( ... ) {}
-         return blob;
+         native.reset();
+         return *blob;
       }
 
       variable_blob& operator=( variable_blob&& other )
       {
-         blob = other;
-         try
-         {
-            native = pack::from_variable_blob< T >( blob );
-            valid = true;
-         }
-         catch( ... ) {}
-         return blob;
+         blob = std::move( other );
+         native.reset();
+         return *blob;
       }
 
       T& operator=( const T& other )
       {
          native = other;
-         dirty = true;
-         return native;
+         blob.reset();
+         return *native;
       }
 
       T& operator=( T&& other )
       {
-         native = other;
-         dirty = true;
-         return native;
+         native = std::move( other );
+         blob.reset();
+         return *native;
       }
 };
 
-} // types
-
-namespace pack
-{
-/*
-template< typename T >
-struct reflector< types::opaque< T > >
-{
-   static auto make_tuple( const types::opaque< T >* t )
-   {
-      return reflector< T >::make_tuple( t );
-   }
-};
-*/
 } } // koinos::types

@@ -60,6 +60,16 @@ KOINOS_PACK_DECLARE_EXCEPTION( json_decode_error );
 
 KOINOS_PACK_DECLARE_EXCEPTION( bad_cast_exception );
 
+/*
+ * Opqaue type is not unboxed
+ */
+KOINOS_PACK_DECLARE_EXCEPTION( opaque_not_unboxed );
+
+/*
+ * Opaque type is locked
+ */
+KOINOS_PACK_DECLARE_EXCEPTION( opaque_locked );
+
 } // koinos::pack
 
 #undef KOINOS_PACK_DECLARE_EXCEPTION
