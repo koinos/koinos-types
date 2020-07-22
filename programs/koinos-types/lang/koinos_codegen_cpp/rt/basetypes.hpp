@@ -73,13 +73,13 @@ namespace koinos::types {
 
    struct multihash
    {
-      pack::unsigned_int id = 0;
-      variable_blob      digest;
+      uint64_t      id = 0;
+      variable_blob digest;
    };
 
    struct multihash_vector
    {
-      pack::unsigned_int           id = 0;
+      uint64_t                     id = 0;
       std::vector< variable_blob > digests;
    };
 

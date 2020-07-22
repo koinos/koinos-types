@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE( fixed_blob_test )
 BOOST_AUTO_TEST_CASE( multihash_test )
 {
    multihash to_bin;
-   to_bin.id = unsigned_int( 1 );
+   to_bin.id = 1;
    to_bin.digest = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
 
    std::stringstream ss;
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE( multihash_test )
 BOOST_AUTO_TEST_CASE( multihash_vector_test )
 {
    multihash_vector to_bin;
-   to_bin.id = unsigned_int( 1 );
+   to_bin.id = 1;
    variable_blob digest_a;
    digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
    variable_blob digest_b;
@@ -425,7 +425,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 {
    test_object to_bin;
    to_bin.id = { 0, 4, 8, 15, 16, 23, 42, 0 };
-   to_bin.key.id = unsigned_int( 1 );
+   to_bin.key.id = 1;
    to_bin.key.digest = { 'f', 'o', 'o', 'b', 'a', 'r' };
    to_bin.vals = { 108 };
 
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE( to_variable_blob_test )
    // Using the same data from reflect_test
    test_object obj;
    obj.id = { 0, 4, 8, 15, 16, 23, 42, 0 };
-   obj.key.id = unsigned_int( 1 );
+   obj.key.id = 1;
    obj.key.digest = { 'f', 'o', 'o', 'b', 'a', 'r' };
    obj.vals = { 108 };
 
