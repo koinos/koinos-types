@@ -14,8 +14,6 @@
 #include <variant>
 #include <vector>
 
-#include <koinos/pack/rt/varint.hpp>
-
 namespace koinos::types {
 
    using std::array;
