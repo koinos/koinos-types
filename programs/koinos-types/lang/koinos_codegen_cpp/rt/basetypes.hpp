@@ -73,6 +73,50 @@ namespace koinos::types {
    {
       uint64_t      id = 0;
       variable_blob digest;
+
+      bool operator ==( const multihash& other ) const
+      {
+         return ( id == other.id )
+            && ( digest.size() == other.digest.size() )
+            && ( std::memcmp( digest.data(), other.digest.data(), other.digest.size() ) == 0 );
+      }
+
+      bool operator !=( const multihash& other ) const
+      {
+         return !(*this == other);
+      }
+
+      bool operator <( const multihash& other ) const
+      {
+         int64_t res = (int64_t)id - (int64_t)other.id;
+         if( res < 0 ) return true;
+         if( res > 0 ) return false;
+         res = digest.size() - other.digest.size();
+         if( res < 0 ) return true;
+         if( res > 0 ) return false;
+         return std::memcmp( digest.data(), other.digest.data(), digest.size() ) < 0;
+      }
+
+      bool operator <=( const multihash& other ) const
+      {
+         int64_t res = (int64_t)id - (int64_t)other.id;
+         if( res < 0 ) return true;
+         if( res > 0 ) return false;
+         res = digest.size() - other.digest.size();
+         if( res < 0 ) return true;
+         if( res > 0 ) return false;
+         return std::memcmp( digest.data(), other.digest.data(), digest.size() ) <= 0;
+      }
+
+      bool operator >( const multihash& other ) const
+      {
+         return !(*this <= other);
+      }
+
+      bool operator >=( const multihash& other ) const
+      {
+         return !(*this < other);
+      }
    };
 
    struct multihash_vector
@@ -80,49 +124,5 @@ namespace koinos::types {
       uint64_t                     id = 0;
       std::vector< variable_blob > digests;
    };
-
-   static bool operator ==( const multihash& mha, const multihash& mhb )
-   {
-      return ( mha.id == mhb.id )
-         && ( mha.digest.size() == mhb.digest.size() )
-         && ( std::memcmp( mha.digest.data(), mhb.digest.data(), mhb.digest.size() ) == 0 );
-   }
-
-   static bool operator !=( const multihash& mha, const multihash& mhb )
-   {
-      return !(mha == mhb);
-   }
-
-   static bool operator <( const multihash& mha, const multihash& mhb )
-   {
-      int64_t res = (int64_t)mha.id - (int64_t)mhb.id;
-      if( res < 0 ) return true;
-      if( res > 0 ) return false;
-      res = mha.digest.size() - mhb.digest.size();
-      if( res < 0 ) return true;
-      if( res > 0 ) return false;
-      return std::memcmp( mha.digest.data(), mhb.digest.data(), mha.digest.size() ) < 0;
-   }
-
-   static bool operator <=( const multihash& mha, const multihash& mhb )
-   {
-      int64_t res = (int64_t)mha.id - (int64_t)mhb.id;
-      if( res < 0 ) return true;
-      if( res > 0 ) return false;
-      res = mha.digest.size() - mhb.digest.size();
-      if( res < 0 ) return true;
-      if( res > 0 ) return false;
-      return std::memcmp( mha.digest.data(), mhb.digest.data(), mha.digest.size() ) <= 0;
-   }
-
-   static bool operator >( const multihash& mha, const multihash& mhb )
-   {
-      return !(mha <= mhb);
-   }
-
-   static bool operator >=( const multihash& mha, const multihash& mhb )
-   {
-      return !(mha < mhb);
-   }
 
 } // koinos::types
