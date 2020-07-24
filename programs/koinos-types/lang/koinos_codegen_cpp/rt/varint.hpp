@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 namespace koinos::pack {
 
 /* signed_int and unsigned_int are dumb wrappers around 64 bit integer types

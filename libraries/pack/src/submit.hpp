@@ -31,9 +31,9 @@ typedef opaque< query_item_result > query_submission_result;
 
 struct block_topology
 {
-   types::multihash_type                 id;
+   types::multihash                      id;
    types::block_height_type              height;
-   types::multihash_type                 previous;
+   types::multihash                      previous;
 };
 
 struct reserved_submission {};

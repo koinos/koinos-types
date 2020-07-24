@@ -438,14 +438,14 @@ inline void from_binary( Stream& s, std::optional< T >& v, uint32_t depth )
  */
 
 template< typename Stream >
-inline void to_binary( Stream& s, const multihash_type& v )
+inline void to_binary( Stream& s, const multihash& v )
 {
-   to_binary( s, unsigned_int( v.hash_id ) );
+   to_binary( s, unsigned_int( v.id ) );
    to_binary( s, v.digest );
 }
 
 template< typename Stream >
-inline void from_binary( Stream& s, multihash_type& v, uint32_t depth )
+inline void from_binary( Stream& s, multihash& v, uint32_t depth )
 {
    unsigned_int id, size;
    from_binary( s, id );
@@ -460,7 +460,7 @@ inline void from_binary( Stream& s, multihash_type& v, uint32_t depth )
       if( !(s.good()) ) throw stream_error( "Error reading from stream" );
    }
 
-   v.hash_id = id.value;
+   v.id = id.value;
 }
 
 /* Multihash Vector:
@@ -478,7 +478,7 @@ inline void to_binary( Stream& s, const multihash_vector& v )
       if( !(v.digests[i].size() == size) ) throw parse_error( "Multihash vector digest size mismatch when packing" );
    }
 
-   to_binary( s, unsigned_int( v.hash_id ) );
+   to_binary( s, unsigned_int( v.id ) );
    to_binary( s, unsigned_int( size ) );
    to_binary( s, unsigned_int( v.digests.size() ) );
    for( size_t i = 0; i < v.digests.size(); ++i )
@@ -497,7 +497,7 @@ inline void from_binary( Stream& s, multihash_vector& v, uint32_t depth )
 
    if( !(uint128_t( digest_size.value ) * num_digests.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Array allocation exceeded" );
 
-   v.hash_id = id.value;
+   v.id = id.value;
    v.digests.reserve( num_digests.value );
 
    for( size_t i = 0; i < num_digests.value; ++i )

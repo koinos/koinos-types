@@ -69,16 +69,60 @@ namespace koinos::types {
    BOOST_STRONG_TYPEDEF( uint64_t, timestamp_type );
    BOOST_STRONG_TYPEDEF( uint64_t, block_height_type );
 
-   struct multihash_type
+   struct multihash
    {
-      uint64_t       hash_id = 0;
-      variable_blob  digest;
+      uint64_t      id = 0;
+      variable_blob digest;
    };
 
    struct multihash_vector
    {
-      uint64_t                     hash_id = 0;
+      uint64_t                     id = 0;
       std::vector< variable_blob > digests;
    };
+
+   static bool operator ==( const multihash& mha, const multihash& mhb )
+   {
+      return ( mha.id == mhb.id )
+         && ( mha.digest.size() == mhb.digest.size() )
+         && ( std::memcmp( mha.digest.data(), mhb.digest.data(), mhb.digest.size() ) == 0 );
+   }
+
+   static bool operator !=( const multihash& mha, const multihash& mhb )
+   {
+      return !(mha == mhb);
+   }
+
+   static bool operator <( const multihash& mha, const multihash& mhb )
+   {
+      int64_t res = (int64_t)mha.id - (int64_t)mhb.id;
+      if( res < 0 ) return true;
+      if( res > 0 ) return false;
+      res = mha.digest.size() - mhb.digest.size();
+      if( res < 0 ) return true;
+      if( res > 0 ) return false;
+      return std::memcmp( mha.digest.data(), mhb.digest.data(), mha.digest.size() ) < 0;
+   }
+
+   static bool operator <=( const multihash& mha, const multihash& mhb )
+   {
+      int64_t res = (int64_t)mha.id - (int64_t)mhb.id;
+      if( res < 0 ) return true;
+      if( res > 0 ) return false;
+      res = mha.digest.size() - mhb.digest.size();
+      if( res < 0 ) return true;
+      if( res > 0 ) return false;
+      return std::memcmp( mha.digest.data(), mhb.digest.data(), mha.digest.size() ) <= 0;
+   }
+
+   static bool operator >( const multihash& mha, const multihash& mhb )
+   {
+      return !(mha <= mhb);
+   }
+
+   static bool operator >=( const multihash& mha, const multihash& mhb )
+   {
+      return !(mha < mhb);
+   }
 
 } // koinos::types
