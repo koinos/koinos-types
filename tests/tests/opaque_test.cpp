@@ -2,6 +2,7 @@
 
 #include <koinos/pack/rt/opaque.hpp>
 #include <koinos/pack/rt/binary.hpp>
+#include <koinos/pack/rt/json.hpp>
 
 using namespace koinos::pack;
 
@@ -80,9 +81,37 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
+   BOOST_TEST_MESSAGE( "Serialize binary and json" );
+
    auto to_blob = to_variable_blob( o );
    BOOST_CHECK( std::equal( to_blob.begin(), to_blob.end(), serialized_bin.begin(), serialized_bin.end() ) );
 
+   o = from_variable_blob< opaque< opaque_test_object > >( serialized_bin );
+   BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
+
+   nlohmann::json expected_json;
+   expected_json = "z31SRtpx1";
+   o = variable_blob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
+
+   nlohmann::json actual_json;
+   to_json( actual_json, o );
+   BOOST_CHECK( actual_json == expected_json );
+
+   expected_json = "z1111";
+   from_json( expected_json, o );
+   to_json( actual_json, o );
+   BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), bad_bin.begin(), bad_bin.end() ) );
+
+   expected_json = nlohmann::json();
+   expected_json[ "a" ] = uint32_t(1);
+   expected_json[ "b" ] = uint32_t(2);
+
+   o = good_bin;
+   to_json( actual_json, o );
+   BOOST_CHECK( actual_json == expected_json );
+
+   from_json( expected_json, o );
+   BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
    BOOST_TEST_MESSAGE( "Unbox, modidy, and box the opaque type" );
 

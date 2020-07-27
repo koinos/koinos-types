@@ -9,15 +9,6 @@ template< typename T > class opaque;
 
 } // types
 
-namespace pack {
-
-template< typename Stream, typename T >
-inline void to_binary( Stream& s, const types::opaque< T >& v );
-template< typename Stream, typename T >
-inline void from_binary( Stream& s, types::opaque< T >& v, uint32_t depth = 0 );
-
-} // pack
-
 namespace types {
 
 template< typename T >

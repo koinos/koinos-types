@@ -15,6 +15,12 @@ inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 inline void to_json( json& j, const type& t );                      \
 inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 
+namespace koinos::types
+{
+   // Forward declaration
+   template< typename T > struct opaque;
+} // koinos::types
+
 namespace koinos::pack {
 
 using namespace koinos::types;
@@ -73,6 +79,11 @@ template< typename T >
 inline void to_json( json& s, const std::optional< T >& v );
 template< typename T >
 inline void from_json( const json& s, std::optional< T >& v, uint32_t depth = 0 );
+
+template< typename T >
+inline void to_json( json& s, const opaque< T >& v );
+template< typename T >
+inline void from_json( const json& s, opaque< T >& v, uint32_t depth = 0 );
 
 template< typename T >
 inline void to_json( json& s, const T& v );

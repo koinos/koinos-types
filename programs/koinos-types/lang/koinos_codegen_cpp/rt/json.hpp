@@ -2,6 +2,7 @@
 #include <koinos/pack/rt/json_fwd.hpp>
 
 #include <koinos/pack/rt/exceptions.hpp>
+#include <koinos/pack/rt/opaque.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 #include <koinos/pack/rt/typename.hpp>
 #include <koinos/pack/rt/util/base58.hpp>
@@ -462,6 +463,34 @@ inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
    }
 
    v.id = j[ "hash" ].get< uint64_t >();
+}
+
+template< typename T >
+inline void to_json( json& j, const opaque< T >& v )
+{
+   v.unbox();
+   if( v.is_unboxed() ) to_json( j, *v );
+   else to_json( j, v.get_blob() );
+}
+
+template< typename T >
+inline void from_json( const json& j, opaque< T >& v, uint32_t depth )
+{
+   depth++;
+   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+
+   v = T();
+   try
+   {
+      // We have to try deserializing as a blob first because the object will fill in default values and not fail
+      variable_blob tmp_blob;
+      from_json( j, tmp_blob, depth );
+      v = std::move( tmp_blob );
+   }
+   catch( ... )
+   {
+      from_json( j, *v, depth );
+   }
 }
 
 namespace detail::json {
