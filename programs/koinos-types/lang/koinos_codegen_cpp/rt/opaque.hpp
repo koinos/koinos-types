@@ -56,13 +56,15 @@ class opaque
          if( native && !blob )
          {
             const_cast< std::optional< variable_blob >& >( blob ).emplace( pack::to_variable_blob( *native ) );
-            const_cast< std::optional< T >& >( native ).reset();
          }
+
+         const_cast< std::optional< T >& >( native ).reset();
+         const_cast< bool& >( locked ) = true;
       }
 
       bool is_unboxed() const
       {
-         return native;
+         return native.has_value();
       }
 
       const variable_blob& get_blob() const
