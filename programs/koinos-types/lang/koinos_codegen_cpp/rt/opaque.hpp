@@ -31,7 +31,8 @@ class opaque
 
       void unbox() const
       {
-         _native.emplace( pack::from_variable_blob< T >( *_blob ) );
+         if( !_native && _blob )
+            _native.emplace( pack::from_variable_blob< T >( *_blob ) );
       }
 
       void box() const
