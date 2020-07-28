@@ -468,7 +468,8 @@ inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
 template< typename T >
 inline void to_json( json& j, const opaque< T >& v )
 {
-   v.unbox();
+   try { v.unbox(); } catch( ... ) {}
+
    if( v.is_unboxed() ) to_json( j, *v );
    else to_json( j, v.get_blob() );
 }
@@ -479,16 +480,15 @@ inline void from_json( const json& j, opaque< T >& v, uint32_t depth )
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
 
-   v = T();
-   try
+   if( j.is_string() ) // Assume it is base 58
    {
-      // We have to try deserializing as a blob first because the object will fill in default values and not fail
       variable_blob tmp_blob;
       from_json( j, tmp_blob, depth );
       v = std::move( tmp_blob );
    }
-   catch( ... )
+   else
    {
+      v = T();
       from_json( j, *v, depth );
    }
 }

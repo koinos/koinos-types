@@ -18,7 +18,7 @@ inline void from_binary( Stream& s, type& t, uint32_t depth = 0 );\
 namespace koinos::types
 {
    // Forward declaration
-   template< typename T > struct opaque;
+   template< typename T > class opaque;
 } // koinos::types
 
 namespace koinos::pack {

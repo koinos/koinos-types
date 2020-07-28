@@ -512,16 +512,17 @@ inline void from_binary( Stream& s, multihash_vector& v, uint32_t depth )
 template< typename Stream, typename T >
 inline void to_binary( Stream& s, const types::opaque< T >& v )
 {
-   to_binary( s, variable_blob( v ) );
+   to_binary( s, v.get_blob() );
 }
 
 template< typename Stream, typename T >
 inline void from_binary( Stream& s, types::opaque< T >& v, uint32_t depth )
 {
+   depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
 
    variable_blob blob;
-   from_binary( s, blob );
+   from_binary( s, blob, depth );
    v = std::move( blob );
 }
 

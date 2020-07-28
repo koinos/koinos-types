@@ -62,12 +62,13 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
-   BOOST_CHECK_THROW( o->a = 3, opaque_not_unboxed );
+   BOOST_CHECK_THROW( o.get_const_native(), opaque_not_unboxed );
 
-   BOOST_CHECK( o.unbox() );
+   o.unbox();
    BOOST_CHECK( o.is_unboxed() );
    BOOST_CHECK( o.is_locked() );
-   BOOST_CHECK_THROW( o->a = 3, opaque_locked );
+   BOOST_CHECK_THROW( o.get_native(), opaque_locked );
+   o.get_const_native();
 
    {
       const auto& const_o = o;
@@ -115,12 +116,13 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    BOOST_TEST_MESSAGE( "Unbox, modidy, and box the opaque type" );
 
-   BOOST_CHECK( o.unbox() );
+   o.unbox();
    o.unlock();
    BOOST_CHECK( !o.is_locked() );
    o->a = 3;
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), mod_bin_a.begin(), mod_bin_a.end() ) );
 
+   o.unlock();
    o->b = 4;
    o.box();
 
@@ -134,7 +136,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = bad_bin;
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( o.is_locked() );
-   BOOST_CHECK( !o.unbox() );
+   BOOST_CHECK_THROW( o.unbox(), std::runtime_error );
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), bad_bin.begin(), bad_bin.end() ) );
 
@@ -144,14 +146,14 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = variable_blob{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( o.is_locked() );
-   BOOST_CHECK( o.unbox() );
+   o.unbox();
    BOOST_CHECK( o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
    opaque_test_object ote{ .a = 3, .b = 2 };
    o = ote;
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_locked() );
 
    {
       const auto& const_o = o;
@@ -165,7 +167,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = opaque_test_object{ .a = 3, .b = 4 };
 
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_locked() );
 
    {
       const auto& const_o = o;
@@ -199,7 +201,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = opaque< opaque_test_object >( opaque_test_object{ .a = 3, .b = 4 } );
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_locked() );
 
    {
       const auto& const_o = o;

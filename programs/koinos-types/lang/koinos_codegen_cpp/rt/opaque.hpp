@@ -3,68 +3,59 @@
 #include <koinos/pack/rt/exceptions.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 
-namespace koinos { namespace types {
 
-template< typename T > class opaque;
-
-} // types
-
-namespace types {
+namespace koinos::types {
 
 template< typename T >
 class opaque
 {
    private:
-      std::optional< T >               native;
-      std::optional< variable_blob >   blob;
-      bool locked = true; // Do not allow modification by default, except for defacult constructor
+      // Native and Blob are optional containers
+      //
+      // When _blob exists and _native does not, the opaque is boxed
+      // When _blob and _native both exist, the opaque is unboxed but not mutated
+      // When _blob does not exist and _native does, the opaque is unlocked
+      // _blob and _native should never both not exist.
+
+      mutable std::optional< T >             _native;
+      mutable std::optional< variable_blob > _blob;
 
    public:
       using type = T;
 
-      opaque() : native( T() ), locked( false ) {}
-      opaque( const T& t ) : native( t ), locked( true ) {}
-      opaque( T&& t ) : native( t ), locked( true ) {}
-      opaque( const variable_blob& v ) : blob( v ), locked( true ) {}
-      opaque( variable_blob&& v ) : blob( std::move( v ) ), locked( true ) {}
+      opaque() : _native( T() ) {}
+      opaque( const T& t ) : _native( t ) { serialize(); }
+      opaque( T&& t ) : _native( t ) {}
+      opaque( const variable_blob& v ) : _blob( v ) {}
+      opaque( variable_blob&& v ) : _blob( std::move( v ) ) {}
 
-      bool unbox() const
+      void unbox() const
       {
-         if( !native && blob )
-         {
-            try
-            {
-               const_cast< std::optional< T >& >( native ).emplace( pack::from_variable_blob< T >( *blob ) );
-            }
-            catch( ... ) { return false; }
-         }
-
-         return true;
+         _native.emplace( pack::from_variable_blob< T >( *_blob ) );
       }
 
       void box() const
       {
-         if( native && !blob )
+         if( _native && !_blob )
          {
-            const_cast< std::optional< variable_blob >& >( blob ).emplace( pack::to_variable_blob( *native ) );
+            serialize();
          }
 
-         const_cast< std::optional< T >& >( native ).reset();
-         const_cast< bool& >( locked ) = true;
+         _native.reset();
       }
 
       bool is_unboxed() const
       {
-         return native.has_value();
+         return _native.has_value();
       }
 
       const variable_blob& get_blob() const
       {
-         if( native && !blob )
+         if( _native && !_blob )
          {
-            const_cast< std::optional< variable_blob >& >( blob ) = pack::to_variable_blob( *native );
+            serialize();
          }
-         return *blob;
+         return *_blob;
       }
 
       operator const variable_blob&() const
@@ -74,87 +65,90 @@ class opaque
 
       void lock()
       {
-         locked = true;
+         serialize();
       }
 
       void unlock()
       {
-         locked = false;
+         _blob.reset();
       }
 
       bool is_locked() const
       {
-         return locked;
+         return _blob.has_value();
       }
 
       T& get_native()
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
-         return *native;
+         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
+         return *_native;
       }
 
       const T& get_const_native() const
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         return *native;
+         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         return *_native;
       }
 
       T& operator*()
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
-         blob.reset();
-         return *native;
+         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
+         _blob.reset();
+         return *_native;
       }
 
       constexpr const T& operator*() const
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         return *native;
+         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         return *_native;
       }
 
       T* operator->()
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( locked ) throw pack::opaque_locked( "Opaque type is locked." );
-         blob.reset();
-         return &(*native);
+         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
+         _blob.reset();
+         return &(*_native);
       }
 
       constexpr const T* operator->() const
       {
-         if( !native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         return &(*native);
+         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         return &(*_native);
       }
 
-      variable_blob& operator=( const variable_blob& other )
+      const variable_blob& operator=( const variable_blob& other )
       {
-         blob = other;
-         native.reset();
-         return *blob;
+         _blob = other;
+         _native.reset();
+         return *_blob;
       }
 
-      variable_blob& operator=( variable_blob&& other )
+      const variable_blob& operator=( variable_blob&& other )
       {
-         blob = std::move( other );
-         native.reset();
-         return *blob;
+         _blob = std::move( other );
+         _native.reset();
+         return *_blob;
       }
 
-      T& operator=( const T& other )
+      const T& operator=( const T& other )
       {
-         native = other;
-         blob.reset();
-         return *native;
+         _native = other;
+         _blob.reset();
+         return *_native;
       }
 
       T& operator=( T&& other )
       {
-         native = std::move( other );
-         blob.reset();
-         return *native;
+         _native = std::move( other );
+         _blob.reset();
+         return *_native;
+      }
+
+   private:
+      void serialize() const
+      {
+         _blob.emplace( pack::to_variable_blob( *_native ) );
       }
 };
 
-} } // koinos::types
+} // koinos::types
