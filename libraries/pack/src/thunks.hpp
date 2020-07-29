@@ -38,7 +38,7 @@ typedef void_type apply_block_ret;
 
 struct apply_transaction_args
 {
-   types::variable_blob                        tx_blob;
+   opaque< types::protocol::transaction >      trx;
 };
 
 typedef void_type apply_transaction_ret;
