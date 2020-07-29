@@ -6,6 +6,39 @@
 
 namespace koinos::types {
 
+////////////////////////////////////////////////////////////////////////////////////
+// opaque<T> state transition diagram                                             //
+////////////////////////////////////////////////////////////////////////////////////
+//                                                                                //
+// +----------+                     +---------+                      +----------+ //
+// | Boxed    | --- unbox() ------> | Unboxed | --- unlock() ------> | Unlocked | //
+// | !_native |                     | _native |                      |  _native | //
+// |  _blob   | <---- box() ------- | _blob   | <---- lock() ------- | !_blob   | //
+// +----------+                     +---------+                      +----------+ //
+//                                                                                //
+////////////////////////////////////////////////////////////////////////////////////
+//
+// All possible transitions:
+//
+// Call unbox() on Boxed     -> Unboxed (see diagram)
+// Call unbox() on Unboxed   -> No-op (idempotent)
+// Call unbox() on Unlocked  -> No-op*
+//
+// Call box() on Boxed       -> No-op (idempotent)
+// Call box() on Unboxed     -> Boxed (see diagram)
+// Call box() on Unlocked    -> Illegal state*
+//
+// Call unlock() on Boxed    -> Illegal state*
+// Call unlock() on Unboxed  -> Unlocked (see diagram)
+// Call unlock() on Unlocked -> No-op (idempotent)
+//
+// Call lock() on Boxed      -> Illegal optional dereference*
+// Call lock() on Unboxed    -> No-op (idempotent)*
+// Call lock() on Unlocked   -> Unboxed (see diagram)
+//
+// *Current behavior of code, questionable correctness.
+//
+
 template< typename T >
 class opaque
 {
