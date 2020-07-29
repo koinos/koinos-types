@@ -6,50 +6,46 @@
 
 namespace koinos::types {
 
-////////////////////////////////////////////////////////////////////////////////////
-// opaque<T> state transition diagram                                             //
-////////////////////////////////////////////////////////////////////////////////////
-//                                                                                //
-// +----------+                     +---------+                      +----------+ //
-// | Boxed    | --- unbox() ------> | Unboxed | --- unlock() ------> | Unlocked | //
-// | !_native |                     | _native |                      |  _native | //
-// |  _blob   | <---- box() ------- | _blob   | <---- lock() ------- | !_blob   | //
-// +----------+                     +---------+                      +----------+ //
-//                                                                                //
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// opaque<T> state transition diagram                                              //
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+// +----------+                     +---------+                        +---------+ //
+// | Boxed    | --- unbox() ------> | Unboxed | ---- make_mutable() -> | Mutable | //
+// | !_native |                     | _native |                        | _native | //
+// |  _blob   | <---- box() ------- |         | <- make_immutable() -- | !_blob  | //
+// +----------+                     +---------+                        +---------+ //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// State transitions are implicitly composible (e.g. calling box() Mutable
+// also calls make_immutable() ).
+//
+// Mutable is a substate of Unboxed (e.g. idempotent transitions on unboxed are
+// indempotent on Mutable )
 //
 // All possible transitions:
 //
-// Call unbox() on Boxed     -> Unboxed (see diagram)
-// Call unbox() on Unboxed   -> No-op (idempotent)
-// Call unbox() on Unlocked  -> No-op*
+// Call unbox() on Boxed            -> Unboxed (see diagram)
+// Call unbox() on Unboxed          -> No-op (idempotent)
+// Call unbox() on Mutable          -> No-op (idempotent)
 //
-// Call box() on Boxed       -> No-op (idempotent)
-// Call box() on Unboxed     -> Boxed (see diagram)
-// Call box() on Unlocked    -> Illegal state*
+// Call box() on Boxed              -> No-op (idempotent)
+// Call box() on Unboxed            -> Boxed (see diagram)
+// Call box() on Mutable            -> Boxed (composed)
 //
-// Call unlock() on Boxed    -> Illegal state*
-// Call unlock() on Unboxed  -> Unlocked (see diagram)
-// Call unlock() on Unlocked -> No-op (idempotent)
+// Call make_mutable() on Boxed     -> Mutable (composed)
+// Call make_mutable() on Unboxed   -> Unlocked (see diagram)
+// Call make_mutable() on Mutable   -> No-op (idempotent)
 //
-// Call lock() on Boxed      -> Illegal optional dereference*
-// Call lock() on Unboxed    -> No-op (idempotent)*
-// Call lock() on Unlocked   -> Unboxed (see diagram)
-//
-// *Current behavior of code, questionable correctness.
-//
+// Call make_immutable() on Boxed   -> No-op (idempotent)
+// Call make_immutable() on Unboxed -> No-op (idempotent)
+// Call make_immutable() on Mutable -> Unboxed (see diagram)
 
 template< typename T >
 class opaque
 {
    private:
-      // Native and Blob are optional containers
-      //
-      // When _blob exists and _native does not, the opaque is boxed
-      // When _blob and _native both exist, the opaque is unboxed but not mutated
-      // When _blob does not exist and _native does, the opaque is unlocked
-      // _blob and _native should never both not exist.
-
       mutable std::optional< T >             _native;
       mutable std::optional< variable_blob > _blob;
 
@@ -70,12 +66,15 @@ class opaque
 
       void box() const
       {
-         if( _native && !_blob )
+         if( _native )
          {
-            serialize();
-         }
+            // Composed state transition Mutable -> Unboxed
+            if( !_blob )
+               serialize();
 
-         _native.reset();
+            // State transition Unboxed -> Boxed
+            _native.reset();
+         }
       }
 
       bool is_unboxed() const
@@ -83,6 +82,35 @@ class opaque
          return _native.has_value();
       }
 
+      void make_immutable()
+      {
+         if( _native && !_blob )
+            serialize();
+      }
+
+      void make_mutable()
+      {
+         // Composed state transtition Boxed -> Unboxed
+         if( !_native )
+            unbox();
+
+         // State transition Unboxed -> Mutable
+         // Must check _native again in case unboxing failed.
+         if( _native && _blob )
+            _blob.reset();
+      }
+
+      bool is_mutable() const
+      {
+         return _native.has_value() && !_blob.has_value();
+      }
+
+      /**
+       * get_blob() returns a reference to the underlying blob. This is an
+       * optimization so that large blobs can be efficiently passed around.
+       * It is the responsibility of the caller to ensure the opaque does
+       * not go out of scope and invalidate the reference.
+       */
       const variable_blob& get_blob() const
       {
          if( _native && !_blob )
@@ -92,90 +120,50 @@ class opaque
          return *_blob;
       }
 
-      operator const variable_blob&() const
-      {
-         return get_blob();
-      }
-
-      void lock()
-      {
-         serialize();
-      }
-
-      void unlock()
-      {
-         _blob.reset();
-      }
-
-      bool is_locked() const
-      {
-         return _blob.has_value();
-      }
-
+      /**
+       * get_native() and get_const_native() returns a reference to the
+       * underlying value. This is an optimization so that large objects can be
+       * efficiently passed around. It is the responsibility of the caller to
+       * ensure the opaque does not go out of scope and invalidate the
+       * reference.
+       */
       T& get_native()
       {
-         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
          return *_native;
       }
 
       const T& get_const_native() const
       {
-         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return *_native;
       }
 
       T& operator*()
       {
-         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
-         _blob.reset();
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
          return *_native;
       }
 
       constexpr const T& operator*() const
       {
-         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return *_native;
       }
 
       T* operator->()
       {
-         if( is_locked() ) throw pack::opaque_locked( "Opaque type is locked." );
-         _blob.reset();
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
          return &(*_native);
       }
 
       constexpr const T* operator->() const
       {
-         if( !is_unboxed() ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
          return &(*_native);
-      }
-
-      const variable_blob& operator=( const variable_blob& other )
-      {
-         _blob = other;
-         _native.reset();
-         return *_blob;
-      }
-
-      const variable_blob& operator=( variable_blob&& other )
-      {
-         _blob = std::move( other );
-         _native.reset();
-         return *_blob;
-      }
-
-      const T& operator=( const T& other )
-      {
-         _native = other;
-         _blob.reset();
-         return *_native;
-      }
-
-      T& operator=( T&& other )
-      {
-         _native = std::move( other );
-         _blob.reset();
-         return *_native;
       }
 
    private:

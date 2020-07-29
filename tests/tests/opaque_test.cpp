@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o.unbox();
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    BOOST_CHECK_THROW( o.get_native(), opaque_locked );
    o.get_const_native();
 
@@ -114,20 +114,78 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    from_json( expected_json, o );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
-   BOOST_TEST_MESSAGE( "Unbox, modidy, and box the opaque type" );
+   BOOST_TEST_MESSAGE( "Check state transitions between boxed, unboxed, and mutable" );
 
+   // Check no-op boxed->boxed (box and make_immutable)
+   o.box();
+   BOOST_CHECK( !o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   o.make_immutable();
+   BOOST_CHECK( !o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   // Check box->unboxed (unbox)
    o.unbox();
-   o.unlock();
-   BOOST_CHECK( !o.is_locked() );
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   // Check no-op unboxed->unboxed (unbox and make_immutable)
+   o.unbox();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   o.make_immutable();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   // Check unboxed->mutable
+   o.make_mutable();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( o.is_mutable() );
+
+   // Check no-op mutable->mutable (unbox and make_mutable)
+   o.unbox();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( o.is_mutable() );
+
+   o.make_mutable();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( o.is_mutable() );
+
+   // Check mutable->boxed
+   o.box();
+   BOOST_CHECK( !o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   // Check boxed->mutable
+   o.make_mutable();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( o.is_mutable() );
+
+   // Check mutable->unboxed
+   o.make_immutable();
+   BOOST_CHECK( o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   // Check unboxed->boxed
+   o.box();
+   BOOST_CHECK( !o.is_unboxed() );
+   BOOST_CHECK( !o.is_mutable() );
+
+   BOOST_TEST_MESSAGE( "Test modification of native type" );
+
+   o.make_mutable();
    o->a = 3;
+   o.make_immutable();
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), mod_bin_a.begin(), mod_bin_a.end() ) );
 
-   o.unlock();
+   o.make_mutable();
    o->b = 4;
    o.box();
 
    BOOST_CHECK( !o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), mod_bin_b.begin(), mod_bin_b.end() ) );
 
 
@@ -135,7 +193,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = bad_bin;
    BOOST_CHECK( !o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    BOOST_CHECK_THROW( o.unbox(), std::runtime_error );
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), bad_bin.begin(), bad_bin.end() ) );
@@ -145,7 +203,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = variable_blob{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 };
    BOOST_CHECK( !o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    o.unbox();
    BOOST_CHECK( o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
@@ -153,7 +211,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    opaque_test_object ote{ .a = 3, .b = 2 };
    o = ote;
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
 
    {
       const auto& const_o = o;
@@ -167,7 +225,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = opaque_test_object{ .a = 3, .b = 4 };
 
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_locked() );
+   BOOST_CHECK( o.is_mutable() );
 
    {
       const auto& const_o = o;
@@ -181,7 +239,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = opaque< opaque_test_object >();
 
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_locked() );
+   BOOST_CHECK( o.is_mutable() );
    BOOST_CHECK_EQUAL( o->a, 0 );
    BOOST_CHECK_EQUAL( o->b, 0 );
 
@@ -189,7 +247,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = opaque< opaque_test_object >( ote );
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
 
    {
       const auto& const_o = o;
@@ -201,7 +259,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = opaque< opaque_test_object >( opaque_test_object{ .a = 3, .b = 4 } );
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_locked() );
+   BOOST_CHECK( o.is_mutable() );
 
    {
       const auto& const_o = o;
@@ -213,12 +271,12 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = opaque< opaque_test_object >( mod_bin_a );
    BOOST_CHECK( !o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), mod_bin_a.begin(), mod_bin_a.end() ) );
 
    o = opaque< opaque_test_object >( variable_blob{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02 } );
    BOOST_CHECK( !o.is_unboxed() );
-   BOOST_CHECK( o.is_locked() );
+   BOOST_CHECK( !o.is_mutable() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 }
 
