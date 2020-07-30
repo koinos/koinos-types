@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    opaque_test_object ote{ .a = 3, .b = 2 };
    o = ote;
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_mutable() );
+   BOOST_CHECK( o.is_mutable() );
 
    {
       const auto& const_o = o;
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    o = opaque< opaque_test_object >( ote );
    BOOST_CHECK( o.is_unboxed() );
-   BOOST_CHECK( !o.is_mutable() );
+   BOOST_CHECK( o.is_mutable() );
 
    {
       const auto& const_o = o;
