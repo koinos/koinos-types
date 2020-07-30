@@ -13,32 +13,32 @@ typedef void_type prints_ret;
 struct verify_block_sig_args
 {
    variable_blob                              sig_data;
-   multihash_type                             digest;
+   multihash                                  digest;
 };
 
 typedef types::boolean verify_block_sig_ret;
 
 struct verify_merkle_root_args
 {
-   multihash_type                             root;
-   std::vector< multihash_type >              hashes;
+   multihash                                  root;
+   std::vector< multihash >                   hashes;
 };
 
 typedef types::boolean verify_merkle_root_ret;
 
 struct apply_block_args
 {
-   std::vector< types::system::block_part >   block_parts;
-   types::boolean                             enable_check_passive_data;
-   types::boolean                             enable_check_block_signature;
-   types::boolean                             enable_check_transaction_signatures;
+   protocol::block                             block;
+   types::boolean                              enable_check_passive_data;
+   types::boolean                              enable_check_block_signature;
+   types::boolean                              enable_check_transaction_signatures;
 };
 
 typedef void_type apply_block_ret;
 
 struct apply_transaction_args
 {
-   types::variable_blob                       tx_blob;
+   opaque< types::protocol::transaction >      trx;
 };
 
 typedef void_type apply_transaction_ret;
@@ -139,6 +139,6 @@ struct hash_args
    types::uint64        size;
 };
 
-typedef types::multihash_type hash_ret;
+typedef types::multihash hash_ret;
 
 } } } // koinos::types::thunks
