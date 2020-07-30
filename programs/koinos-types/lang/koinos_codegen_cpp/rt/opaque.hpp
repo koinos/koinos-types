@@ -53,8 +53,8 @@ class opaque
       using type = T;
 
       opaque() : _native( T() ) {}
-      opaque( const T& t ) : _native( t ) { serialize(); }
-      opaque( T&& t ) : _native( t ) {}
+      opaque( const T& t ) : _native( t ) {}
+      opaque( T&& t ) : _native( std::move( t ) ) {}
       opaque( const variable_blob& v ) : _blob( v ) {}
       opaque( variable_blob&& v ) : _blob( std::move( v ) ) {}
 
