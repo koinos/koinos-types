@@ -24,7 +24,8 @@ enum class thunk_id : uint32
    get_head_info = 0x89df34c4,
    hash = 0x8aaaf547,
    verify_block_sig = 0x89254037,
-   verify_merkle_root = 0x8ed9ddcb
+   verify_merkle_root = 0x8ed9ddcb,
+   null_call = 0x83624bad
 };
 
 } } } // koinos::types::thunks

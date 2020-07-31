@@ -24,7 +24,8 @@ enum class system_call_id : uint32
    get_head_info = 0x956fb22d,
    hash = 0x99770e04,
    verify_block_sig = 0x95836910,
-   verify_merkle_root = 0x996e24b9
+   verify_merkle_root = 0x996e24b9,
+   null_call = 0x96062b7b
 };
 
 } } } // koinos::types::system

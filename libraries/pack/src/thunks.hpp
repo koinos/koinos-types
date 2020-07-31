@@ -141,4 +141,8 @@ struct hash_args
 
 typedef types::multihash hash_ret;
 
+typedef void_type null_call_args;
+
+typedef void_type null_call_ret;
+
 } } } // koinos::types::thunks
