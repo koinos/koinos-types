@@ -93,11 +93,7 @@ def generate_golang(schema):
     result["files"] = result_files
 
     template_names = [
-        #"classes.hpp.j2",
-        #"thunk_ids.hpp.j2",
-        #"system_call_ids.hpp.j2",
-        #"thunk_ids.h.j2",
-        #"system_call_ids.h.j2",
+        "koinos.go.j2",
         ]
 
     for template_name in template_names:
