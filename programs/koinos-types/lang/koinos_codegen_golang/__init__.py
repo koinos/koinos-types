@@ -1,0 +1,2 @@
+
+from .gengolang import setup
