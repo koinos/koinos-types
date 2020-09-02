@@ -3,7 +3,6 @@
 //type int128  int64
 //type uint128 uint64
 
-type boolean bool
 type variable_blob []byte
 type timestamp_type uint64
 type block_height_type uint64

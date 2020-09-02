@@ -14,10 +14,16 @@
 [{{typeref(tref["targs"][0])}}]fixed_blob
 {%- endmacro -%}
 
+{%- macro variant(tref) -%}
+interface{}{# TODO: Generate a struct for each variant that enforces desired types #}
+{%- endmacro -%}
+
 {%- macro typeref(tref) -%}
 {%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
+{%- elif tref["name"][-1] == "variant" -%}{{variant(tref)}}
+{%- elif tref["name"][-1] == "boolean" -%}bool
 {%- else -%}
 {{tref["name"][-1]}}
 {%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
@@ -25,8 +31,7 @@
 {%- endmacro -%}
 
 {%- macro struct(decl) -%}
-// {{decl}}
-type {{decl["name"]}} struct {
+{# // {{decl}} #}type {{decl["name"]}} struct {
 {% if decl["fields"]|length > 0 -%}
 {%- for field in decl["fields"] %}    {{field["name"]}} {{typeref(field["tref"])}}
 {% endfor %}
