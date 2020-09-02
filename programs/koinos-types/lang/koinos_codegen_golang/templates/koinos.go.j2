@@ -5,27 +5,42 @@
 {%- macro template(targs) -%}
 <
 {%- for arg in targs -%}
-{{arg["name"][-1]}}{{"," if not loop.last}}
+{{typeref(arg)}}{{"," if not loop.last}}
 {%- endfor -%}
 >
 {%- endmacro -%}
 
+{%- macro fixed_blob(tref) -%}
+[{{typeref(tref["targs"][0])}}]fixed_blob
+{%- endmacro -%}
+
 {%- macro typeref(tref) -%}
-{%- if tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
+{%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
 {%- else -%}
 {{tref["name"][-1]}}
 {%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
 {%- endif -%}
 {%- endmacro -%}
 
-{%- for name, decl in decls_by_name.items() -%}
-{% if decl["info"]["type"] == "Struct" %}
+{%- macro struct(decl) -%}
 // {{decl}}
 type {{decl["name"]}} struct {
 {% if decl["fields"]|length > 0 -%}
-{%- for field in decl["fields"] %}{{field["name"]}} {{typeref(field["tref"])}}
+{%- for field in decl["fields"] %}    {{field["name"]}} {{typeref(field["tref"])}}
 {% endfor %}
 {%- endif -%}
 }
+{% endmacro -%}
+
+{%- macro typedef(decl) -%}
+type {{decl["name"]}} {{typeref(decl["tref"])}}
+{% endmacro -%}
+
+{%- for name, decl in decls_by_name.items() -%}
+{% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
+{% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
 {% endif -%}
+
 {% endfor %}

@@ -8,6 +8,8 @@ type variable_blob []byte
 type timestamp_type uint64
 type block_height_type uint64
 
+type fixed_blob byte
+
 // ----------------
 //  Multihash
 // ----------------
