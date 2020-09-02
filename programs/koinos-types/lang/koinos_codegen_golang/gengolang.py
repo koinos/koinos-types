@@ -15,24 +15,6 @@ import os
 class RenderError(Exception):
     pass
 
-def classname_case_gen(name):
-    it = iter(name)
-    for c in it:
-        if c != "_":
-            yield c.lower()
-            break
-    for c in it:
-        yield c.lower()
-
-def classname_case(name):
-    return "".join(classname_case_gen(name))
-
-def simple_name(fqn):
-    if isinstance(fqn, list):
-        return fqn[-1]
-    else:
-        return fqn.split("::")[-1]
-
 def fq_name(name):
     return "::".join(name)
 
@@ -42,42 +24,15 @@ def cpp_namespace(name):
         return ""
     return "::".join(u[:-1])
 
-def cpp_classname(current_ns, name):
-    name_ns = "::".join(name[:-1])
-    if name_ns == current_ns:
-        return name[-1]
-    return "::".join(name)
-
-def typeref_has_type_parameters(tref):
-    # Typedef with type parameters is a base typedef.
-    if tref["targs"] is None:
-        return False
-    for targ in tref["targs"]:
-        if "value" not in targ:
-            return True
-    return False
-
-def template_raise(cause):
-    # Helper function to allow templates to raise exceptions
-    # See https://stackoverflow.com/questions/21778252/how-to-raise-an-exception-in-a-jinja2-macro
-    raise RenderError(cause)
-
 def generate_golang(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
             keep_trailing_newline=True,
         )
-    env.filters["classname_case"] = classname_case
-    env.filters["simple_name"] = simple_name
-    env.filters["typeref_has_type_parameters"] = typeref_has_type_parameters
     env.filters["fq_name"] = fq_name
     env.filters["tuple"] = tuple
-    env.filters["cpp_namespace"] = cpp_namespace
     decls_by_name = collections.OrderedDict(((fq_name(name), decl) for name, decl in schema["decls"]))
     decl_namespaces = sorted(set(cpp_namespace(name) for name in decls_by_name))
-
-    env.globals["raise"] = template_raise
-    env.globals["cpp_classname"] = cpp_classname
 
     ctx = {"schema" : schema,
            "decls_by_name" : decls_by_name,
