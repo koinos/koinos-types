@@ -43,9 +43,26 @@ interface{}{# TODO: Generate a struct for each variant that enforces desired typ
 type {{decl["name"]}} {{typeref(decl["tref"])}}
 {% endmacro -%}
 
+{%- macro enum(decl) -%}
+// --------------------------------
+//  Enum: {{decl["name"]}}
+// --------------------------------
+
+type {{decl["name"]}} uint32
+
+const (
+{%- for entry in decl["entries"] %}
+    {{entry["name"]}} {{decl["name"]}} = {{entry["value"]}}
+{%- endfor %}
+)
+{% endmacro -%}
+
 {%- for name, decl in decls_by_name.items() -%}
 {% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
 {% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
-{% endif -%}
+{% elif decl["info"]["type"] == "BaseType" %}{# Ignore base types for now #}
+{% elif decl["info"]["type"] == "EnumClass" %}{{enum(decl)}}
+{# {%- else -%}// TODO: Unimplemented {{decl}} #}
+{%- endif -%}
 
 {% endfor %}
