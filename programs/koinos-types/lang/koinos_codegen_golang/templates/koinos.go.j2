@@ -30,13 +30,27 @@ interface{}{# TODO: Generate a struct for each variant that enforces desired typ
 {%- endif -%}
 {%- endmacro -%}
 
+{%- macro struct_serialization(decl) -%}
+func (n {{decl["name"]}}) Serialize(vblob variable_blob) variable_blob {
+{%- for field in decl["fields"] %}
+    vb = {{field["name"]}}.Serialize(vb){% endfor %}
+    return vb
+}
+{%- endmacro -%}
+
 {%- macro struct(decl) -%}
+// ----------------------------------------
+//  Struct: {{decl["name"]}}
+// ----------------------------------------
+
 {# // {{decl}} #}type {{decl["name"]}} struct {
 {% if decl["fields"]|length > 0 -%}
 {%- for field in decl["fields"] %}    {{field["name"]}} {{typeref(field["tref"])}}
 {% endfor %}
 {%- endif -%}
 }
+
+{{struct_serialization(decl)}}
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
@@ -44,9 +58,9 @@ type {{decl["name"]}} {{typeref(decl["tref"])}}
 {% endmacro -%}
 
 {%- macro enum(decl) -%}
-// --------------------------------
+// ----------------------------------------
 //  Enum: {{decl["name"]}}
-// --------------------------------
+// ----------------------------------------
 
 type {{decl["name"]}} uint32
 
