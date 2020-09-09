@@ -5,143 +5,143 @@ import (
 )
 
 type Serializeable interface {
-    Serialize(vb *variable_blob)
+    Serialize(vb *VariableBlob)
 }
 
 // --------------------------------
 // variable blob
 // --------------------------------
 
-func (n variable_blob) Serialize(vb variable_blob) variable_blob {
+func (n VariableBlob) Serialize(vb VariableBlob) VariableBlob {
     header := make([]byte, 8)
     binary.BigEndian.PutUint64(header, uint64(len(n)))
     vb = appendByte(vb, header...)
     return appendByte(vb, n...)
 }
 
-func DeserializeVariableBlob(vb variable_blob) (size_t,variable_blob) {
-    var size size_t = size_t(binary.BigEndian.Uint64(vb))
-    var result variable_blob = variable_blob(make([]byte, 0, size))
+func DeserializeVariableBlob(vb VariableBlob) (uint64,VariableBlob) {
+    var size uint64 = binary.BigEndian.Uint64(vb)
+    var result VariableBlob = VariableBlob(make([]byte, 0, size))
     return 8+size, appendByte(result, vb[8:]...)
 }
 
 // --------------------------------
-// boolean
+// Boolean
 // --------------------------------
 
-func (n boolean) Serialize(vb variable_blob) variable_blob {
+func (n boolean) Serialize(vb VariableBlob) VariableBlob {
     return appendByte(vb, byte(n))
 }
 
-func DeserializeBoolean(vb variable_blob) (uint32,boolean) {
+func DeserializeBoolean(vb VariableBlob) (uint32,boolean) {
     return 1, boolean(vb[0])
 }
 
 // --------------------------------
-// int8_t
+// Int8
 // --------------------------------
 
-func (n int8_t) Serialize(vb variable_blob) variable_blob {
+func (n Int8) Serialize(vb VariableBlob) VariableBlob {
     return appendByte(vb, byte(n))
 }
 
-func DeserializeInt8(vb variable_blob) (uint32,int8_t) {
-    return 1, int8_t(vb[0])
+func DeserializeInt8(vb VariableBlob) (uint32,Int8) {
+    return 1, Int8(vb[0])
 }
 
 // --------------------------------
-// uint8_t
+// UInt8
 // --------------------------------
 
-func (n uint8_t) Serialize(vb variable_blob) variable_blob {
+func (n UInt8) Serialize(vb VariableBlob) VariableBlob {
     return appendByte(vb, byte(n))
 }
 
-func DeserializeUint8(vb variable_blob) (uint32,uint8_t) {
-    return 1, uint8_t(vb[0])
+func DeserializeUint8(vb VariableBlob) (uint32,UInt8) {
+    return 1, UInt8(vb[0])
 }
 
 // --------------------------------
-// int16_t
+// Int16
 // --------------------------------
 
-func (n int16_t) Serialize(vb variable_blob) variable_blob {
+func (n Int16) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 2)
     binary.BigEndian.PutUint16(b, uint16(n))
     return appendByte(vb, b...)
 }
 
-func DeserializeInt16(vb variable_blob) (uint32,int16_t) {
-    return 2, int16_t(binary.BigEndian.Uint16(vb))
+func DeserializeInt16(vb VariableBlob) (uint32,Int16) {
+    return 2, Int16(binary.BigEndian.Uint16(vb))
 }
 
 // --------------------------------
-// uint16_t
+// UInt16
 // --------------------------------
 
-func (n uint16_t) Serialize(vb variable_blob) variable_blob {
+func (n UInt16) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 2)
     binary.BigEndian.PutUint16(b, n)
     return appendByte(vb, b...)
 }
 
-func DeserializeUint16(vb variable_blob) (uint32,uint16_t) {
+func DeserializeUInt16(vb VariableBlob) (uint32,UInt16) {
     return 2, binary.BigEndian.Uint16(vb)
 }
 
 // --------------------------------
-// int32_t
+// Int32
 // --------------------------------
 
-func (n int32_t) Serialize(vb variable_blob) variable_blob {
+func (n Int32) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 4)
     binary.BigEndian.PutUint32(b, uint32(n))
     return appendByte(vb, b...)
 }
 
-func DeserializeInt32(vb variable_blob) (uint32,int32_t) {
-    return 4, int32_t(binary.BigEndian.Uint32(vb))
+func DeserializeInt32(vb VariableBlob) (uint32,Int32) {
+    return 4, Int32(binary.BigEndian.Uint32(vb))
 }
 
 // --------------------------------
-// uint32_t
+// UInt32
 // --------------------------------
 
-func (n uint32_t) Serialize(vb variable_blob) variable_blob {
+func (n UInt32) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 4)
     binary.BigEndian.PutUint32(b, n)
     return appendByte(vb, b...)
 }
 
-func DeserializeUint32(vb variable_blob) (uint32,uint32_t) {
+func DeserializeUint32(vb VariableBlob) (uint32,Int32) {
     return 4, binary.BigEndian.Uint32(vb)
 }
 
 // --------------------------------
-// int64_t
+// Int64
 // --------------------------------
 
-func (n int64_t) Serialize(vb variable_blob) variable_blob {
+func (n Int64) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, uint64(n))
     return appendByte(vb, b...)
 }
 
-func DeserializeInt64(vb variable_blob) (uint32,int64_t) {
-    return 8, int64_t(binary.BigEndian.Uint64(vb))
+func DeserializeInt64(vb VariableBlob) (uint32,Int64) {
+    return 8, Int64(binary.BigEndian.Uint64(vb))
 }
 
 // --------------------------------
-// uint64_t
+// UInt64
 // --------------------------------
 
-func (n uint64_t) Serialize(vb variable_blob) variable_blob {
+func (n UInt64) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, n)
     return appendByte(vb, b...)
 }
 
-func DeserializeUint64(vb variable_blob) (uint32,uint64_t) {
+func DeserializeUInt64(vb VariableBlob) (uint32,UInt64) {
     return 8, binary.BigEndian.Uint64(vb)
 }
 
@@ -149,7 +149,7 @@ func DeserializeUint64(vb variable_blob) (uint32,uint64_t) {
 // Utility functions
 // --------------------------------
 
-func AppendToVBlob(vblob variable_blob, data ...byte) []byte {
+func AppendToVBlob(vblob VariableBlob, data ...byte) []byte {
     m := len(vblob)
     n := m + len(data)
     if n > cap(vblob) { // if necessary, reallocate
