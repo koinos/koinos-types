@@ -14,13 +14,13 @@ type Serializeable interface {
 
 func (n variable_blob) Serialize(vb variable_blob) variable_blob {
     header := make([]byte, 8)
-    binary.LittleEndian.PutUint64(header, uint64(len(n)))
+    binary.BigEndian.PutUint64(header, uint64(len(n)))
     vb = appendByte(vb, header...)
     return appendByte(vb, n...)
 }
 
 func DeserializeVariableBlob(vb variable_blob) (size_t,variable_blob) {
-    var size size_t = size_t(binary.LittleEndian.Uint64(vb))
+    var size size_t = size_t(binary.BigEndian.Uint64(vb))
     var result variable_blob = variable_blob(make([]byte, 0, size))
     return 8+size, appendByte(result, vb[8:]...)
 }
@@ -67,12 +67,12 @@ func DeserializeUint8(vb variable_blob) (uint32,uint8_t) {
 
 func (n int16_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 2)
-    binary.LittleEndian.PutUint16(b, uint16(n))
+    binary.BigEndian.PutUint16(b, uint16(n))
     return appendByte(vb, b...)
 }
 
 func DeserializeInt16(vb variable_blob) (uint32,int16_t) {
-    return 2, int16_t(binary.LittleEndian.Uint16(vb))
+    return 2, int16_t(binary.BigEndian.Uint16(vb))
 }
 
 // --------------------------------
@@ -81,12 +81,12 @@ func DeserializeInt16(vb variable_blob) (uint32,int16_t) {
 
 func (n uint16_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 2)
-    binary.LittleEndian.PutUint16(b, n)
+    binary.BigEndian.PutUint16(b, n)
     return appendByte(vb, b...)
 }
 
 func DeserializeUint16(vb variable_blob) (uint32,uint16_t) {
-    return 2, binary.LittleEndian.Uint16(vb)
+    return 2, binary.BigEndian.Uint16(vb)
 }
 
 // --------------------------------
@@ -95,12 +95,12 @@ func DeserializeUint16(vb variable_blob) (uint32,uint16_t) {
 
 func (n int32_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 4)
-    binary.LittleEndian.PutUint32(b, uint32(n))
+    binary.BigEndian.PutUint32(b, uint32(n))
     return appendByte(vb, b...)
 }
 
 func DeserializeInt32(vb variable_blob) (uint32,int32_t) {
-    return 4, int32_t(binary.LittleEndian.Uint32(vb))
+    return 4, int32_t(binary.BigEndian.Uint32(vb))
 }
 
 // --------------------------------
@@ -109,12 +109,12 @@ func DeserializeInt32(vb variable_blob) (uint32,int32_t) {
 
 func (n uint32_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 4)
-    binary.LittleEndian.PutUint32(b, n)
+    binary.BigEndian.PutUint32(b, n)
     return appendByte(vb, b...)
 }
 
 func DeserializeUint32(vb variable_blob) (uint32,uint32_t) {
-    return 4, binary.LittleEndian.Uint32(vb)
+    return 4, binary.BigEndian.Uint32(vb)
 }
 
 // --------------------------------
@@ -123,12 +123,12 @@ func DeserializeUint32(vb variable_blob) (uint32,uint32_t) {
 
 func (n int64_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 8)
-    binary.LittleEndian.PutUint64(b, uint64(n))
+    binary.BigEndian.PutUint64(b, uint64(n))
     return appendByte(vb, b...)
 }
 
 func DeserializeInt64(vb variable_blob) (uint32,int64_t) {
-    return 8, int64_t(binary.LittleEndian.Uint64(vb))
+    return 8, int64_t(binary.BigEndian.Uint64(vb))
 }
 
 // --------------------------------
@@ -137,12 +137,12 @@ func DeserializeInt64(vb variable_blob) (uint32,int64_t) {
 
 func (n uint64_t) Serialize(vb variable_blob) variable_blob {
     b := make([]byte, 8)
-    binary.LittleEndian.PutUint64(b, n)
+    binary.BigEndian.PutUint64(b, n)
     return appendByte(vb, b...)
 }
 
 func DeserializeUint64(vb variable_blob) (uint32,uint64_t) {
-    return 8, binary.LittleEndian.Uint64(vb)
+    return 8, binary.BigEndian.Uint64(vb)
 }
 
 // --------------------------------
