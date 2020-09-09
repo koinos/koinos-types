@@ -17,12 +17,30 @@ type int32_t   int32
 type uint32_t  uint32
 type int64_t   int64
 type uint64_t  uint64
-type int128_t  big.Int
-type uint128_t big.Int
-type int160_t  big.Int
-type uint160_t big.Int
-type int256_t  big.Int
-type uint256_t big.Int
+
+type int128_t  struct {
+    big.Int
+}
+
+type uint128_t struct {
+    big.Int
+}
+
+type int160_t struct {
+    big.Int
+}
+
+type uint160_t {
+    big.Int
+}
+
+type int256_t {
+    big.Int
+}
+
+type uint256_t {
+    big.Int
+}
 
 type variable_blob []byte
 type timestamp_type uint64
