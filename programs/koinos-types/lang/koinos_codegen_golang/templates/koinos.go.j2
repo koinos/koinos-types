@@ -1,5 +1,5 @@
 {%- macro vector(tref) -%}
-[]{{typeref(tref["targs"][0])}}
+[]{{go_name(typeref(tref["targs"][0]))}}
 {%- endmacro -%}
 
 {%- macro template(targs) -%}
@@ -11,11 +11,11 @@
 {%- endmacro -%}
 
 {%- macro fixed_blob(tref) -%}
-[{{typeref(tref["targs"][0])}}]fixed_blob
+[{{typeref(tref["targs"][0])}}]FixedBlob
 {%- endmacro -%}
 
 {%- macro variant(tref) -%}
-interface{}{# TODO: Generate a struct for each variant that enforces desired types #}
+Serializeable{}{# TODO: Generate a struct for each variant that enforces desired types #}
 {%- endmacro -%}
 
 {%- macro typeref(tref) -%}
@@ -23,15 +23,15 @@ interface{}{# TODO: Generate a struct for each variant that enforces desired typ
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
 {%- elif tref["name"][-1] == "variant" -%}{{variant(tref)}}
-{%- elif tref["name"][-1] == "boolean" -%}bool
+{%- elif tref["name"][-1] == "boolean" -%}Boolean
 {%- else -%}
-{{tref["name"][-1]}}
+{{go_name(tref["name"][-1])}}
 {%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
 {%- endif -%}
 {%- endmacro -%}
 
 {%- macro struct_serialization(decl) -%}
-func (n {{decl["name"]}}) Serialize(vblob variable_blob) variable_blob {
+func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
 {%- for field in decl["fields"] %}
     vb = {{field["name"]}}.Serialize(vb){% endfor %}
     return vb
@@ -40,7 +40,7 @@ func (n {{decl["name"]}}) Serialize(vblob variable_blob) variable_blob {
 
 {%- macro struct(decl) -%}
 // ----------------------------------------
-//  Struct: {{decl["name"]}}
+//  Struct: {{go_name(decl["name"])}}
 // ----------------------------------------
 
 {# // {{decl}} #}type {{decl["name"]}} struct {
@@ -54,19 +54,19 @@ func (n {{decl["name"]}}) Serialize(vblob variable_blob) variable_blob {
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
-type {{decl["name"]}} {{typeref(decl["tref"])}}
+type {{go_name(decl["name"])}} {{typeref(decl["tref"])}}
 {% endmacro -%}
 
 {%- macro enum(decl) -%}
 // ----------------------------------------
-//  Enum: {{decl["name"]}}
+//  Enum: go_name({{decl["name"]}})
 // ----------------------------------------
 
-type {{decl["name"]}} uint32
+type {{decl["name"]}} UInt64
 
 const (
 {%- for entry in decl["entries"] %}
-    {{entry["name"]}} {{decl["name"]}} = {{entry["value"]}}
+    {{go_name(entry["name"])}} {{go_name(decl["name"])}} = {{entry["value"]}}
 {%- endfor %}
 )
 {% endmacro -%}

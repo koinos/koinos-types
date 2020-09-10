@@ -24,6 +24,14 @@ def cpp_namespace(name):
         return ""
     return "::".join(u[:-1])
 
+def go_name(name):
+    u = name
+    # Fix integer naming
+    if u.startswith("ui"): u = "u_i" + u[2:]
+    if u.endswith("_t"): u = u[-2:]
+    # Convert to pascal case
+    return u.replace("_", " ").title().replace(" ", "")
+
 def generate_golang(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -37,6 +45,7 @@ def generate_golang(schema):
     ctx = {"schema" : schema,
            "decls_by_name" : decls_by_name,
            "decl_namespaces" : decl_namespaces,
+           "go_name" : go_name
           }
     for name, val in ctx["decls_by_name"].items():
         print(name)

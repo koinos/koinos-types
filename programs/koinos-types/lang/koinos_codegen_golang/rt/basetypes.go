@@ -51,19 +51,19 @@ type FixedBlob byte
 //  Multihash
 // ----------------
 type Multihash struct {
-    id uint64
-    digest variable_blob
+    Id UInt64
+    Digest VariableBlob
 }
 
-func (m0 *Multihash) eq(m1 *multihash) boolean {
+func (m0 *Multihash) eq(m1 *Multihash) Boolean {
     return false
 }
 
-func (m0 *Multihash) lt(m1 *multihash) boolean {
+func (m0 *Multihash) lt(m1 *Multihash) Boolean {
     return false
 }
 
-func (m0 *Multihash) gt(m1 *multihash) boolean {
+func (m0 *Multihash) gt(m1 *Multihash) Boolean {
     return false
 }
 
@@ -71,6 +71,6 @@ func (m0 *Multihash) gt(m1 *multihash) boolean {
 //  Multihash Vector
 // ----------------
 type MultihashVector struct {
-    id uint64_t
-    digests []variable_blob
+    Id UInt64
+    Digests []VariableBlob
 }
