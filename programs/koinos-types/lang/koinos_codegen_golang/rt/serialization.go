@@ -33,7 +33,7 @@ func (n boolean) Serialize(vb VariableBlob) VariableBlob {
     return appendByte(vb, byte(n))
 }
 
-func DeserializeBoolean(vb VariableBlob) (uint32,boolean) {
+func DeserializeBoolean(vb VariableBlob) (uint32,Boolean) {
     return 1, boolean(vb[0])
 }
 

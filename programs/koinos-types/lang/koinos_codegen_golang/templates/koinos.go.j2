@@ -1,5 +1,5 @@
 {%- macro vector(tref) -%}
-[]{{go_name(typeref(tref["targs"][0]))}}
+[]{{typeref(tref["targs"][0])}}
 {%- endmacro -%}
 
 {%- macro template(targs) -%}
@@ -33,24 +33,38 @@ Serializeable{}{# TODO: Generate a struct for each variant that enforces desired
 {%- macro struct_serialization(decl) -%}
 func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
 {%- for field in decl["fields"] %}
-    vb = {{field["name"]}}.Serialize(vb){% endfor %}
+    vb = {{go_name(field["name"])}}.Serialize(vb){% endfor %}
     return vb
 }
 {%- endmacro -%}
 
+{%- macro struct_deserialization(decl) -%}
+func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(decl["name"])}}) {
+    var i,j uint64 = 0,0
+    s := {{go_name(decl["name"])}}{}
+{%- for field in decl["fields"] %}
+    {%- set tname = typeref(field["tref"]) %}
+    j,s.{{go_name(field["name"])}} = Deserialize{{tname}}(vb[i:]) (uint64,{{tname}}); i+=j{% endfor %}
+    return i, s
+}
+{%- endmacro -%}
+
 {%- macro struct(decl) -%}
+{%- set sname = go_name(decl["name"]) -%}
 // ----------------------------------------
-//  Struct: {{go_name(decl["name"])}}
+//  Struct: {{sname}}
 // ----------------------------------------
 
-{# // {{decl}} #}type {{decl["name"]}} struct {
+{# // {{decl}} #}type {{sname}} struct {
 {% if decl["fields"]|length > 0 -%}
-{%- for field in decl["fields"] %}    {{field["name"]}} {{typeref(field["tref"])}}
+{%- for field in decl["fields"] %}    {{go_name(field["name"])}} {{typeref(field["tref"])}}
 {% endfor %}
 {%- endif -%}
 }
 
 {{struct_serialization(decl)}}
+
+{{struct_deserialization(decl)}}
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
