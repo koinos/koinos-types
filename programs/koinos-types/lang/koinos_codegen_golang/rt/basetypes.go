@@ -15,12 +15,20 @@ type Serializeable interface {
 
 type Boolean bool
 
-func (n boolean) Serialize(vb VariableBlob) VariableBlob {
-    return appendByte(vb, byte(n))
+func (n Boolean) Serialize(vb VariableBlob) VariableBlob {
+    var b byte
+    if n {
+        b = 1
+    }
+    return AppendToVBlob(vb, b)
 }
 
 func DeserializeBoolean(vb VariableBlob) (uint32,Boolean) {
-    return 1, boolean(vb[0])
+    var b Boolean
+    if vb[0] == 1 {
+        b = true
+    }
+    return 1, b
 }
 
 // --------------------------------
@@ -30,7 +38,7 @@ func DeserializeBoolean(vb VariableBlob) (uint32,Boolean) {
 type Int8 int8
 
 func (n Int8) Serialize(vb VariableBlob) VariableBlob {
-    return appendByte(vb, byte(n))
+    return AppendToVBlob(vb, byte(n))
 }
 
 func DeserializeInt8(vb VariableBlob) (uint32,Int8) {
@@ -44,7 +52,7 @@ func DeserializeInt8(vb VariableBlob) (uint32,Int8) {
 type UInt8 uint8
 
 func (n UInt8) Serialize(vb VariableBlob) VariableBlob {
-    return appendByte(vb, byte(n))
+    return AppendToVBlob(vb, byte(n))
 }
 
 func DeserializeUint8(vb VariableBlob) (uint32,UInt8) {
@@ -60,7 +68,7 @@ type Int16 int16
 func (n Int16) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 2)
     binary.BigEndian.PutUint16(b, uint16(n))
-    return appendByte(vb, b...)
+    return AppendToVBlob(vb, b...)
 }
 
 func DeserializeInt16(vb VariableBlob) (uint32,Int16) {
@@ -75,12 +83,12 @@ type UInt16 uint16
 
 func (n UInt16) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 2)
-    binary.BigEndian.PutUint16(b, n)
-    return appendByte(vb, b...)
+    binary.BigEndian.PutUint16(b, uint16(n))
+    return AppendToVBlob(vb, b...)
 }
 
 func DeserializeUInt16(vb VariableBlob) (uint32,UInt16) {
-    return 2, binary.BigEndian.Uint16(vb)
+    return 2, UInt16(binary.BigEndian.Uint16(vb))
 }
 
 
@@ -93,7 +101,7 @@ type Int32 int32
 func (n Int32) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 4)
     binary.BigEndian.PutUint32(b, uint32(n))
-    return appendByte(vb, b...)
+    return AppendToVBlob(vb, b...)
 }
 
 func DeserializeInt32(vb VariableBlob) (uint32,Int32) {
@@ -108,12 +116,12 @@ type UInt32 uint32
 
 func (n UInt32) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 4)
-    binary.BigEndian.PutUint32(b, n)
-    return appendByte(vb, b...)
+    binary.BigEndian.PutUint32(b, uint32(n))
+    return AppendToVBlob(vb, b...)
 }
 
-func DeserializeUint32(vb VariableBlob) (uint32,Int32) {
-    return 4, binary.BigEndian.Uint32(vb)
+func DeserializeUint32(vb VariableBlob) (uint32,UInt32) {
+    return 4, UInt32(binary.BigEndian.Uint32(vb))
 }
 
 // --------------------------------
@@ -125,7 +133,7 @@ type Int64 int64
 func (n Int64) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, uint64(n))
-    return appendByte(vb, b...)
+    return AppendToVBlob(vb, b...)
 }
 
 func DeserializeInt64(vb VariableBlob) (uint32,Int64) {
@@ -140,12 +148,12 @@ type UInt64 uint64
 
 func (n UInt64) Serialize(vb VariableBlob) VariableBlob {
     b := make([]byte, 8)
-    binary.BigEndian.PutUint64(b, n)
-    return appendByte(vb, b...)
+    binary.BigEndian.PutUint64(b, uint64(n))
+    return AppendToVBlob(vb, b...)
 }
 
 func DeserializeUInt64(vb VariableBlob) (uint32,UInt64) {
-    return 8, binary.BigEndian.Uint64(vb)
+    return 8, UInt64(binary.BigEndian.Uint64(vb))
 }
 
 type Int128  struct {
@@ -160,15 +168,15 @@ type Int160 struct {
     value big.Int
 }
 
-type UInt160 {
+type UInt160 struct {
     value big.Int
 }
 
-type UInt256_t {
+type Int256 struct {
     value big.Int
 }
 
-type UInt256_t {
+type UInt256 struct {
     value big.Int
 }
 
@@ -181,14 +189,14 @@ type VariableBlob []byte
 func (n VariableBlob) Serialize(vb VariableBlob) VariableBlob {
     header := make([]byte, 8)
     binary.BigEndian.PutUint64(header, uint64(len(n)))
-    vb = appendByte(vb, header...)
-    return appendByte(vb, n...)
+    vb = AppendToVBlob(vb, header...)
+    return AppendToVBlob(vb, n...)
 }
 
 func DeserializeVariableBlob(vb VariableBlob) (uint64,VariableBlob) {
     var size uint64 = binary.BigEndian.Uint64(vb)
     var result VariableBlob = VariableBlob(make([]byte, 0, size))
-    return 8+size, appendByte(result, vb[8:]...)
+    return 8+size, AppendToVBlob(result, vb[8:]...)
 }
 
 type TimestampType uint64
@@ -240,3 +248,4 @@ func AppendToVBlob(vblob VariableBlob, data ...byte) []byte {
     copy(vblob[m:n], data)
     return vblob
 }
+
