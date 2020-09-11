@@ -33,7 +33,7 @@ Serializeable{}{# TODO: Generate a struct for each variant that enforces desired
 {%- macro struct_serialization(decl) -%}
 func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
 {%- for field in decl["fields"] %}
-    vb = {{go_name(field["name"])}}.Serialize(vb){% endfor %}
+    vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
     return vb
 }
 {%- endmacro -%}
@@ -44,7 +44,7 @@ func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(dec
     s := {{go_name(decl["name"])}}{}
 {%- for field in decl["fields"] %}
     {%- set tname = typeref(field["tref"]) %}
-    j,s.{{go_name(field["name"])}} = Deserialize{{tname}}(vb[i:]) (uint64,{{tname}}); i+=j{% endfor %}
+    j,s.{{go_name(field["name"])}} = Deserialize{{tname}}(vb[i:]); i+=j{% endfor %}
     return i, s
 }
 {%- endmacro -%}
@@ -68,15 +68,19 @@ func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(dec
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
+// ----------------------------------------
+//  Typedef: {{go_name(decl["name"])}}
+// ----------------------------------------
+
 type {{go_name(decl["name"])}} {{typeref(decl["tref"])}}
-{% endmacro -%}
+{%- endmacro -%}
 
 {%- macro enum(decl) -%}
 // ----------------------------------------
-//  Enum: go_name({{decl["name"]}})
+//  Enum: {{go_name(decl["name"])}}
 // ----------------------------------------
 
-type {{decl["name"]}} UInt64
+type {{go_name(decl["name"])}} UInt64
 
 const (
 {%- for entry in decl["entries"] %}
@@ -85,10 +89,17 @@ const (
 )
 {% endmacro -%}
 
-{%- for name, decl in decls_by_name.items() -%}
+//   ____                           _           _    ____          _
+//  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| |  / ___|___   __| | ___
+// | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \/ _` | | |   / _ \ / _` |/ _ \
+// | |_| |  __/ | | |  __/ | | (_| | ||  __/ (_| | | |__| (_) | (_| |  __/
+//  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|  \____\___/ \__,_|\___|
+//                         Please do not modify
+
+{% for name, decl in decls_by_name.items() -%}
 {% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
 {% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
-{% elif decl["info"]["type"] == "BaseType" %}{# Ignore base types for now #}
+{# {%- elif decl["info"]["type"] == "BaseType" -%} #}
 {% elif decl["info"]["type"] == "EnumClass" %}{{enum(decl)}}
 {# {%- else -%}// TODO: Unimplemented {{decl}} #}
 {%- endif -%}

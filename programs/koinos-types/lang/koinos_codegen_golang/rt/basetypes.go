@@ -23,7 +23,7 @@ func (n Boolean) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b)
 }
 
-func DeserializeBoolean(vb VariableBlob) (uint32,Boolean) {
+func DeserializeBoolean(vb VariableBlob) (uint64,Boolean) {
     var b Boolean
     if vb[0] == 1 {
         b = true
@@ -41,7 +41,7 @@ func (n Int8) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, byte(n))
 }
 
-func DeserializeInt8(vb VariableBlob) (uint32,Int8) {
+func DeserializeInt8(vb VariableBlob) (uint64,Int8) {
     return 1, Int8(vb[0])
 }
 
@@ -55,7 +55,7 @@ func (n UInt8) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, byte(n))
 }
 
-func DeserializeUint8(vb VariableBlob) (uint32,UInt8) {
+func DeserializeUint8(vb VariableBlob) (uint64,UInt8) {
     return 1, UInt8(vb[0])
 }
 
@@ -71,7 +71,7 @@ func (n Int16) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeInt16(vb VariableBlob) (uint32,Int16) {
+func DeserializeInt16(vb VariableBlob) (uint64,Int16) {
     return 2, Int16(binary.BigEndian.Uint16(vb))
 }
 
@@ -87,7 +87,7 @@ func (n UInt16) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeUInt16(vb VariableBlob) (uint32,UInt16) {
+func DeserializeUInt16(vb VariableBlob) (uint64,UInt16) {
     return 2, UInt16(binary.BigEndian.Uint16(vb))
 }
 
@@ -104,7 +104,7 @@ func (n Int32) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeInt32(vb VariableBlob) (uint32,Int32) {
+func DeserializeInt32(vb VariableBlob) (uint64,Int32) {
     return 4, Int32(binary.BigEndian.Uint32(vb))
 }
 
@@ -120,7 +120,7 @@ func (n UInt32) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeUint32(vb VariableBlob) (uint32,UInt32) {
+func DeserializeUInt32(vb VariableBlob) (uint64,UInt32) {
     return 4, UInt32(binary.BigEndian.Uint32(vb))
 }
 
@@ -136,7 +136,7 @@ func (n Int64) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeInt64(vb VariableBlob) (uint32,Int64) {
+func DeserializeInt64(vb VariableBlob) (uint64,Int64) {
     return 8, Int64(binary.BigEndian.Uint64(vb))
 }
 
@@ -152,7 +152,7 @@ func (n UInt64) Serialize(vb VariableBlob) VariableBlob {
     return AppendToVBlob(vb, b...)
 }
 
-func DeserializeUInt64(vb VariableBlob) (uint32,UInt64) {
+func DeserializeUInt64(vb VariableBlob) (uint64,UInt64) {
     return 8, UInt64(binary.BigEndian.Uint64(vb))
 }
 
@@ -187,20 +187,50 @@ type UInt256 struct {
 type VariableBlob []byte
 
 func (n VariableBlob) Serialize(vb VariableBlob) VariableBlob {
-    header := make([]byte, 8)
-    binary.BigEndian.PutUint64(header, uint64(len(n)))
-    vb = AppendToVBlob(vb, header...)
+    header := make([]byte, binary.MaxVarintLen64)
+    bytes := binary.PutUvarint(header, uint64(len(n)))
+    vb = AppendToVBlob(vb, header[:bytes]...)
     return AppendToVBlob(vb, n...)
 }
 
 func DeserializeVariableBlob(vb VariableBlob) (uint64,VariableBlob) {
-    var size uint64 = binary.BigEndian.Uint64(vb)
+    size,bytes := binary.Uvarint(vb)
     var result VariableBlob = VariableBlob(make([]byte, 0, size))
-    return 8+size, AppendToVBlob(result, vb[8:]...)
+    return uint64(uint64(bytes)+size), AppendToVBlob(result, vb[bytes:]...)
 }
 
+// --------------------------------
+//  TimestampType
+// --------------------------------
+
 type TimestampType uint64
+
+func (n TimestampType) Serialize(vb VariableBlob) VariableBlob {
+    b := make([]byte, 8)
+    binary.BigEndian.PutUint64(b, uint64(n))
+    return AppendToVBlob(vb, b...)
+}
+
+func DeserializeTimestampType(vb VariableBlob) (uint32,TimestampType) {
+    return 8, TimestampType(binary.BigEndian.Uint64(vb))
+}
+
+// --------------------------------
+//  BlockHeightType
+// --------------------------------
+
 type BlockHeightType uint64
+
+func (n BlockHeightType) Serialize(vb VariableBlob) VariableBlob {
+    b := make([]byte, 8)
+    binary.BigEndian.PutUint64(b, uint64(n))
+    return AppendToVBlob(vb, b...)
+}
+
+func DeserializeBlockHeightType(vb VariableBlob) (uint32,BlockHeightType) {
+    return 8, BlockHeightType(binary.BigEndian.Uint64(vb))
+}
+
 type FixedBlob byte
 
 // --------------------------------
@@ -232,7 +262,7 @@ type MultihashVector struct {
 }
 
 // --------------------------------
-// Utility functions
+//  Utility functions
 // --------------------------------
 
 func AppendToVBlob(vblob VariableBlob, data ...byte) []byte {
