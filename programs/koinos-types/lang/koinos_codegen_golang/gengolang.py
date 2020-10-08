@@ -12,6 +12,8 @@ import jinja2
 import collections
 import os
 
+fixed_blobs = set()
+
 class RenderError(Exception):
     pass
 
@@ -32,6 +34,15 @@ def go_name(name):
     # Convert to pascal case
     return u.replace("_", " ").title().replace(" ", "")
 
+def decl_fixed_blob(length):
+    fixed_blobs.add(length)
+    return ""
+
+def get_fixed_blobs():
+    fb_list = list(fixed_blobs)
+    fb_list.sort()
+    return fb_list
+
 def generate_golang(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -45,7 +56,9 @@ def generate_golang(schema):
     ctx = {"schema" : schema,
            "decls_by_name" : decls_by_name,
            "decl_namespaces" : decl_namespaces,
-           "go_name" : go_name
+           "go_name" : go_name,
+           "decl_fixed_blob" : decl_fixed_blob,
+           "get_fixed_blobs" : get_fixed_blobs
           }
     for name, val in ctx["decls_by_name"].items():
         print(name)

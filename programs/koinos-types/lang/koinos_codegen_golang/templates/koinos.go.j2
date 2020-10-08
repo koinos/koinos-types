@@ -11,7 +11,9 @@
 {%- endmacro -%}
 
 {%- macro fixed_blob(tref) -%}
-[{{typeref(tref["targs"][0])}}]FixedBlob
+{%- set length = typeref(tref["targs"][0]) -%}
+FixedBlob{{length}}
+{{decl_fixed_blob(length)}}
 {%- endmacro -%}
 
 {%- macro variant(tref) -%}
@@ -89,6 +91,28 @@ const (
 )
 {% endmacro -%}
 
+{%- macro generate_fixed_blobs() -%}
+{% for length in get_fixed_blobs() -%}
+{%- set fbname='FixedBlob'+length -%}
+// ----------------------------------------
+//  {{fbname}}
+// ----------------------------------------
+
+type {{fbname}} [{{length}}]byte
+
+func (n {{fbname}}) Serialize(vb VariableBlob) VariableBlob {
+    return AppendToVBlob(vb, n[:]...)
+}
+
+func Deserialize{{fbname}}(vb VariableBlob) (uint32,{{fbname}}) {
+    var result {{fbname}}
+    copy(result[:], vb)
+    return {{length}},result
+}
+
+{% endfor %}
+{% endmacro -%}
+
 //   ____                           _           _    ____          _
 //  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| |  / ___|___   __| | ___
 // | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \/ _` | | |   / _ \ / _` |/ _ \
@@ -105,3 +129,4 @@ const (
 {%- endif -%}
 
 {% endfor %}
+{{generate_fixed_blobs()}}

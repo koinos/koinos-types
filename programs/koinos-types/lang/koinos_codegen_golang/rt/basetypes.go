@@ -278,4 +278,3 @@ func AppendToVBlob(vblob VariableBlob, data ...byte) []byte {
     copy(vblob[m:n], data)
     return vblob
 }
-
