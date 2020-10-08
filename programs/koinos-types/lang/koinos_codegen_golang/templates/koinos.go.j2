@@ -78,17 +78,27 @@ type {{go_name(decl["name"])}} {{typeref(decl["tref"])}}
 {%- endmacro -%}
 
 {%- macro enum(decl) -%}
+{%- set ename = go_name(decl["name"]) -%}
 // ----------------------------------------
-//  Enum: {{go_name(decl["name"])}}
+//  Enum: {{ename}}
 // ----------------------------------------
 
-type {{go_name(decl["name"])}} UInt64
+type {{ename}} UInt32
 
 const (
 {%- for entry in decl["entries"] %}
-    {{go_name(entry["name"])}} {{go_name(decl["name"])}} = {{entry["value"]}}
+    {{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
 {%- endfor %}
 )
+
+func (n {{ename}}) Serialize(vb VariableBlob) VariableBlob {
+    return UInt32(n).Serialize(vb)
+}
+
+func Deserialize{{ename}}(vb VariableBlob) (uint32,uint32) {
+    return DeserializeUInt32(vb)
+}
+
 {% endmacro -%}
 
 {%- macro generate_fixed_blobs() -%}
@@ -101,7 +111,7 @@ const (
 type {{fbname}} [{{length}}]byte
 
 func (n {{fbname}}) Serialize(vb VariableBlob) VariableBlob {
-    return AppendToVBlob(vb, n[:]...)
+    return append(vb, n[:]...)
 }
 
 func Deserialize{{fbname}}(vb VariableBlob) (uint32,{{fbname}}) {
