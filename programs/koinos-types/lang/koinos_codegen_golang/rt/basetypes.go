@@ -156,28 +156,148 @@ func DeserializeUInt64(vb VariableBlob) (uint64,UInt64) {
     return 8, UInt64(binary.BigEndian.Uint64(vb))
 }
 
-type Int128  struct {
-    value big.Int
+// ----------------------------------------
+//  Int128
+// ----------------------------------------
+
+type Int128 struct {
+    Value big.Int
 }
+
+func NewInt128(value string) Int128 {
+    var result Int128 = Int128{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n Int128) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 16, true)...)
+}
+
+func DeserializeInt128(vb VariableBlob) (uint64,Int128) {
+    bi := Int128{Value:*DeserializeBigInt(vb, 16, true)}
+    return 16,bi
+}
+
+// ----------------------------------------
+//  UInt128
+// ----------------------------------------
 
 type UInt128 struct {
-    value big.Int
+    Value big.Int
 }
+
+func NewUInt128(value string) UInt128 {
+    var result UInt128 = UInt128{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n UInt128) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 20, false)...)
+}
+
+func DeserializeUInt128(vb VariableBlob) (uint64,UInt128) {
+    bi := UInt128{Value:*DeserializeBigInt(vb, 20, false)}
+    return 16,bi
+}
+
+// ----------------------------------------
+//  Int160
+// ----------------------------------------
 
 type Int160 struct {
-    value big.Int
+    Value big.Int
 }
+
+func NewInt160(value string) Int160 {
+    var result Int160 = Int160{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n Int160) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 16, true)...)
+}
+
+func DeserializeInt160(vb VariableBlob) (uint64,Int160) {
+    bi := Int160{Value:*DeserializeBigInt(vb, 16, true)}
+    return 16,bi
+}
+
+// ----------------------------------------
+//  UInt160
+// ----------------------------------------
 
 type UInt160 struct {
-    value big.Int
+    Value big.Int
 }
+
+func NewUInt160(value string) UInt160 {
+    var result UInt160 = UInt160{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n UInt160) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 20, false)...)
+}
+
+func DeserializeUInt160(vb VariableBlob) (uint64,UInt160) {
+    bi := UInt160{Value:*DeserializeBigInt(vb, 20, false)}
+    return 20,bi
+}
+
+// ----------------------------------------
+//  Int256
+// ----------------------------------------
 
 type Int256 struct {
-    value big.Int
+    Value big.Int
 }
 
+func NewInt256(value string) Int256 {
+    var result Int256 = Int256{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n Int256) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 32, true)...)
+}
+
+func DeserializeInt256(vb VariableBlob) (uint64,Int256) {
+    bi := Int256{Value:*DeserializeBigInt(vb, 32, true)}
+    return 32,bi
+}
+
+// ----------------------------------------
+//  UInt256
+// ----------------------------------------
+
 type UInt256 struct {
-    value big.Int
+    Value big.Int
+}
+
+func NewUInt256(value string) UInt256 {
+    var result UInt256 = UInt256{}
+    nv,_ := result.Value.SetString(value, 10)
+    result.Value = *nv
+    return result
+}
+
+func (n UInt256) Serialize(vb VariableBlob) VariableBlob {
+    return append(vb, SerializeBigInt(&n.Value, 32, false)...)
+}
+
+func DeserializeUInt256(vb VariableBlob) (uint64,UInt256) {
+    bi := UInt256{Value:*DeserializeBigInt(vb, 32, false)}
+    return 32,bi
 }
 
 // --------------------------------
@@ -236,6 +356,7 @@ type FixedBlob byte
 // --------------------------------
 //  Multihash
 // --------------------------------
+
 type Multihash struct {
     Id UInt64
     Digest VariableBlob
@@ -256,7 +377,43 @@ func (m0 *Multihash) gt(m1 *Multihash) Boolean {
 // --------------------------------
 //  Multihash Vector
 // --------------------------------
+
 type MultihashVector struct {
     Id UInt64
     Digests []VariableBlob
+}
+
+// --------------------------------
+//  Utility Functions
+// --------------------------------
+
+func SerializeBigInt(num *big.Int, byte_size int, signed bool) VariableBlob {
+    v := VariableBlob(make([]byte, byte_size))
+
+    if signed && num.Sign() == -1 {
+        num = num.Add(big.NewInt(1), num)
+        v = num.FillBytes(v)
+        for i := 0; i < byte_size; i++ {
+            v[i] = ^v[i]
+        }
+        return v
+    }
+
+    v = num.FillBytes(v)
+    return v
+}
+
+func DeserializeBigInt(vb VariableBlob, byte_size int, signed bool) *big.Int {
+    num := new(big.Int)
+    v := VariableBlob(make([]byte, byte_size))
+    _ = copy(v, vb[:byte_size])
+    if signed && (0x80 & v[0]) == 0x80 {
+        for i := 0; i < byte_size; i++ {
+            v[i] = ^v[i]
+        }
+        neg := big.NewInt(-1)
+        return num.SetBytes(v).Mul(neg, num).Add(neg, num)
+    }
+
+    return num.SetBytes(v[:byte_size])
 }
