@@ -81,14 +81,39 @@ func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(dec
 //  Variant: {{varname}}
 // ----------------------------------------
 
-type {{varname}} Serializeable
-
-func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
-    
+type {{varname}} struct {
+    Value interface{}
 }
 
-func Deserialize{{varname}}(vb VariableBlob) (uint32,{{varname}}) {
-    
+func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
+    var i uint64
+    switch n.Value.(type) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{arg_type}}:
+            i = {{loop.index - 1}}
+            break;
+{%- endfor %}
+    }
+
+    vb = UInt64(i).Serialize(vb)
+    return n.Serialize(vb)
+}
+
+func Deserialize{{varname}}(vb VariableBlob) (uint64,{{varname}}) {
+    i,type_id := DeserializeUInt64(vb)
+    var j UInt64
+    v := {{varname}}
+    switch( type_id ) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{loop.index - 1}}:
+            j,v.Value = Deserialize{{arg_type}}(vb[i:])
+            break
+{%- endfor %}
+    }
+
+    return i+j,v
 }
 
 {%- endmacro -%}
