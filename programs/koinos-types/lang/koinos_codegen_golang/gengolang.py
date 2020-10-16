@@ -13,6 +13,7 @@ import collections
 import os
 
 fixed_blobs = set()
+variants = []
 
 class RenderError(Exception):
     pass
@@ -42,6 +43,13 @@ def get_fixed_blobs():
     fb_list = list(fixed_blobs)
     fb_list.sort()
     return fb_list
+
+def decl_variant():
+    variants.append(v_def)
+    return ""
+
+def get_variants():
+    return variants
 
 def generate_golang(schema):
     env = jinja2.Environment(

@@ -351,8 +351,6 @@ func DeserializeBlockHeightType(vb VariableBlob) (uint32,BlockHeightType) {
     return 8, BlockHeightType(binary.BigEndian.Uint64(vb))
 }
 
-type FixedBlob byte
-
 // --------------------------------
 //  Multihash
 // --------------------------------

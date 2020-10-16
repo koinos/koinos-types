@@ -12,19 +12,17 @@
 
 {%- macro fixed_blob(tref) -%}
 {%- set length = typeref(tref["targs"][0]) -%}
-FixedBlob{{length}}
-{{decl_fixed_blob(length)}}
+FixedBlob{{length}}{{decl_fixed_blob(length)}}
 {%- endmacro -%}
 
 {%- macro variant(tref) -%}
-Serializeable{}{# TODO: Generate a struct for each variant that enforces desired types #}
+{{tref["name"]}}
 {%- endmacro -%}
 
 {%- macro typeref(tref) -%}
 {%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
-{%- elif tref["name"][-1] == "variant" -%}{{variant(tref)}}
 {%- elif tref["name"][-1] == "boolean" -%}Boolean
 {%- else -%}
 {{go_name(tref["name"][-1])}}
@@ -70,11 +68,49 @@ func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(dec
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
+{%- if decl["tref"]["name"][-1] == "variant" -%}
+{{variant_def(decl)}}
+{%- else -%}
+{{basic_typedef(decl)}}
+{%- endif %}
+{% endmacro -%}
+
+{%- macro variant_def(decl) -%}
+{%- set varname = go_name(decl["name"]) -%}
 // ----------------------------------------
-//  Typedef: {{go_name(decl["name"])}}
+//  Variant: {{varname}}
 // ----------------------------------------
 
-type {{go_name(decl["name"])}} {{typeref(decl["tref"])}}
+type {{varname}} Serializeable
+
+func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
+    
+}
+
+func Deserialize{{varname}}(vb VariableBlob) (uint32,{{varname}}) {
+    
+}
+
+{%- endmacro -%}
+
+{%- macro basic_typedef(decl) -%}
+{%- set tname = go_name(decl["name"])-%}
+{%- set rname = typeref(decl["tref"])-%}
+// ----------------------------------------
+//  Typedef: {{tname}}
+// ----------------------------------------
+
+type {{tname}} {{rname}}
+
+func (n {{tname}}) Serialize(vb VariableBlob) VariableBlob {
+    return {{rname}}(n).Serialize(vb)
+}
+
+func Deserialize{{tname}}(vb VariableBlob) (uint64,{{tname}}) {
+    i,n := Deserialize{{rname}}(vb)
+    return i,{{tname}}(n)
+}
+
 {%- endmacro -%}
 
 {%- macro enum(decl) -%}
