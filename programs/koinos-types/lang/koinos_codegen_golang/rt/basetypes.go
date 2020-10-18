@@ -10,6 +10,20 @@ type Serializeable interface {
 }
 
 // --------------------------------
+//  String
+// --------------------------------
+
+type String string
+
+func (n String) Serialize(vb VariableBlob) VariableBlob {
+    return vb
+}
+
+func DeserializeString(vb VariableBlob) (uint64,String) {
+    return 0,String("")
+}
+
+// --------------------------------
 //  Boolean
 // --------------------------------
 
@@ -55,7 +69,7 @@ func (n UInt8) Serialize(vb VariableBlob) VariableBlob {
     return append(vb, byte(n))
 }
 
-func DeserializeUint8(vb VariableBlob) (uint64,UInt8) {
+func DeserializeUInt8(vb VariableBlob) (uint64,UInt8) {
     return 1, UInt8(vb[0])
 }
 
@@ -306,6 +320,11 @@ func DeserializeUInt256(vb VariableBlob) (uint64,UInt256) {
 
 type VariableBlob []byte
 
+// TODO: Make this variadic for size and size_hint
+func NewVariableBlob() VariableBlob {
+    return VariableBlob(make([]byte, 0))
+}
+
 func (n VariableBlob) Serialize(vb VariableBlob) VariableBlob {
     header := make([]byte, binary.MaxVarintLen64)
     bytes := binary.PutUvarint(header, uint64(len(n)))
@@ -331,7 +350,7 @@ func (n TimestampType) Serialize(vb VariableBlob) VariableBlob {
     return append(vb, b...)
 }
 
-func DeserializeTimestampType(vb VariableBlob) (uint32,TimestampType) {
+func DeserializeTimestampType(vb VariableBlob) (uint64,TimestampType) {
     return 8, TimestampType(binary.BigEndian.Uint64(vb))
 }
 
@@ -347,7 +366,7 @@ func (n BlockHeightType) Serialize(vb VariableBlob) VariableBlob {
     return append(vb, b...)
 }
 
-func DeserializeBlockHeightType(vb VariableBlob) (uint32,BlockHeightType) {
+func DeserializeBlockHeightType(vb VariableBlob) (uint64,BlockHeightType) {
     return 8, BlockHeightType(binary.BigEndian.Uint64(vb))
 }
 
@@ -372,6 +391,14 @@ func (m0 *Multihash) gt(m1 *Multihash) Boolean {
     return false
 }
 
+func (n Multihash) Serialize(vb VariableBlob) VariableBlob {
+    return vb
+}
+
+func DeserializeMultihash(vb VariableBlob) (uint64,Multihash) {
+    return 0,Multihash{}
+}
+
 // --------------------------------
 //  Multihash Vector
 // --------------------------------
@@ -379,6 +406,14 @@ func (m0 *Multihash) gt(m1 *Multihash) Boolean {
 type MultihashVector struct {
     Id UInt64
     Digests []VariableBlob
+}
+
+func (n MultihashVector) Serialize(vb VariableBlob) VariableBlob {
+    return vb
+}
+
+func DeserializeMultihashVector(vb VariableBlob) (uint64,MultihashVector) {
+    return 0,MultihashVector{}
 }
 
 // --------------------------------

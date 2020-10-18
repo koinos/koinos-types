@@ -1,5 +1,6 @@
 {%- macro vector(tref) -%}
-[]{{typeref(tref["targs"][0])}}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Vector{{v_type}}{{decl_vector(v_type)}}
 {%- endmacro -%}
 
 {%- macro template(targs) -%}
@@ -15,6 +16,11 @@
 FixedBlob{{length}}{{decl_fixed_blob(length)}}
 {%- endmacro -%}
 
+{%- macro opaque(tref) -%}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Opaque{{v_type}}{{decl_opaque(v_type)}}
+{%- endmacro -%}
+
 {%- macro variant(tref) -%}
 {{tref["name"]}}
 {%- endmacro -%}
@@ -23,7 +29,9 @@ FixedBlob{{length}}{{decl_fixed_blob(length)}}
 {%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
+{%- elif tref["name"][-1] == "opaque" -%}{{opaque(tref)}}
 {%- elif tref["name"][-1] == "boolean" -%}Boolean
+{%- elif tref["name"][-1] == "string" -%}String
 {%- else -%}
 {{go_name(tref["name"][-1])}}
 {%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
@@ -40,7 +48,7 @@ func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
 
 {%- macro struct_deserialization(decl) -%}
 func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(decl["name"])}}) {
-    var i,j uint64 = 0,0
+    {% if decl["fields"]|length > 0 -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
     s := {{go_name(decl["name"])}}{}
 {%- for field in decl["fields"] %}
     {%- set tname = typeref(field["tref"]) %}
@@ -102,8 +110,8 @@ func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
 
 func Deserialize{{varname}}(vb VariableBlob) (uint64,{{varname}}) {
     i,type_id := DeserializeUInt64(vb)
-    var j UInt64
-    v := {{varname}}
+    var j uint64
+    var v {{varname}}
     switch( type_id ) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
@@ -121,6 +129,7 @@ func Deserialize{{varname}}(vb VariableBlob) (uint64,{{varname}}) {
 {%- macro basic_typedef(decl) -%}
 {%- set tname = go_name(decl["name"])-%}
 {%- set rname = typeref(decl["tref"])-%}
+{%- if tname != rname -%}
 // ----------------------------------------
 //  Typedef: {{tname}}
 // ----------------------------------------
@@ -136,6 +145,7 @@ func Deserialize{{tname}}(vb VariableBlob) (uint64,{{tname}}) {
     return i,{{tname}}(n)
 }
 
+{%- endif -%}
 {%- endmacro -%}
 
 {%- macro enum(decl) -%}
@@ -148,7 +158,7 @@ type {{ename}} UInt32
 
 const (
 {%- for entry in decl["entries"] %}
-    {{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
+    {{ename}}_{{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
 {%- endfor %}
 )
 
@@ -156,11 +166,71 @@ func (n {{ename}}) Serialize(vb VariableBlob) VariableBlob {
     return UInt32(n).Serialize(vb)
 }
 
-func Deserialize{{ename}}(vb VariableBlob) (uint32,uint32) {
-    return DeserializeUInt32(vb)
+func Deserialize{{ename}}(vb VariableBlob) (uint64,{{ename}}) {
+    i,item := DeserializeUInt32(vb)
+    return i,{{ename}}(item)
 }
 
 {% endmacro -%}
+
+{%- macro generate_vectors() -%}
+{% for v_type in get_vectors() -%}
+{%- set o_type = "Vector" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+type {{o_type}} []{{v_type}}
+
+func (n {{o_type}}) Serialize(vb VariableBlob) VariableBlob {
+    header := make([]byte, binary.MaxVarintLen64)
+    bytes := binary.PutUvarint(header, uint64(len(n)))
+    vb = append(vb, header[:bytes]...)
+    for _, item := range n {
+        vb = item.Serialize(vb)
+    }
+
+    return vb
+}
+
+func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
+    size,bytes := binary.Uvarint(vb)
+    var result {{o_type}} = {{o_type}}(make([]{{v_type}}, 0, size))
+    i := uint64(bytes)
+    var j uint64
+    var item {{v_type}}
+    for num := uint64(0); num < size; num++ {
+        j,item = Deserialize{{v_type}}(vb[i:])
+        i += j
+        result = append(result, item)
+    }
+
+    return i, result
+}
+
+{% endfor -%}
+{% endmacro %}
+
+{%- macro generate_opaques() -%}
+{% for v_type in get_opaque() -%}
+{%- set o_type = "Opaque" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+type {{o_type}} struct {
+}
+
+func (n {{o_type}}) Serialize(vb VariableBlob) VariableBlob {
+    return vb
+}
+
+func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
+    return 0,{{o_type}}{}
+}
+
+{% endfor -%}
+{% endmacro %}
 
 {%- macro generate_fixed_blobs() -%}
 {% for length in get_fixed_blobs() -%}
@@ -175,7 +245,7 @@ func (n {{fbname}}) Serialize(vb VariableBlob) VariableBlob {
     return append(vb, n[:]...)
 }
 
-func Deserialize{{fbname}}(vb VariableBlob) (uint32,{{fbname}}) {
+func Deserialize{{fbname}}(vb VariableBlob) (uint64,{{fbname}}) {
     var result {{fbname}}
     copy(result[:], vb)
     return {{length}},result
@@ -191,6 +261,12 @@ func Deserialize{{fbname}}(vb VariableBlob) (uint32,{{fbname}}) {
 //  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|  \____\___/ \__,_|\___|
 //                         Please do not modify
 
+package koinos
+
+import (
+    "encoding/binary"
+)
+
 {% for name, decl in decls_by_name.items() -%}
 {% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
 {% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
@@ -201,3 +277,5 @@ func Deserialize{{fbname}}(vb VariableBlob) (uint32,{{fbname}}) {
 
 {% endfor %}
 {{generate_fixed_blobs()}}
+{{generate_opaques()}}
+{{generate_vectors()}}

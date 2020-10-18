@@ -13,7 +13,8 @@ import collections
 import os
 
 fixed_blobs = set()
-variants = []
+opaque = set()
+vectors = set()
 
 class RenderError(Exception):
     pass
@@ -44,12 +45,23 @@ def get_fixed_blobs():
     fb_list.sort()
     return fb_list
 
-def decl_variant():
-    variants.append(v_def)
+def decl_opaque(o_type):
+    opaque.add(o_type)
     return ""
 
-def get_variants():
-    return variants
+def get_opaque():
+    o_list = list(opaque)
+    o_list.sort()
+    return o_list
+
+def decl_vector(v_type):
+    vectors.add(v_type)
+    return ""
+
+def get_vectors():
+    v_list = list(vectors)
+    v_list.sort()
+    return v_list
 
 def generate_golang(schema):
     env = jinja2.Environment(
@@ -66,7 +78,11 @@ def generate_golang(schema):
            "decl_namespaces" : decl_namespaces,
            "go_name" : go_name,
            "decl_fixed_blob" : decl_fixed_blob,
-           "get_fixed_blobs" : get_fixed_blobs
+           "get_fixed_blobs" : get_fixed_blobs,
+           "decl_opaque" : decl_opaque,
+           "get_opaque" : get_opaque,
+           "decl_vector": decl_vector,
+           "get_vectors": get_vectors
           }
     for name, val in ctx["decls_by_name"].items():
         print(name)
