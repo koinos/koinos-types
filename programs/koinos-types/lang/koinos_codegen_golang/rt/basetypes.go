@@ -239,7 +239,7 @@ func (n Int160) Serialize(vb VariableBlob) VariableBlob {
 
 func DeserializeInt160(vb VariableBlob) (uint64,Int160) {
     bi := Int160{Value:*DeserializeBigInt(vb, 16, true)}
-    return 16,bi
+    return 20,bi
 }
 
 // ----------------------------------------
