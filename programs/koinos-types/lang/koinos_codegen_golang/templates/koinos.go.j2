@@ -39,7 +39,7 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {%- endmacro -%}
 
 {%- macro struct_serialization(decl) -%}
-func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
+func (n *{{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- for field in decl["fields"] %}
     vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
     return vb
@@ -47,13 +47,16 @@ func (n {{go_name(decl["name"])}}) Serialize(vb VariableBlob) VariableBlob {
 {%- endmacro -%}
 
 {%- macro struct_deserialization(decl) -%}
-func Deserialize{{go_name(decl["name"])}}(vb VariableBlob) (uint64,{{go_name(decl["name"])}}) {
+func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(decl["name"])}}) {
     {% if decl["fields"]|length > 0 -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
     s := {{go_name(decl["name"])}}{}
+    {% if decl["fields"]|length > 0 -%}var ovb VariableBlob{%- endif %}
 {%- for field in decl["fields"] %}
     {%- set tname = typeref(field["tref"]) %}
-    j,s.{{go_name(field["name"])}} = Deserialize{{tname}}(vb[i:]); i+=j{% endfor %}
-    return i, s
+    ovb = (*vb)[i:]
+    j,t_{{field["name"]}} := Deserialize{{tname}}(&ovb); i+=j
+    s.{{go_name(field["name"])}} = *t_{{field["name"]}}{% endfor %}
+    return i, &s
 }
 {%- endmacro -%}
 
@@ -93,7 +96,7 @@ type {{varname}} struct {
     Value interface{}
 }
 
-func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
+func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     var i uint64
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
@@ -104,24 +107,28 @@ func (n {{varname}}) Serialize(vb VariableBlob) VariableBlob {
 {%- endfor %}
     }
 
-    vb = UInt64(i).Serialize(vb)
+    ix := UInt64(i)
+    vb = ix.Serialize(vb)
     return n.Serialize(vb)
 }
 
-func Deserialize{{varname}}(vb VariableBlob) (uint64,{{varname}}) {
+func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}}) {
     i,type_id := DeserializeUInt64(vb)
     var j uint64
     var v {{varname}}
-    switch( type_id ) {
+    switch( *type_id ) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
         case {{loop.index - 1}}:
-            j,v.Value = Deserialize{{arg_type}}(vb[i:])
+            ovb := (*vb)[i:]
+            k,x := Deserialize{{arg_type}}(&ovb)
+            j = k
+            v.Value = &x
             break
 {%- endfor %}
     }
 
-    return i+j,v
+    return i+j,&v
 }
 
 {%- endmacro -%}
@@ -136,13 +143,15 @@ func Deserialize{{varname}}(vb VariableBlob) (uint64,{{varname}}) {
 
 type {{tname}} {{rname}}
 
-func (n {{tname}}) Serialize(vb VariableBlob) VariableBlob {
-    return {{rname}}(n).Serialize(vb)
+func (n *{{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    ox := {{rname}}(*n)
+    return ox.Serialize(vb)
 }
 
-func Deserialize{{tname}}(vb VariableBlob) (uint64,{{tname}}) {
+func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}}) {
     i,n := Deserialize{{rname}}(vb)
-    return i,{{tname}}(n)
+    ot := {{tname}}(*n)
+    return i,&ot
 }
 
 {%- endif -%}
@@ -162,13 +171,15 @@ const (
 {%- endfor %}
 )
 
-func (n {{ename}}) Serialize(vb VariableBlob) VariableBlob {
-    return UInt32(n).Serialize(vb)
+func (n *{{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
+    x := UInt32(*n)
+    return x.Serialize(vb)
 }
 
-func Deserialize{{ename}}(vb VariableBlob) (uint64,{{ename}}) {
+func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}}) {
     i,item := DeserializeUInt32(vb)
-    return i,{{ename}}(item)
+    x := {{ename}}(*item)
+    return i,&x
 }
 
 {% endmacro -%}
@@ -182,30 +193,32 @@ func Deserialize{{ename}}(vb VariableBlob) (uint64,{{ename}}) {
 
 type {{o_type}} []{{v_type}}
 
-func (n {{o_type}}) Serialize(vb VariableBlob) VariableBlob {
+func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     header := make([]byte, binary.MaxVarintLen64)
-    bytes := binary.PutUvarint(header, uint64(len(n)))
-    vb = append(vb, header[:bytes]...)
-    for _, item := range n {
+    bytes := binary.PutUvarint(header, uint64(len(*n)))
+    ovb := append(*vb, header[:bytes]...)
+    vb = &ovb
+    for _, item := range *n {
         vb = item.Serialize(vb)
     }
 
     return vb
 }
 
-func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
-    size,bytes := binary.Uvarint(vb)
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}}) {
+    size,bytes := binary.Uvarint(*vb)
     var result {{o_type}} = {{o_type}}(make([]{{v_type}}, 0, size))
     i := uint64(bytes)
     var j uint64
-    var item {{v_type}}
+    var item *{{v_type}}
     for num := uint64(0); num < size; num++ {
-        j,item = Deserialize{{v_type}}(vb[i:])
+        ovb := (*vb)[i:]
+        j,item = Deserialize{{v_type}}(&ovb)
         i += j
-        result = append(result, item)
+        result = append(result, *item)
     }
 
-    return i, result
+    return i, &result
 }
 
 {% endfor -%}
@@ -221,12 +234,13 @@ func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
 type {{o_type}} struct {
 }
 
-func (n {{o_type}}) Serialize(vb VariableBlob) VariableBlob {
+func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     return vb
 }
 
-func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
-    return 0,{{o_type}}{}
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}}) {
+    x := {{o_type}}{}
+    return 0,&x
 }
 
 {% endfor -%}
@@ -241,14 +255,15 @@ func Deserialize{{o_type}}(vb VariableBlob) (uint64,{{o_type}}) {
 
 type {{fbname}} [{{length}}]byte
 
-func (n {{fbname}}) Serialize(vb VariableBlob) VariableBlob {
-    return append(vb, n[:]...)
+func (n {{fbname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    ovb := append(*vb, n[:]...)
+    return &ovb
 }
 
-func Deserialize{{fbname}}(vb VariableBlob) (uint64,{{fbname}}) {
+func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}}) {
     var result {{fbname}}
-    copy(result[:], vb)
-    return {{length}},result
+    copy(result[:], *vb)
+    return {{length}},&result
 }
 
 {% endfor %}
