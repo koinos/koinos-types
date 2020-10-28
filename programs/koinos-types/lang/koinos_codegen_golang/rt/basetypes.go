@@ -1,6 +1,7 @@
 package koinos
 
 import (
+    "bytes"
     "math/big"
     "encoding/binary"
 )
@@ -107,7 +108,7 @@ func (n *UInt16) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 2)
     binary.BigEndian.PutUint16(b, uint16(*n))
     ov := append(*vb, b...)
-    return &ov 
+    return &ov
 }
 
 func DeserializeUInt16(vb *VariableBlob) (uint64,*UInt16) {
@@ -416,25 +417,37 @@ type Multihash struct {
     Digest VariableBlob
 }
 
-func (m0 *Multihash) eq(m1 *Multihash) Boolean {
-    return false
+func (m0 *Multihash) Equals(m1 *Multihash) bool {
+    return (m0.Id == m1.Id) && bytes.Equal(m0.Digest, m1.Digest)
 }
 
-func (m0 *Multihash) lt(m1 *Multihash) Boolean {
-    return false
+func (m0 *Multihash) LessThan(m1 *Multihash) bool {
+    r := m0.Id - m1.Id
+    if (r < 0) {
+        return true
+    }
+    if (r > 0) {
+        return false
+    }
+    return (len(m0.Digest) - len(m1.Digest)) < 0
 }
 
-func (m0 *Multihash) gt(m1 *Multihash) Boolean {
-    return false
+func (m0 *Multihash) GreaterThan(m1 *Multihash) bool {
+    return !m0.Equals(m1) && !m0.LessThan(m1)
 }
 
 func (n *Multihash) Serialize(vb *VariableBlob) *VariableBlob {
-    return vb
+    vb = n.Id.Serialize(vb)
+    return n.Digest.Serialize(vb)
 }
 
 func DeserializeMultihash(vb *VariableBlob) (uint64,*Multihash) {
     omh := Multihash{}
-    return 0, &omh
+    isize,id := DeserializeUInt64(vb)
+    dsize,d := DeserializeVariableBlob(vb)
+    omh.Id = *id
+    omh.Digest = *d
+    return isize+dsize, &omh
 }
 
 // --------------------------------
@@ -447,12 +460,34 @@ type MultihashVector struct {
 }
 
 func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {
+    vb = n.Id.Serialize(vb)
+    header := make([]byte, binary.MaxVarintLen64)
+    bytes := binary.PutUvarint(header, uint64(len(n.Digests)))
+    ovb := append(*vb, header[:bytes]...)
+    vb = &ovb
+    for _, item := range n.Digests {
+        vb = item.Serialize(vb)
+    }
     return vb
 }
 
 func DeserializeMultihashVector(vb *VariableBlob) (uint64,*MultihashVector) {
     omv := MultihashVector{}
-    return 0, &omv
+    i,id := DeserializeUInt64(vb)
+    size,bytes := binary.Uvarint((*vb)[i:])
+    i += uint64(bytes)
+    d := make([]VariableBlob, 0, size)
+    var j uint64
+    var item *VariableBlob
+    for num := uint64(0); num < size; num++ {
+        ovb := (*vb)[i:]
+        j,item = DeserializeVariableBlob(&ovb)
+        i += j
+        d = append(d, *item)
+    }
+    omv.Id = *id
+    omv.Digests = d
+    return i, &omv
 }
 
 // --------------------------------
