@@ -3,14 +3,6 @@
 set -e
 set -x
 
-if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-   PACKAGE_DIR=/usr/local/opt
-   export OPENSSL_ROOT_DIR=${PACKAGE_DIR}/openssl@1.1
-   export SNAPPY_LIBRARIES=${PACKAGE_DIR}/snappy/lib
-   export SNAPPY_INCLUDE_DIR=${PACKAGE_DIR}/snappy/include
-   export ZLIB_LIBRARIES=${PACKAGE_DIR}/zlib/lib
-fi
-
 mkdir build
 cd build
 
