@@ -20,8 +20,7 @@ template< class T > void append( T&& t, json& arr, std::ofstream& bin )
 {
    json j;
    koinos::pack::to_json( j, std::forward< T >( t ) );
-   arr.push_back( j );
-
+   arr.push_back( std::move( j ) );
    koinos::pack::to_binary( bin, std::forward< T >( t ) );
 }
 
@@ -47,7 +46,6 @@ int main( int argc, char** argv )
 
    std::ofstream bin_out, json_out;
    json arr = json::array();
-//   std::ostringstream ss( std::ios::binary );
 
    bin_out.open( vm[ "binary" ].as< std::string >(), std::ios::binary );
    json_out.open( vm[ "json" ].as< std::string >() );
