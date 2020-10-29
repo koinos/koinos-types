@@ -8,9 +8,12 @@
 #include <koinos/pack/rt/json.hpp>
 #include <koinos/pack/classes.hpp>
 
+#include <boost/program_options.hpp>
+
 #include <nlohmann/json.hpp>
 
 using namespace koinos::types;
+using namespace boost::program_options;
 using nlohmann::json;
 
 static std::ofstream bin_out, json_out;
@@ -28,8 +31,25 @@ int main( int argc, char** argv )
 {
    using namespace std::string_literals;
 
-   bin_out.open( "types.bin", std::ios::binary );
-   json_out.open( "types.json" );
+   options_description desc{ "Options" };
+   desc.add_options()
+      ("help,h", "Help screen")
+      ("binary,b", value< std::string >()->default_value( "types.bin" ),  "The binary output file")
+      ("json,j",   value< std::string >()->default_value( "types.json" ), "The JSON output file");
+
+   variables_map vm;
+   store( parse_command_line( argc, argv, desc ), vm );
+   notify( vm );
+
+
+   if ( vm.count( "help" ) )
+   {
+      std::cout << desc << std::endl;
+      exit( EXIT_SUCCESS );
+   }
+
+   bin_out.open( vm[ "binary" ].as< std::string >(), std::ios::binary );
+   json_out.open( vm[ "json" ].as< std::string >() );
 
    write( unused_extensions_type{} );
    write( protocol::reserved_operation{} );
