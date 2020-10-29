@@ -1,2 +1,2 @@
-add_subdirectory(binary-gen)
+add_subdirectory(canonical-output)
 
