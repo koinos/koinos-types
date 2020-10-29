@@ -232,15 +232,87 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}}) {
 // ----------------------------------------
 
 type {{o_type}} struct {
+    blob *VariableBlob
+    native *{{v_type}}
+}
+
+func (n *{{o_type}}) GetBlob() *VariableBlob {
+    if (n.native != nil && n.blob == nil) {
+        n.serializeNative()
+    }
+
+    return n.blob
+}
+
+func (n *{{o_type}}) GetNative() *{{v_type}} {
+    if( n.native == nil ) {
+        panic("Opaque type not unboxed.")
+    }
+    if( n.blob != nil ) {
+        panic("Opaque type is not mutable.")
+    }
+
+    return n.native;
+}
+
+func (n *{{o_type}}) Box() {
+    if (n.native != nil) {
+        // Mutable -> Unboxed
+        if (n.blob == nil) {
+            n.serializeNative()
+        }
+
+        // Unboxed -> Boxed
+        n.native = nil
+    }
+}
+
+func (n *{{o_type}}) Unbox() {
+    if (n.native == nil && n.blob != nil) {
+        _,n.native = Deserialize{{v_type}}(n.blob)
+    }
+}
+
+func (n *{{o_type}}) MakeMutable() {
+    if (n.native == nil) {
+        n.Unbox()
+    }
+
+    // Unboxed -> Mutable
+    if (n.native != nil && n.blob != nil) {
+        n.blob = nil
+    }
+}
+
+func (n *{{o_type}}) MakeImmutable() {
+    if (n.native != nil && n.blob == nil) {
+        n.serializeNative()
+    }
+}
+
+func (n *{{o_type}}) IsUnboxed() bool {
+    return n.native != nil;
+}
+
+func (n *{{o_type}}) IsMutable() bool {
+    return n.native != nil && n.blob == nil;
+}
+
+func (n *{{o_type}}) serializeNative() {
+    vb := NewVariableBlob()
+    n.blob = n.native.Serialize(vb)
 }
 
 func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
-    return vb
+    n.Box()
+    ovb := append(*vb, (*n.blob)...)
+    return &ovb
 }
 
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}}) {
-    x := {{o_type}}{}
-    return 0,&x
+    size,nv := DeserializeVariableBlob(vb)
+    o := {{o_type}}{blob:nv, native:nil}
+    return size,&o
 }
 
 {% endfor -%}
