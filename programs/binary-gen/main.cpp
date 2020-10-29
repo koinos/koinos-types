@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -16,15 +16,13 @@ using namespace koinos::types;
 using namespace boost::program_options;
 using nlohmann::json;
 
-static std::ofstream bin_out, json_out;
-
-template< class T > void write( T&& t )
+template< class T > void append( T&& t, json& arr, std::ofstream& bin )
 {
    json j;
-   koinos::pack::to_json( j, t );
-   json_out << j;
+   koinos::pack::to_json( j, std::forward< T >( t ) );
+   arr.push_back( j );
 
-   koinos::pack::to_binary( bin_out, t );
+   koinos::pack::to_binary( bin, std::forward< T >( t ) );
 }
 
 int main( int argc, char** argv )
@@ -41,40 +39,43 @@ int main( int argc, char** argv )
    store( parse_command_line( argc, argv, desc ), vm );
    notify( vm );
 
-
    if ( vm.count( "help" ) )
    {
       std::cout << desc << std::endl;
       exit( EXIT_SUCCESS );
    }
 
+   std::ofstream bin_out, json_out;
+   json arr = json::array();
+//   std::ostringstream ss( std::ios::binary );
+
    bin_out.open( vm[ "binary" ].as< std::string >(), std::ios::binary );
    json_out.open( vm[ "json" ].as< std::string >() );
 
-   write( unused_extensions_type{} );
-   write( protocol::reserved_operation{} );
-   write( protocol::nop_operation{} );
-   write( protocol::create_system_contract_operation {
+   append( unused_extensions_type{}, arr, bin_out );
+   append( protocol::reserved_operation{}, arr, bin_out );
+   append( protocol::nop_operation{}, arr, bin_out );
+   append( protocol::create_system_contract_operation {
       .contract_id = contract_id_type{ '1' },
       .bytecode = koinos::pack::to_variable_blob( "bytecode"s )
-   } );
-   write( system::system_call_target_reserved{} );
-   write( system::contract_call_bundle {
+   }, arr, bin_out );
+   append( system::system_call_target_reserved{}, arr, bin_out );
+   append( system::contract_call_bundle {
       .contract_id = contract_id_type{ '2' },
       .entry_point = 400
-   } );
-   write( protocol::set_system_call_operation {
+   }, arr, bin_out );
+   append( protocol::set_system_call_operation {
       .call_id = 300,
       .target = system::system_call_target{}
-   } );
-   write( protocol::contract_call_operation {
+   }, arr, bin_out );
+   append( protocol::contract_call_operation {
       .contract_id = contract_id_type{ '3' },
       .entry_point = 500,
       .args = koinos::pack::to_variable_blob( "arguments"s )
-   } );
-   write( protocol::active_transaction_data{} );
-   write( protocol::passive_transaction_data{} );
-   write( protocol::transaction {
+   }, arr, bin_out );
+   append( protocol::active_transaction_data{}, arr, bin_out );
+   append( protocol::passive_transaction_data{}, arr, bin_out );
+   append( protocol::transaction {
       .active_data = protocol::active_transaction_data{},
       .passive_data = protocol::passive_transaction_data{},
       .signature_data = koinos::pack::to_variable_blob( "signature"s ),
@@ -86,14 +87,14 @@ int main( int argc, char** argv )
             .bytecode = koinos::pack::to_variable_blob( "bytecode"s )
          }
       }
-   } );
-   write( protocol::active_block_data {
+   }, arr, bin_out );
+   append( protocol::active_block_data {
       .header_hashes = 10,
       .height = block_height_type{ 20 },
       .timestamp = timestamp_type{ 30 }
-   } );
-   write( protocol::passive_block_data{} );
-   write( protocol::block {
+   }, arr, bin_out );
+   append( protocol::passive_block_data{}, arr, bin_out );
+   append( protocol::block {
       .active_data = protocol::active_block_data {
          .header_hashes = multihash_vector {
             .id = 70,
@@ -112,21 +113,21 @@ int main( int argc, char** argv )
          protocol::opaque_transaction{},
          protocol::opaque_transaction{}
       }
-   } );
-   write( rpc::reserved_query_params{} );
-   write( rpc::get_head_info_params{} );
-   write( rpc::reserved_query_result{} );
-   write( rpc::query_error {
+   }, arr, bin_out );
+   append( rpc::reserved_query_params{}, arr, bin_out );
+   append( rpc::get_head_info_params{}, arr, bin_out );
+   append( rpc::reserved_query_result{}, arr, bin_out );
+   append( rpc::query_error {
       .error_text = koinos::pack::to_variable_blob( "failure"s )
-   } );
-   write( system::head_info {
+   }, arr, bin_out );
+   append( system::head_info {
       .id = multihash {
          .id = 50,
          .digest = koinos::pack::to_variable_blob( "50-digest"s )
       },
       .height = block_height_type{ 100 }
-   } );
-   write( rpc::block_topology {
+   }, arr, bin_out );
+   append( rpc::block_topology {
       .id = multihash {
          .id = 50,
          .digest = koinos::pack::to_variable_blob( "50-digest"s )
@@ -136,9 +137,9 @@ int main( int argc, char** argv )
          .id = 60,
          .digest = koinos::pack::to_variable_blob( "60-digest"s )
       }
-   } );
-   write( rpc::reserved_submission{} );
-   write( rpc::block_submission {
+   }, arr, bin_out );
+   append( rpc::reserved_submission{}, arr, bin_out );
+   append( rpc::block_submission {
       .topology = rpc::block_topology {
          .id = multihash {
             .id = 60,
@@ -185,29 +186,29 @@ int main( int argc, char** argv )
       .verify_passive_data = true,
       .verify_block_signature = true,
       .verify_transaction_signatures = true,
-   } );
-   write( rpc::transaction_submission {
+   }, arr, bin_out );
+   append( rpc::transaction_submission {
       .active_bytes = koinos::pack::to_variable_blob( protocol::active_transaction_data {} ),
       .passive_bytes = koinos::pack::to_variable_blob( protocol::passive_transaction_data {} )
-   } );
-   write( rpc::reserved_submission_result{} );
-   write( rpc::block_submission_result{} );
-   write( rpc::transaction_submission_result{} );
-   write( rpc::submission_error_result {
+   }, arr, bin_out );
+   append( rpc::reserved_submission_result{}, arr, bin_out );
+   append( rpc::block_submission_result{}, arr, bin_out );
+   append( rpc::transaction_submission_result{}, arr, bin_out );
+   append( rpc::submission_error_result {
       .error_text = koinos::pack::to_variable_blob( "failure text"s )
-   } );
-   write( thunks::void_type{} );
-   write( thunks::prints_args {
+   }, arr, bin_out );
+   append( thunks::void_type{}, arr, bin_out );
+   append( thunks::prints_args {
       .message = "prints arguments"
-   } );
-   write( thunks::verify_block_sig_args {
+   }, arr, bin_out );
+   append( thunks::verify_block_sig_args {
       .sig_data = koinos::pack::to_variable_blob( "signature data"s ),
       .digest = multihash {
          .id = 800,
          .digest = koinos::pack::to_variable_blob( "digest"s )
       }
-   } );
-   write( thunks::verify_merkle_root_args {
+   }, arr, bin_out );
+   append( thunks::verify_merkle_root_args {
       .root = multihash {
          .id = 900,
          .digest = koinos::pack::to_variable_blob( "root"s )
@@ -222,8 +223,8 @@ int main( int argc, char** argv )
             .digest = koinos::pack::to_variable_blob( "hash2"s )
          }
       }
-   } );
-   write( thunks::apply_block_args {
+   }, arr, bin_out );
+   append( thunks::apply_block_args {
       .block = protocol::block {
          .active_data = protocol::active_block_data {
          .header_hashes = multihash_vector {
@@ -247,8 +248,8 @@ int main( int argc, char** argv )
       .enable_check_passive_data = true,
       .enable_check_block_signature = true,
       .enable_check_transaction_signatures = true
-   } );
-   write( thunks:: apply_transaction_args {
+   }, arr, bin_out );
+   append( thunks:: apply_transaction_args {
       .trx = protocol::transaction {
          .active_data = protocol::active_transaction_data{},
          .passive_data = protocol::passive_transaction_data{},
@@ -262,60 +263,62 @@ int main( int argc, char** argv )
             }
          }
       }
-   } );
-   write( thunks::apply_upload_contract_operation_args {
+   }, arr, bin_out );
+   append( thunks::apply_upload_contract_operation_args {
       .op = protocol::create_system_contract_operation {
          .contract_id = contract_id_type{ '1', '2', '3' },
          .bytecode = koinos::pack::to_variable_blob( "contract bytecode"s )
       }
-   } );
-   write( thunks::apply_reserved_operation_args {
+   }, arr, bin_out );
+   append( thunks::apply_reserved_operation_args {
       .op = protocol::reserved_operation{}
-   } );
-   write( thunks::apply_execute_contract_operation_args {
+   }, arr, bin_out );
+   append( thunks::apply_execute_contract_operation_args {
       .op = protocol::contract_call_operation {
          .contract_id = contract_id_type{ '4', '5', '6' },
          .entry_point = 7,
          .args = koinos::pack::to_variable_blob( "contract arguments"s )
       }
-   } );
-   write( thunks::apply_set_system_call_operation_args {
+   }, arr, bin_out );
+   append( thunks::apply_set_system_call_operation_args {
       .op = protocol::set_system_call_operation {
          .call_id = 8,
          .target = system::thunk_id_type{ 9 }
       }
-   } );
-   write( thunks::db_put_object_args {
+   }, arr, bin_out );
+   append( thunks::db_put_object_args {
       .space = 100,
       .key = 200,
       .obj = koinos::pack::to_variable_blob( "object"s )
-   } );
-   write( thunks::db_get_object_args {
+   }, arr, bin_out );
+   append( thunks::db_get_object_args {
       .space = 100,
       .key = 200,
       .object_size_hint = 300
-   } );
-   write( thunks::execute_contract_args {
+   }, arr, bin_out );
+   append( thunks::execute_contract_args {
       .contract_id = contract_id_type{ '7', '8', '9' },
       .entry_point = 10,
       .args = koinos::pack::to_variable_blob( "contract argument"s )
-   } );
-   write( thunks::set_contract_return_args {
+   }, arr, bin_out );
+   append( thunks::set_contract_return_args {
       .ret = koinos::pack::to_variable_blob( "return"s )
-   } );
-   write( thunks::exit_contract_args {
+   }, arr, bin_out );
+   append( thunks::exit_contract_args {
       .exit_code = EXIT_SUCCESS
-   } );
-   write( thunks::hash_args {
+   }, arr, bin_out );
+   append( thunks::hash_args {
       .code = 120,
       .obj = koinos::pack::to_variable_blob( "object"s ),
       .size = 7
-   } );
-   write( system::block_part {
+   }, arr, bin_out );
+   append( system::block_part {
       .active_data = koinos::pack::to_variable_blob( "active"s ),
       .passive_data = koinos::pack::to_variable_blob( "passive"s ),
       .sig_data = koinos::pack::to_variable_blob( "signature"s )
-   } );
+   }, arr, bin_out );
+
+   json_out << arr;
 
    bin_out.close();
    json_out.close();
