@@ -89,7 +89,14 @@ int main( int argc, char** argv )
       }
    }, arr, bin_out );
    append( protocol::active_block_data {
-      .header_hashes = 10,
+      .header_hashes = multihash_vector {
+         .id = 70,
+         .digests = std::vector< variable_blob > {
+            koinos::pack::to_variable_blob( "digestA"s ),
+            koinos::pack::to_variable_blob( "digestB"s ),
+            koinos::pack::to_variable_blob( "digestC"s ),
+         }
+      },
       .height = block_height_type{ 20 },
       .timestamp = timestamp_type{ 30 }
    }, arr, bin_out );
