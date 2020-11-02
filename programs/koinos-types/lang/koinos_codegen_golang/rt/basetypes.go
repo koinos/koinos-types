@@ -7,7 +7,7 @@ import (
 )
 
 type Serializeable interface {
-    Serialize(vb VariableBlob)
+    Serialize(vb *VariableBlob)
 }
 
 // --------------------------------
@@ -368,7 +368,7 @@ func (n *VariableBlob) Serialize(vb *VariableBlob) *VariableBlob {
 func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob) {
     size,bytes := binary.Uvarint(*vb)
     var result VariableBlob = VariableBlob(make([]byte, 0, size))
-    ovb := append(result, (*vb)[bytes:]...)
+    ovb := append(result, (*vb)[bytes:uint64(bytes)+size]...)
     return uint64(uint64(bytes)+size), &ovb
 }
 
@@ -444,7 +444,8 @@ func (n *Multihash) Serialize(vb *VariableBlob) *VariableBlob {
 func DeserializeMultihash(vb *VariableBlob) (uint64,*Multihash) {
     omh := Multihash{}
     isize,id := DeserializeUInt64(vb)
-    dsize,d := DeserializeVariableBlob(vb)
+    rvb := (*vb)[isize:]
+    dsize,d := DeserializeVariableBlob(&rvb)
     omh.Id = *id
     omh.Digest = *d
     return isize+dsize, &omh
