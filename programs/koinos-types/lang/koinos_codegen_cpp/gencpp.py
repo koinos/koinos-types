@@ -115,5 +115,31 @@ def generate_cpp(schema):
             result_files[os.path.join("rt", relpath)] = content
     return result
 
+def escape_json(obj):
+   import json
+   return json.dumps(obj).replace('"', '\\"')
+
+def generate_tests(test_data):
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader(__package__, "test"),
+        keep_trailing_newline=True
+    )
+    test_cases = []
+
+    for test in test_data:
+        split_ns = test['type'].rsplit('::', 1)
+        namespace, typename = '', ''
+        if len(split_ns) == 2:
+            namespace = split_ns[0]
+            typename = split_ns[1]
+        else:
+            typename = split_ns[0]
+
+        test_cases.append({"typename": typename, "namespace": namespace, "json": escape_json(test['json'])})
+
+    return env.get_template("main.cpp.j2").render({"test_cases" : test_cases}), "main.cpp"
+
+
 def setup(app):
     app.register_target("cpp", generate_cpp)
+    app.register_target("cpp_test", generate_tests)
