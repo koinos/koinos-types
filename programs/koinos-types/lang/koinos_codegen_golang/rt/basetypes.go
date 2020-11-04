@@ -526,8 +526,8 @@ func DeserializeBlockHeightType(vb *VariableBlob) (uint64,*BlockHeightType) {
 // --------------------------------
 
 type Multihash struct {
-    Id UInt64
-    Digest VariableBlob
+    Id UInt64 `json:"hash"`
+    Digest VariableBlob `json:"digest"`
 }
 
 func (m0 *Multihash) Equals(m1 *Multihash) bool {
@@ -569,8 +569,8 @@ func DeserializeMultihash(vb *VariableBlob) (uint64,*Multihash) {
 // --------------------------------
 
 type MultihashVector struct {
-    Id UInt64
-    Digests []VariableBlob
+    Id UInt64 `json:"hash"`
+    Digests []VariableBlob `json:"digests"`
 }
 
 func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {

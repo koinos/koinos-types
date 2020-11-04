@@ -68,7 +68,7 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 
 {# // {{decl}} #}type {{sname}} struct {
 {% if decl["fields"]|length > 0 -%}
-{%- for field in decl["fields"] %}    {{go_name(field["name"])}} {{typeref(field["tref"])}}
+{%- for field in decl["fields"] %}    {{go_name(field["name"])}} {{typeref(field["tref"])}} `json:"{{field["name"]}}"`
 {% endfor %}
 {%- endif -%}
 }
