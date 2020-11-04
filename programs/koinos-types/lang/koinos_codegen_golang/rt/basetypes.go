@@ -6,7 +6,7 @@ import (
     "encoding/binary"
     "encoding/json"
 
-    //"github.com/btcsuite/btcutil/base58"
+    "github.com/btcsuite/btcutil/base58"
 )
 
 type Serializeable interface {
@@ -463,6 +463,26 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob) {
     var result VariableBlob = VariableBlob(make([]byte, 0, size))
     ovb := append(result, (*vb)[bytes:uint64(bytes)+size]...)
     return uint64(uint64(bytes)+size), &ovb
+}
+
+func (n *VariableBlob) MarshalJSON() ([]byte, error) {
+    nvb := NewVariableBlob()
+    nvb = n.Serialize(nvb)
+    s := base58.Encode(*nvb)
+    return json.Marshal("z" + s)
+}
+
+func (n *VariableBlob) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return nil
+    }
+
+    // Assume base58 encoding for now
+    svb := VariableBlob(base58.Decode(s[1:]))
+    _,n = DeserializeVariableBlob(&svb)
+
+    return nil
 }
 
 // --------------------------------
