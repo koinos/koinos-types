@@ -1,0 +1,37 @@
+package main
+
+import (
+   "flag"
+   "io/ioutil"
+   . "koinos"
+)
+
+func main() {
+   binPtr  := flag.String("binary", "types.bin", "The binary output file")
+   jsonPtr := flag.String("json", "types.json", "The JSON output file")
+
+   flag.Parse()
+
+   var arr [][]byte
+   bin := NewVariableBlob()
+
+   {%- for test in test_cases %}
+   {
+      var t {{ go_name(test.typename) }}
+      jsonBlob = []byte('{{ test.json }}')
+      err := json.Unmarshal(jsonBlock, t)
+      if err != nil {
+         panic(err)
+      }
+      jsonBlob, err = json.Marshal(t)
+      if err != nil {
+         panic(err)
+      }
+      arr = append(arr, jsonBlob)
+      bin = t.Serialize(bin)
+   }
+   {%- endfor -%}
+
+   ioutil.WriteFile(*binPtr, bin)
+   ioutil.WriteFile(*jsonPtr, arr)
+}
