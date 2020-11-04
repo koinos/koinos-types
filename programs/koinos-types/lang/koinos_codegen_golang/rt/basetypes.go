@@ -4,6 +4,9 @@ import (
     "bytes"
     "math/big"
     "encoding/binary"
+    "encoding/json"
+
+    //"github.com/btcsuite/btcutil/base58"
 )
 
 type Serializeable interface {
@@ -215,6 +218,21 @@ func DeserializeInt128(vb *VariableBlob) (uint64,*Int128) {
     return 16, &bi
 }
 
+func (n *Int128) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *Int128) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewInt128(s)
+    return nil
+}
+
 // ----------------------------------------
 //  UInt128
 // ----------------------------------------
@@ -239,6 +257,21 @@ func (n *UInt128) Serialize(vb *VariableBlob) *VariableBlob {
 func DeserializeUInt128(vb *VariableBlob) (uint64,*UInt128) {
     bi := UInt128{Value:*DeserializeBigInt(vb, 16, false)}
     return 16, &bi
+}
+
+func (n *UInt128) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *UInt128) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewUInt128(s)
+    return nil
 }
 
 // ----------------------------------------
@@ -267,6 +300,21 @@ func DeserializeInt160(vb *VariableBlob) (uint64,*Int160) {
     return 20, &bi
 }
 
+func (n *Int160) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *Int160) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewInt160(s)
+    return nil
+}
+
 // ----------------------------------------
 //  UInt160
 // ----------------------------------------
@@ -291,6 +339,21 @@ func (n *UInt160) Serialize(vb *VariableBlob) *VariableBlob {
 func DeserializeUInt160(vb *VariableBlob) (uint64,*UInt160) {
     bi := UInt160{Value:*DeserializeBigInt(vb, 20, false)}
     return 20, &bi
+}
+
+func (n *UInt160) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *UInt160) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewUInt160(s)
+    return nil
 }
 
 // ----------------------------------------
@@ -319,6 +382,21 @@ func DeserializeInt256(vb *VariableBlob) (uint64,*Int256) {
     return 32, &bi
 }
 
+func (n *Int256) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *Int256) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewInt256(s)
+    return nil
+}
+
 // ----------------------------------------
 //  UInt256
 // ----------------------------------------
@@ -343,6 +421,21 @@ func (n *UInt256) Serialize(vb *VariableBlob) *VariableBlob {
 func DeserializeUInt256(vb *VariableBlob) (uint64,*UInt256) {
     bi := UInt256{Value:*DeserializeBigInt(vb, 32, false)}
     return 32, &bi
+}
+
+func (n *UInt256) MarshalJSON() ([]byte, error) {
+    s := n.Value.String()
+    return json.Marshal(s)
+}
+
+func (n *UInt256) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return err
+    }
+
+    n = NewUInt256(s)
+    return nil
 }
 
 // --------------------------------
