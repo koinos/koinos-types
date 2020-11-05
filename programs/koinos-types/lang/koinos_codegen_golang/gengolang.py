@@ -63,6 +63,22 @@ def get_vectors():
     v_list.sort()
     return v_list
 
+def is_struct(targ, decls_by_name):
+    ns = "::"
+    type_name = ns.join(targ["name"])
+
+    if targ["targs"] != None:
+        type_name = ns.join(targ["targs"][0]["name"])
+
+    type_info = decls_by_name[type_name]["info"]["type"]
+
+    if type_info == "Struct":
+        return True;
+    elif type_info == "BaseType":
+        return False
+    else:
+        return is_struct(decls_by_name[type_name]["tref"], decls_by_name)
+
 def generate_golang(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -82,7 +98,8 @@ def generate_golang(schema):
            "decl_opaque" : decl_opaque,
            "get_opaque" : get_opaque,
            "decl_vector": decl_vector,
-           "get_vectors": get_vectors
+           "get_vectors": get_vectors,
+           "is_struct_impl" : is_struct
           }
     for name, val in ctx["decls_by_name"].items():
         print(name)
