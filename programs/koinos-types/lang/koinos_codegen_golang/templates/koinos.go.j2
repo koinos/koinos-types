@@ -38,6 +38,16 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {%- endif -%}
 {%- endmacro -%}
 
+{%- macro namespaced_typeref(tref) -%}
+{%- for name in tref["name"] -%}
+{{name}}{{"::" if not loop.last}}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- macro is_struct(targ) -%}
+{{is_struct_impl(targ,decls_by_name)}}
+{%- endmacro -%}
+
 {%- macro struct_serialization(decl) -%}
 func (n *{{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- for field in decl["fields"] %}
@@ -112,6 +122,30 @@ func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     return n.Serialize(vb)
 }
 
+func (n *{{varname}}) TypeToName() (string) {
+    switch n.Value.(type) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{arg_type}}:
+            return "{{namespaced_typeref(arg)}}"
+{%- endfor %}
+        default:
+            return "unknown type"
+    }
+}
+
+func (n *{{varname}}) MarshalJSON() ([]byte, error) {
+    variant := struct {
+        Type string `json:"type"`
+        Value *interface{} `json:"value"`
+    }{
+        n.TypeToName(),
+        &n.Value,
+    }
+
+    return json.Marshal(&variant)
+}
+
 func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}}) {
     i,type_id := DeserializeUInt64(vb)
     var j uint64
@@ -129,6 +163,43 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}}) {
     }
 
     return i+j,&v
+}
+
+func (n *{{varname}}) UnmarshalJSON(data []byte) error {
+    variant := struct {
+        Type string `json:"type"`
+        Value interface{} `json:"value"`
+    }{}
+
+    err := json.Unmarshal(data, &variant)
+    if err != nil {
+        return err
+    }
+
+    var tmp []byte
+    tmp, err = json.Marshal(&variant.Value)
+    if err != nil {
+        return err
+    }
+
+    switch variant.Type {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case "{{namespaced_typeref(arg)}}":
+{%- if is_struct(arg) == "True" %}
+            v := {{arg_type}}{}
+{%- else %}
+            v := {{arg_type}}(0)
+{%- endif %}
+            json.Unmarshal(tmp, &v)
+            n.Value = v
+            break
+{%- endfor %}
+        default:
+            return errors.New("Unknown Variant Type: " + variant.Type)
+    }
+
+    return nil
 }
 
 {%- endmacro -%}
@@ -369,6 +440,7 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 package koinos
 
 import (
+    "errors"
     "encoding/binary"
     "encoding/json"
     "github.com/btcsuite/btcutil/base58"
