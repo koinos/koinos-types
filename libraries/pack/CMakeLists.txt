@@ -7,6 +7,9 @@ set(KOINOS_CPP_OUTPUT_INCLUDE_DIR "${KOINOS_CPP_OUTPUT_DIR}/include")
 # Golang
 set(KOINOS_GOLANG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/golang")
 
+set(GOLANG_MODULE_NAME koinos)
+set(GOLANG_MODULE_VERSION 1.15)
+configure_file(${CMAKE_MODULE_PATH}/go.mod.in ${KOINOS_GOLANG_OUTPUT_DIR}/src/go.mod)
 
 set(KOINOS_REFLECT_PYTHONPATH "${CMAKE_CURRENT_SOURCE_DIR}/../../programs/koinos-types")
 set(KOINOS_REFLECT_TEMPLATE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../programs/koinos-types/lang")
