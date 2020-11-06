@@ -10,7 +10,7 @@ if [ "$RUN_TYPE" = "test" ]; then
    popd
 
    # Golang tests
-   GOPATH=~/go:$(pwd)/build/generated/golang
+   export GOPATH=~/go:$(pwd)/build/generated/golang
    go get -d ./tests/golang
    go test ./tests/golang
 fi
