@@ -5,13 +5,15 @@ set -x
 
 if [ "$RUN_TYPE" = "test" ]; then
    # C++ tests
-   cd $(dirname "$0")/../build/tests/cpp
+   pushd ../build/tests/cpp
    ctest -j3 --output-on-failure
+   popd
 
    # Golang tests
-   cd $(dirname "$0")/..
+   pushd ..
    GOPATH=$GOPATH:$(pwd)/build/generated/golang
    go get -d ./tests/golang
    go test ./tests/golang
+   popd
 fi
 
