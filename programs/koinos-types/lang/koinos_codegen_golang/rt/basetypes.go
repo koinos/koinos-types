@@ -480,7 +480,8 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
 
     // Assume base58 encoding for now
     svb := VariableBlob(base58.Decode(s[1:]))
-    _,n = DeserializeVariableBlob(&svb)
+    _,ovb := DeserializeVariableBlob(&svb)
+    *n = *ovb
 
     return nil
 }
