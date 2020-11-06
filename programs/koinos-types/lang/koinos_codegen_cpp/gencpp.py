@@ -83,10 +83,10 @@ def generate_cpp(schema):
            "decls_by_name" : decls_by_name,
            "decl_namespaces" : decl_namespaces,
           }
-    for name, val in ctx["decls_by_name"].items():
-        print(name)
-        import json
-        print(json.dumps(val))
+    #for name, val in ctx["decls_by_name"].items():
+    #    print(name)
+    #    import json
+    #    print(json.dumps(val))
 
     result = collections.OrderedDict()
     result_files = collections.OrderedDict()

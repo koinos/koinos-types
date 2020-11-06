@@ -5,7 +5,7 @@ set -x
 
 if [ "$RUN_TYPE" = "test" ]; then
    # C++ tests
-   cd $(dirname "$0")/../build/tests
+   cd $(dirname "$0")/../build/tests/cpp
    exec ctest -j3 --output-on-failure
 
    # Golang tests

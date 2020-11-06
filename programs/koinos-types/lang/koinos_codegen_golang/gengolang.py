@@ -101,10 +101,10 @@ def generate_golang(schema):
            "get_vectors": get_vectors,
            "is_struct_impl" : is_struct
           }
-    for name, val in ctx["decls_by_name"].items():
-        print(name)
-        import json
-        print(json.dumps(val))
+    #for name, val in ctx["decls_by_name"].items():
+    #    print(name)
+    #    import json
+    #    print(json.dumps(val))
 
     result = collections.OrderedDict()
     result_files = collections.OrderedDict()
