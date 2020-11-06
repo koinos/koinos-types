@@ -126,7 +126,7 @@ def generate_golang(schema):
             relpath = os.path.relpath(filepath, rt_path)
             with open(filepath, "r") as f:
                 content = f.read()
-            result_files[os.path.join("rt", relpath)] = content
+            result_files[relpath] = content
     return result
 
 def setup(app):
