@@ -386,6 +386,26 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}}) {
     return size,&o
 }
 
+func (n *{{o_type}}) MarshalJSON() ([]byte, error) {
+    n.Unbox()
+
+    if n.IsUnboxed() {
+        return json.Marshal(&n.native)
+    }
+
+    return json.Marshal(&n.blob)
+}
+
+func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
+    err := json.Unmarshal(data, &n.native)
+
+    if err != nil {
+        err = json.Unmarshal(data, &n.blob)
+    }
+
+    return err
+}
+
 {% endfor -%}
 {% endmacro %}
 
