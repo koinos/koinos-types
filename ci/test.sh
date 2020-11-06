@@ -11,7 +11,7 @@ if [ "$RUN_TYPE" = "test" ]; then
 
    # Golang tests
    export GOPATH=~/go:$(pwd)/build/generated/golang
-   go get -d ./tests/golang
+   go get -d ./build/generated/golang/src/koinos
    go test ./tests/golang
 fi
 
