@@ -1,5 +1,8 @@
 language: c++
 
+go:
+- 1.15.x
+
 cache:
 - ccache
 - pip
