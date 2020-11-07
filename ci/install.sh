@@ -9,9 +9,9 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       valgrind \
       ccache
 
-   eval "$(gimme 1.15.x)"
-   cat ~/.gimme/envs/go1.15.x.env
-   cat ~/.gimme/envs/go1.15.x.env > ~/.bash_profile
+   eval "$(gimme 1.15.4)"
+   cat ~/.gimme/envs/go1.15.4.env
+   cat ~/.gimme/envs/go1.15.4.env > ~/.bash_profile
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
