@@ -10,6 +10,7 @@ if [ "$RUN_TYPE" = "test" ]; then
    popd
 
    # Golang tests
+   go version
    export GOPATH=~/go:$(pwd)/build/generated/golang
    go get -d ./build/generated/golang/src/koinos
    go test -v ./tests/golang
