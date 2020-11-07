@@ -9,10 +9,10 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       valgrind \
       ccache
 
-   sudo apt-get remove golang
    wget -q https://storage.googleapis.com/golang/getgo/installer_linux
    chmod +x installer_linux
    ./installer_linux
+   source ~/.bash_profile
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
