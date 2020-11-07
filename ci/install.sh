@@ -13,7 +13,6 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
-      go \
       ccache
 
    if [ "$RUN_TYPE" = "coverage" ]; then
@@ -21,5 +20,5 @@ elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
       sudo gem install coveralls-lcov
    fi
 fi
-
+eval "$(gimme 1.15.4)"
 pip3 install --user dataclasses-json Jinja2 importlib_resources pluginbase
