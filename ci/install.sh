@@ -10,7 +10,7 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       ccache
 
    eval "$(gimme 1.15.4)"
-   cat ~/.gimme/envs/go1.15.4.env >> ~/.bash_profile
+   source ~/.gimme/envs/go1.15.4.env
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
