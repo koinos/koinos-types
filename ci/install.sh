@@ -9,9 +9,9 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       valgrind \
       ccache
 
-   wget https://dl.google.com/go/go1.15.3.linux-amd64.tar.gz
-   tar -xvf go1.15.3.linux-amd64.tar.gz
-   sudo mv go /usr/local
+   wget -q https://storage.googleapis.com/golang/getgo/installer_linux
+   chmod +x installer_linux
+   ./installer_linux
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
