@@ -8,7 +8,7 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       python3-setuptools \
       valgrind \
       ccache
-
+   sudo apt-get remove golang*
    eval "$(gimme 1.15.4)"
    cat ~/.gimme/envs/go1.15.4.env
    cat ~/.gimme/envs/go1.15.4.env > ~/.bash_profile
