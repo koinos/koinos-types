@@ -10,8 +10,6 @@ if [ "$RUN_TYPE" = "test" ]; then
    popd
 
    # Golang tests
-   go version
-   source ~/.gimme/envs/go1.15.4.env
    export GOPATH=~/go:$(pwd)/build/generated/golang
    go get -d ./build/generated/golang/src/koinos
    go test -v ./tests/golang
