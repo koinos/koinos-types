@@ -8,9 +8,13 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       python3-setuptools \
       valgrind \
       ccache
+
+   eval "$(gimme 1.15.4)"
+   source ~/.gimme/envs/go1.15.4.env
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
    brew install cmake \
       boost \
+      go \
       ccache
 
    if [ "$RUN_TYPE" = "coverage" ]; then
