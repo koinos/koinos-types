@@ -438,6 +438,9 @@ func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
 
     if err != nil {
         err = json.Unmarshal(data, &n.blob)
+        n.native = nil
+    } else {
+        n.blob = nil
     }
 
     return err

@@ -86,11 +86,13 @@ func (n *Int8) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeInt8(vb *VariableBlob) (uint64,*Int8,error) {
-    i := Int8((*vb)[0])
+    var i Int8
 
     if len(*vb) < 1 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = Int8((*vb)[0])
 
     return 1, &i, nil
 }
@@ -107,11 +109,13 @@ func (n *UInt8) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeUInt8(vb *VariableBlob) (uint64,*UInt8,error) {
-    i := UInt8((*vb)[0])
+    var i UInt8
 
     if len(*vb) < 1 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = UInt8((*vb)[0])
 
     return 1, &i, nil
 }
@@ -130,11 +134,13 @@ func (n *Int16) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeInt16(vb *VariableBlob) (uint64,*Int16,error) {
-    i := Int16(binary.BigEndian.Uint16(*vb))
+    var i Int16
 
     if len(*vb) < 2 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = Int16((*vb)[0])
 
     return 2, &i, nil
 }
@@ -153,11 +159,13 @@ func (n *UInt16) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeUInt16(vb *VariableBlob) (uint64,*UInt16,error) {
-    i := UInt16(binary.BigEndian.Uint16(*vb))
+    var i UInt16
 
     if len(*vb) < 2 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = UInt16((*vb)[0])
 
     return 2, &i, nil
 }
@@ -177,11 +185,13 @@ func (n *Int32) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeInt32(vb *VariableBlob) (uint64,*Int32,error) {
-    i := Int32(binary.BigEndian.Uint32(*vb))
+    var i Int32
 
     if len(*vb) < 4 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = Int32((*vb)[0])
 
     return 4, &i, nil
 }
@@ -200,11 +210,13 @@ func (n *UInt32) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeUInt32(vb *VariableBlob) (uint64,*UInt32,error) {
-    i := UInt32(binary.BigEndian.Uint32(*vb))
+    var i UInt32
 
     if len(*vb) < 4 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = UInt32((*vb)[0])
 
     return 4, &i, nil
 }
@@ -223,11 +235,13 @@ func (n *Int64) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeInt64(vb *VariableBlob) (uint64,*Int64,error) {
-    i := Int64(binary.BigEndian.Uint64(*vb))
+    var i Int64
 
     if len(*vb) < 8 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = Int64((*vb)[0])
 
     return 8, &i, nil
 }
@@ -246,11 +260,13 @@ func (n *UInt64) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func DeserializeUInt64(vb *VariableBlob) (uint64,*UInt64,error) {
-    i := UInt64(binary.BigEndian.Uint64(*vb))
+    var i UInt64
 
     if len(*vb) < 8 {
         return 0, &i, errors.New("Unexpected EOF")
     }
+
+    i = UInt64((*vb)[0])
 
     return 8, &i, nil
 }
