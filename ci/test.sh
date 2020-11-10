@@ -10,7 +10,7 @@ if [ "$RUN_TYPE" = "test" ]; then
    popd
 
    # Golang tests
-   go get -d ./build/generated/golang/src/koinos
+   go get ./build/generated/golang/src/koinos
    go test -v ./tests/golang
 fi
 
