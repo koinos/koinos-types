@@ -116,15 +116,17 @@ func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- set arg_type = typeref(arg) %}
         case {{arg_type}}:
             i = {{loop.index - 1}}
-            break;
 {%- endfor %}
         default:
             panic("Unknown variant type")
     }
 
-    ix := UInt64(i)
-    vb = ix.Serialize(vb)
-    return n.Serialize(vb)
+    vb = EncodeVarint(vb, i)
+    ser,ok := n.Value.(Serializeable)
+    if !ok {
+        panic("Variant type is not serializeable.")
+    }
+    return ser.Serialize(vb)
 }
 
 func (n *{{varname}}) TypeToName() (string) {
@@ -152,15 +154,15 @@ func (n *{{varname}}) MarshalJSON() ([]byte, error) {
 }
 
 func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
-    i,type_id,err := DeserializeUInt64(vb)
+    type_id,i := binary.Uvarint(*vb)
     var j uint64
     var v {{varname}}
 
-    if err != nil {
-        return 0, &v, err
+    if i <= 0 {
+        return 0, &v, errors.New("Could not deserialize variant tag")
     }
 
-    switch( *type_id ) {
+    switch( type_id ) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
         case {{loop.index - 1}}:
@@ -171,13 +173,12 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
             }
             j = k
             v.Value = &x
-            break
 {%- endfor %}
         default:
             return 0, &v, errors.New("Unknown variant tag")
     }
 
-    return i+j,&v,nil
+    return uint64(i)+j,&v,nil
 }
 
 func (n *{{varname}}) UnmarshalJSON(data []byte) error {
@@ -208,7 +209,6 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 {%- endif %}
             json.Unmarshal(tmp, &v)
             n.Value = v
-            break
 {%- endfor %}
         default:
             return errors.New("Unknown Variant Type: " + variant.Type)
