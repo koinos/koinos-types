@@ -1,6 +1,7 @@
 package koinos
 
 import (
+    "errors"
     "bytes"
     "math/big"
     "encoding/binary"
@@ -460,7 +461,7 @@ func (n *VariableBlob) Serialize(vb *VariableBlob) *VariableBlob {
 
 func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob) {
     size,bytes := binary.Uvarint(*vb)
-    var result VariableBlob = VariableBlob(make([]byte, 0, size))
+    result := VariableBlob(make([]byte, 0, size))
     ovb := append(result, (*vb)[bytes:uint64(bytes)+size]...)
     return uint64(uint64(bytes)+size), &ovb
 }
@@ -468,8 +469,8 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob) {
 func (n *VariableBlob) MarshalJSON() ([]byte, error) {
     nvb := NewVariableBlob()
     nvb = n.Serialize(nvb)
-    s := base58.Encode(*nvb)
-    return json.Marshal("z" + s)
+    s := EncodeBytes(*nvb)
+    return json.Marshal(s)
 }
 
 func (n *VariableBlob) UnmarshalJSON(b []byte) error {
@@ -479,8 +480,12 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
     }
 
     // Assume base58 encoding for now
-    svb := VariableBlob(base58.Decode(s[1:]))
-    _,ovb := DeserializeVariableBlob(&svb)
+    db,err := DecodeBytes(s)
+    if err != nil {
+        return err
+    }
+    pdb := VariableBlob(db)
+    _,ovb := DeserializeVariableBlob(&pdb)
     *n = *ovb
 
     return nil
@@ -490,36 +495,34 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
 //  TimestampType
 // --------------------------------
 
-type TimestampType uint64
+type TimestampType UInt64
 
 func (n *TimestampType) Serialize(vb *VariableBlob) *VariableBlob {
-    b := make([]byte, 8)
-    binary.BigEndian.PutUint64(b, uint64(*n))
-    ovb := append(*vb, b...)
-    return &ovb
+    un := UInt64(*n)
+    return un.Serialize(vb)
 }
 
 func DeserializeTimestampType(vb *VariableBlob) (uint64,*TimestampType) {
-    ots := TimestampType(binary.BigEndian.Uint64(*vb))
-    return 8, &ots
+    i,x := DeserializeUInt64(vb)
+    ox := TimestampType(*x)
+    return i,&ox
 }
 
 // --------------------------------
 //  BlockHeightType
 // --------------------------------
 
-type BlockHeightType uint64
+type BlockHeightType UInt64
 
 func (n *BlockHeightType) Serialize(vb *VariableBlob) *VariableBlob {
-    b := make([]byte, 8)
-    binary.BigEndian.PutUint64(b, uint64(*n))
-    ovb := append(*vb, b...)
-    return &ovb
+    un := UInt64(*n)
+    return un.Serialize(vb)
 }
 
 func DeserializeBlockHeightType(vb *VariableBlob) (uint64,*BlockHeightType) {
-    obh := BlockHeightType(binary.BigEndian.Uint64(*vb))
-    return 8, &obh
+    i,x := DeserializeUInt64(vb)
+    ox := BlockHeightType(*x)
+    return i,&ox
 }
 
 // --------------------------------
@@ -551,63 +554,125 @@ func (m0 *Multihash) GreaterThan(m1 *Multihash) bool {
 }
 
 func (n *Multihash) Serialize(vb *VariableBlob) *VariableBlob {
-    vb = n.Id.Serialize(vb)
+    vb = EncodeVarint(vb, uint64(n.Id))
     return n.Digest.Serialize(vb)
 }
 
 func DeserializeMultihash(vb *VariableBlob) (uint64,*Multihash) {
     omh := Multihash{}
-    isize,id := DeserializeUInt64(vb)
+    id,isize := binary.Uvarint(*vb)
     rvb := (*vb)[isize:]
     dsize,d := DeserializeVariableBlob(&rvb)
-    omh.Id = *id
+    omh.Id = UInt64(id)
     omh.Digest = *d
-    return isize+dsize, &omh
+    return uint64(isize)+dsize, &omh
 }
 
 // --------------------------------
-//  Multihash Vector
+//  MultihashVector
 // --------------------------------
 
 type MultihashVector struct {
-    Id UInt64 `json:"hash"`
-    Digests []VariableBlob `json:"digests"`
+    Id UInt64
+    Digests []VariableBlob
 }
 
 func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {
-    vb = n.Id.Serialize(vb)
-    header := make([]byte, binary.MaxVarintLen64)
-    bytes := binary.PutUvarint(header, uint64(len(n.Digests)))
-    ovb := append(*vb, header[:bytes]...)
-    vb = &ovb
-    for _, item := range n.Digests {
-        vb = item.Serialize(vb)
+    vb = EncodeVarint(vb, uint64(n.Id))
+    size := uint64(0)
+    if len(n.Digests) > 0 {
+        size = uint64(len(n.Digests[0]))
     }
+    vb = EncodeVarint(vb, size)
+    vb = EncodeVarint(vb, uint64(len(n.Digests)))
+
+    for _, item := range n.Digests {
+        *vb = append(*vb, item...)
+    }
+
     return vb
 }
 
 func DeserializeMultihashVector(vb *VariableBlob) (uint64,*MultihashVector) {
     omv := MultihashVector{}
-    i,id := DeserializeUInt64(vb)
-    size,bytes := binary.Uvarint((*vb)[i:])
-    i += uint64(bytes)
-    d := make([]VariableBlob, 0, size)
-    var j uint64
-    var item *VariableBlob
-    for num := uint64(0); num < size; num++ {
-        ovb := (*vb)[i:]
-        j,item = DeserializeVariableBlob(&ovb)
-        i += j
-        d = append(d, *item)
+    id,i := binary.Uvarint(*vb)
+    omv.Id = UInt64(id)
+    size,j := binary.Uvarint((*vb)[i:])
+    i += j
+    entries,j := binary.Uvarint((*vb)[i:])
+    i += j
+
+    for num := uint64(0); num < entries; num++ {
+        omv.Digests = append(omv.Digests, (*vb)[i:i+int(size)])
+        i += int(size)
     }
-    omv.Id = *id
-    omv.Digests = d
-    return i, &omv
+
+    return uint64(i), &omv
+}
+
+func (n *MultihashVector) MarshalJSON() ([]byte, error) {
+    mhv := struct {
+        Id uint64 `json:"hash"`
+        Digests []string `json:"digests"`
+    }{Id: uint64(n.Id)}
+
+    for _,item := range n.Digests {
+        mhv.Digests = append(mhv.Digests, EncodeBytes(item))
+    }
+
+    return json.Marshal(&mhv)
+}
+
+func (n *MultihashVector) UnmarshalJSON(b []byte) error {
+    mhv := struct {
+        Id uint64 `json:"hash"`
+        Digests []string `json:"digests"`
+    }{}
+
+    err := json.Unmarshal(b, &mhv)
+    if err != nil {
+        return err
+    }
+
+    n.Id = UInt64(mhv.Id)
+    size := 0
+    if len(mhv.Digests) > 0 {
+        size = len(mhv.Digests[0])
+    }
+    for _, item := range mhv.Digests {
+        if len(item) != size {
+            return errors.New("Multihash vector size mismatch")
+        }
+        db,err := DecodeBytes(item)
+        if err != nil {
+            return err
+        }
+        n.Digests = append(n.Digests, VariableBlob(db))
+    }
+
+    return nil
 }
 
 // --------------------------------
 //  Utility Functions
 // --------------------------------
+
+func EncodeBytes(b []byte) string {
+    return "z" + base58.Encode(b)
+}
+
+func DecodeBytes(s string) ([]byte,error) {
+    if len(s) <= 1 {
+        return make([]byte, 0),nil
+    }
+
+    switch s[0] {
+    case 'z':
+        return base58.Decode(s[1:]),nil
+    default:
+        return nil,errors.New("Unknown encoding: " + string(s[0]))
+    }
+}
 
 func SerializeBigInt(num *big.Int, byte_size int, signed bool) *VariableBlob {
     v := VariableBlob(make([]byte, byte_size))
@@ -627,15 +692,21 @@ func SerializeBigInt(num *big.Int, byte_size int, signed bool) *VariableBlob {
 
 func DeserializeBigInt(vb *VariableBlob, byte_size int, signed bool) *big.Int {
     num := new(big.Int)
-    v := VariableBlob(make([]byte, byte_size))
-    _ = copy(v, (*vb)[:byte_size])
-    if signed && (0x80 & v[0]) == 0x80 {
+    if signed && (0x80 & (*vb)[0]) == 0x80 {
+        v := VariableBlob(make([]byte, byte_size))
         for i := 0; i < byte_size; i++ {
-            v[i] = ^v[i]
+            v[i] = ^((*vb)[i])
         }
         neg := big.NewInt(-1)
         return num.SetBytes(v).Mul(neg, num).Add(neg, num)
     }
 
-    return num.SetBytes(v[:byte_size])
+    return num.SetBytes((*vb)[:byte_size])
+}
+
+func EncodeVarint(vb* VariableBlob, value uint64) *VariableBlob {
+    header := make([]byte, binary.MaxVarintLen64)
+    bytes := binary.PutUvarint(header, value)
+    *vb = append(*vb, header[:bytes]...)
+    return vb
 }
