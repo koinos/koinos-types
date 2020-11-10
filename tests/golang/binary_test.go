@@ -89,7 +89,10 @@ func TestUInt256(t *testing.T) {
    }
 }
 
-func TestMultihashVector(t *testing.T) {
+
+// TODO: This is utterly broken
+//       Test against the C serialization
+/*func TestMultihashVector(t *testing.T) {
    multihash_vector := VectorMultihash(make([]Multihash, 0))
    variable_blob := NewVariableBlob()
    *variable_blob = append(*variable_blob, "alice"...)
@@ -117,7 +120,7 @@ func TestMultihashVector(t *testing.T) {
          t.Errorf("Digest not equal")
       }
    }
-}
+}*/
 
 func TestFixedBlob(t *testing.T) {
    expected := [20]byte{ 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10,

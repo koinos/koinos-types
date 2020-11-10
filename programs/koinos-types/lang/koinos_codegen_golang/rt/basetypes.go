@@ -11,7 +11,7 @@ import (
 )
 
 type Serializeable interface {
-    Serialize(vb *VariableBlob)
+    Serialize(vb *VariableBlob) *VariableBlob
 }
 
 // --------------------------------
