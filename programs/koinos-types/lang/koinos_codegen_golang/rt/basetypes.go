@@ -140,7 +140,7 @@ func DeserializeInt16(vb *VariableBlob) (uint64,*Int16,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = Int16((*vb)[0])
+    i = Int16(binary.BigEndian.Uint16(*vb))
 
     return 2, &i, nil
 }
@@ -165,7 +165,7 @@ func DeserializeUInt16(vb *VariableBlob) (uint64,*UInt16,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = UInt16((*vb)[0])
+    i = UInt16(binary.BigEndian.Uint16(*vb))
 
     return 2, &i, nil
 }
@@ -191,7 +191,7 @@ func DeserializeInt32(vb *VariableBlob) (uint64,*Int32,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = Int32((*vb)[0])
+    i = Int32(binary.BigEndian.Uint32(*vb))
 
     return 4, &i, nil
 }
@@ -216,7 +216,7 @@ func DeserializeUInt32(vb *VariableBlob) (uint64,*UInt32,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = UInt32((*vb)[0])
+    i = UInt32(binary.BigEndian.Uint32(*vb))
 
     return 4, &i, nil
 }
@@ -241,7 +241,7 @@ func DeserializeInt64(vb *VariableBlob) (uint64,*Int64,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = Int64((*vb)[0])
+    i = Int64(binary.BigEndian.Uint64(*vb))
 
     return 8, &i, nil
 }
@@ -266,7 +266,7 @@ func DeserializeUInt64(vb *VariableBlob) (uint64,*UInt64,error) {
         return 0, &i, errors.New("Unexpected EOF")
     }
 
-    i = UInt64((*vb)[0])
+    i = UInt64(binary.BigEndian.Uint64(*vb))
 
     return 8, &i, nil
 }
@@ -593,7 +593,7 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob,error) {
     }
 
     if len(*vb) < bytes + int(size) {
-        errors.New("Unexpected EOF")
+        return 0, &result, errors.New("Unexpected EOF")
     }
 
     ovb := append(result, (*vb)[bytes:uint64(bytes)+size]...)
@@ -778,7 +778,7 @@ func SerializeBigInt(num *big.Int, byte_size int, signed bool) *VariableBlob {
 func DeserializeBigInt(vb *VariableBlob, byte_size int, signed bool) (*big.Int,error) {
     num := new(big.Int)
 
-    if len(*vb) < 1 {
+    if len(*vb) < byte_size {
         return num, errors.New("Unexpected EOF")
     }
 
