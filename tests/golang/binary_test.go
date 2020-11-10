@@ -6,6 +6,50 @@ import (
     . "koinos"
 )
 
+func TestBoolean(t *testing.T) {
+   value := Boolean(true)
+   expected := []byte{0x01}
+   result := NewVariableBlob()
+   result = value.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected")
+   }
+   size, value2, err := DeserializeBoolean(result)
+   if err != nil {
+      t.Errorf("err != nil (%s)", err)
+   }
+   if *value2 != true {
+      t.Errorf("*integer2 != true (%t != true)", *value2)
+   }
+   if size != 1 {
+      t.Errorf("size != 1 (%d != 1)", size )
+   }
+
+   result = &VariableBlob{0x00}
+   size, value2, err = DeserializeBoolean(result)
+   if err != nil {
+      t.Errorf("err != nil (%s)", err)
+   }
+   if *value2 != false {
+      t.Errorf("*integer2 != true (%t != false)", *value2)
+   }
+   if size != 1 {
+      t.Errorf("size != 1 (%d != 1)", size )
+   }
+
+   vb := VariableBlob{0x02}
+   _, _, err = DeserializeInt64(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   vb = VariableBlob{}
+   _, _, err = DeserializeInt64(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+}
+
 func TestBasic(t *testing.T) {
    integer := Int64(-256)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00}
@@ -201,4 +245,57 @@ func TestFixedBlob(t *testing.T) {
    if err == nil {
       t.Errorf("err == nil")
    }
+}
+
+func TestString(t *testing.T) {
+   msg := String("Hello World!")
+   expected := []byte{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
+                      0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, }
+   result := NewVariableBlob()
+   result = msg.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected (%d != %d)", *result, expected)
+   }
+   size, msg2, err := DeserializeString(result)
+   if err != nil {
+      t.Errorf("err != nil (%s)", err)
+   }
+   if *msg2 != msg {
+      t.Errorf("*msg2 != msg (%s != %s)", *msg2, msg)
+   }
+   if size != 13 {
+      t.Errorf("size != 13 (%d != 13)", size )
+   }
+
+   result = NewVariableBlob()
+   result = msg2.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected (%d != %d)", *result, expected)
+   }
+
+   vb := VariableBlob{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
+                      0x57, 0x6f, 0x72, 0x6c, 0x64, }
+   _, _, err = DeserializeString(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   vb = VariableBlob{0x0c, 0xc7, 0xc0, 0x6c, 0x6c, 0x6f, 0x20,
+                     0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, }
+   _, _, err = DeserializeString(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+}
+
+func TestVariant(t *testing.T) {
+   defer func() {
+      if r := recover(); r == nil {
+          t.Errorf("Serializing an incorrect variant tag did not panic")
+      }
+  }()
+
+   variant := SystemCallTarget{Value:UInt64(0)}
+   vb := NewVariableBlob()
+   _ = variant.Serialize(vb)
 }
