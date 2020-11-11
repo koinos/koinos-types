@@ -1,0 +1,148 @@
+{%- macro vector(tref) -%}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Vector{{v_type}}{{decl_vector(v_type)}}
+{%- endmacro -%}
+
+{%- macro template(targs) -%}
+<
+{%- for arg in targs -%}
+{{typeref(arg)}}{{"," if not loop.last}}
+{%- endfor -%}
+>
+{%- endmacro -%}
+
+{%- macro fixed_blob(tref) -%}
+{%- set length = typeref(tref["targs"][0]) -%}
+FixedBlob{{length}}{{decl_fixed_blob(length)}}
+{%- endmacro -%}
+
+{%- macro opaque(tref) -%}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Opaque{{v_type}}{{decl_opaque(v_type)}}
+{%- endmacro -%}
+
+{%- macro variant(tref) -%}
+{{tref["name"]}}
+{%- endmacro -%}
+
+{%- macro typeref(tref) -%}
+{%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
+{%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
+{%- elif tref["name"][-1] == "opaque" -%}{{opaque(tref)}}
+{%- elif tref["name"][-1] == "boolean" -%}Boolean
+{%- elif tref["name"][-1] == "string" -%}String
+{%- else -%}
+{{go_name(tref["name"][-1])}}
+{%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro namespaced_typeref(tref) -%}
+{%- for name in tref["name"] -%}
+{{name}}{{"::" if not loop.last}}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- macro is_struct(targ) -%}
+{{is_struct_impl(targ,decls_by_name)}}
+{%- endmacro -%}
+
+{%- macro struct(decl) -%}
+{%- set sname = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Struct: {{sname}}
+// ----------------------------------------
+
+{% endmacro -%}
+
+{%- macro typedef(decl) -%}
+{%- if decl["tref"]["name"][-1] == "variant" -%}
+{{variant_def(decl)}}
+{%- else -%}
+{{basic_typedef(decl)}}
+{%- endif %}
+{% endmacro -%}
+
+{%- macro variant_def(decl) -%}
+{%- set varname = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Variant: {{varname}}
+// ----------------------------------------
+
+{%- endmacro -%}
+
+{%- macro basic_typedef(decl) -%}
+{%- set tname = go_name(decl["name"])-%}
+{%- set rname = typeref(decl["tref"])-%}
+{%- if tname != rname -%}
+// ----------------------------------------
+//  Typedef: {{tname}}
+// ----------------------------------------
+
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro enum(decl) -%}
+{%- set ename = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Enum: {{ename}}
+// ----------------------------------------
+
+{% endmacro -%}
+
+{%- macro generate_vectors() -%}
+{% for v_type in get_vectors() -%}
+{%- set o_type = "Vector" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+{% endfor -%}
+{% endmacro %}
+
+{%- macro generate_opaques() -%}
+{% for v_type in get_opaque() -%}
+{%- set o_type = "Opaque" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+{% endfor -%}
+{% endmacro %}
+
+{%- macro generate_fixed_blobs() -%}
+{% for length in get_fixed_blobs() -%}
+{%- set fbname='FixedBlob'+length -%}
+// ----------------------------------------
+//  {{fbname}}
+// ----------------------------------------
+
+{% endfor %}
+{% endmacro -%}
+
+//   ____                           _           _   _____         _
+//  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| | |_   _|__  ___| |_ ___
+// | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \/ _` |   | |/ _ \/ __| __/ __|
+// | |_| |  __/ | | |  __/ | | (_| | ||  __/ (_| |   | |  __/\__ \ |_\__ \
+//  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|   |_|\___||___/\__|___/
+//                         Please do not modify
+
+package koinos
+
+import (
+    "testing"
+)
+
+{% for name, decl in decls_by_name.items() -%}
+{% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
+{% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
+{# {%- elif decl["info"]["type"] == "BaseType" -%} #}
+{% elif decl["info"]["type"] == "EnumClass" %}{{enum(decl)}}
+{# {%- else -%}// TODO: Unimplemented {{decl}} #}
+{%- endif -%}
+
+{% endfor %}
+{{generate_fixed_blobs()}}
+{{generate_opaques()}}
+{{generate_vectors()}}

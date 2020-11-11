@@ -112,6 +112,7 @@ def generate_golang(schema):
 
     template_names = [
         "koinos.go.j2",
+        "koinos_test.go.j2"
         ]
 
     for template_name in template_names:
