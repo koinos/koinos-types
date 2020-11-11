@@ -129,6 +129,10 @@ def generate_golang(schema):
             result_files[relpath] = content
     return result
 
+def escape_json(obj):
+   import json
+   return json.dumps(obj).replace('"', '\\"')
+
 def generate_tests(test_data):
     import json
     env = jinja2.Environment(
@@ -146,7 +150,7 @@ def generate_tests(test_data):
         else:
             typename = split_ns[0]
 
-        test_cases.append({"typename": typename, "json": json.dumps(test['json'])})
+        test_cases.append({"typename": typename, "json": escape_json(test['json'])})
 
     ctx = {"test_cases" : test_cases,
            "go_name" : go_name

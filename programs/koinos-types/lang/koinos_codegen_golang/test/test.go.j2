@@ -1,8 +1,10 @@
 package main
 
 import (
+   "encoding/json"
    "flag"
    "io/ioutil"
+   "os"
    . "koinos"
 )
 
@@ -15,11 +17,11 @@ func main() {
    var arr [][]byte
    bin := NewVariableBlob()
 
-   {%- for test in test_cases %}
+   {% for test in test_cases %}
    {
       var t {{ go_name(test.typename) }}
-      jsonBlob = []byte('{{ test.json }}')
-      err := json.Unmarshal(jsonBlock, t)
+      jsonBlob := []byte("{{ test.json }}")
+      err := json.Unmarshal(jsonBlob, &t)
       if err != nil {
          panic(err)
       }
@@ -30,8 +32,20 @@ func main() {
       arr = append(arr, jsonBlob)
       bin = t.Serialize(bin)
    }
-   {%- endfor -%}
+   {% endfor %}
 
-   ioutil.WriteFile(*binPtr, bin)
-   ioutil.WriteFile(*jsonPtr, arr)
+   ioutil.WriteFile(*binPtr, []byte(*bin), 0644 )
+
+   f, err := os.OpenFile(*jsonPtr, os.O_CREATE | os.O_WRONLY, 0644)
+   if err != nil {
+      panic(err)
+   }
+
+   defer f.Close()
+
+   for i := range arr {
+      if _, err := f.WriteString(string(arr[i])); err != nil {
+         panic(err)
+      }
+   }
 }
