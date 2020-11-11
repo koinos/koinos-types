@@ -1,9 +1,9 @@
 package main
 
 import (
-    "bytes"
-    "testing"
-    . "koinos"
+   "bytes"
+   . "koinos"
+   "testing"
 )
 
 func TestBoolean(t *testing.T) {
@@ -22,7 +22,7 @@ func TestBoolean(t *testing.T) {
       t.Errorf("*integer2 != true (%t != true)", *value2)
    }
    if size != 1 {
-      t.Errorf("size != 1 (%d != 1)", size )
+      t.Errorf("size != 1 (%d != 1)", size)
    }
 
    result = &VariableBlob{0x00}
@@ -34,7 +34,7 @@ func TestBoolean(t *testing.T) {
       t.Errorf("*integer2 != true (%t != false)", *value2)
    }
    if size != 1 {
-      t.Errorf("size != 1 (%d != 1)", size )
+      t.Errorf("size != 1 (%d != 1)", size)
    }
 
    vb := VariableBlob{0x02}
@@ -66,7 +66,7 @@ func TestBasic(t *testing.T) {
       t.Errorf("*integer2 != Int64(-256) (%d != %d)", *integer2, Int64(-256))
    }
    if size != 8 {
-      t.Errorf("size != 8 (%d != 8)", size )
+      t.Errorf("size != 8 (%d != 8)", size)
    }
 
    result = NewVariableBlob()
@@ -184,54 +184,35 @@ func TestUInt256(t *testing.T) {
    }
 }
 
-
-// TODO: This is utterly broken
-//       Test against the C serialization
-/*func TestMultihashVector(t *testing.T) {
-   multihash_vector := VectorMultihash(make([]Multihash, 0))
+func TestMultihashVector(t *testing.T) {
    variable_blob := NewVariableBlob()
-   *variable_blob = append(*variable_blob, "alice"...)
+   *variable_blob = append(*variable_blob, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
    variable_blob2 := NewVariableBlob()
-   *variable_blob2 = append(*variable_blob2, "bob"...)
-   multihash_vector = append(multihash_vector, Multihash{Id: 1, Digest: *variable_blob}, Multihash{Id: 2, Digest: *variable_blob2})
+   *variable_blob2 = append(*variable_blob2, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
+   var multihashVector MultihashVector
+   multihashVector.Id = 1
+   multihashVector.Digests = append(multihashVector.Digests, *variable_blob)
+   multihashVector.Digests = append(multihashVector.Digests, *variable_blob2)
 
-   vblob := NewVariableBlob()
-   vblob = multihash_vector.Serialize(vblob)
+   result := NewVariableBlob()
+   result = multihashVector.Serialize(result)
 
    expected := []byte{
-      0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x05, 0x61, 0x6c, 0x69, 0x63, 0x65,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x03, 0x62, 0x6f, 0x62, }
-   if !bytes.Equal(expected, *vblob) {
-      t.Errorf("expected != *vblob")
+      0x01,                               // hash_id
+      0x06,                               // hash length
+      0x02,                               // num hashes
+      0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A, // digest_a
+      0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // digest_b
    }
 
-   _, mhv, err := DeserializeVectorMultihash(vblob)
-   if err != nil {
-      t.Errorf("err != nil")
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected")
    }
-   for i := 0; i < 2; i++ {
-      if multihash_vector[i].Id != (*mhv)[i].Id {
-         t.Errorf("Id not equal")
-      }
-
-      if !bytes.Equal(multihash_vector[i].Digest, (*mhv)[i].Digest) {
-         t.Errorf("Digest not equal")
-      }
-   }
-
-   vb := VariableBlob{
-      0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x05, 0x61, 0x6c, 0x69, 0x63, 0x65,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x03, 0x62, 0x6f,
-   }
-   _, _, err = DeserializeVectorMultihash(&vb)
-   if err == nil {
-      t.Errorf("err == nil")
-   }
-}*/
+}
 
 func TestFixedBlob(t *testing.T) {
-   expected := [20]byte{ 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10,
-                         0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x20, }
+   expected := [20]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10,
+      0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x20}
    fixed_blob := FixedBlob20(expected)
    vblob := NewVariableBlob()
    vblob = fixed_blob.Serialize(vblob)
@@ -253,7 +234,7 @@ func TestFixedBlob(t *testing.T) {
 func TestString(t *testing.T) {
    msg := String("Hello World!")
    expected := []byte{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
-                      0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, }
+      0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21}
    result := NewVariableBlob()
    result = msg.Serialize(result)
    if !bytes.Equal(*result, expected) {
@@ -267,7 +248,7 @@ func TestString(t *testing.T) {
       t.Errorf("*msg2 != msg (%s != %s)", *msg2, msg)
    }
    if size != 13 {
-      t.Errorf("size != 13 (%d != 13)", size )
+      t.Errorf("size != 13 (%d != 13)", size)
    }
 
    result = NewVariableBlob()
@@ -277,14 +258,14 @@ func TestString(t *testing.T) {
    }
 
    vb := VariableBlob{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
-                      0x57, 0x6f, 0x72, 0x6c, 0x64, }
+      0x57, 0x6f, 0x72, 0x6c, 0x64}
    _, _, err = DeserializeString(&vb)
    if err == nil {
       t.Errorf("err == nil")
    }
 
    vb = VariableBlob{0x0c, 0xc7, 0xc0, 0x6c, 0x6c, 0x6f, 0x20,
-                     0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, }
+      0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21}
    _, _, err = DeserializeString(&vb)
    if err == nil {
       t.Errorf("err == nil")
@@ -294,11 +275,21 @@ func TestString(t *testing.T) {
 func TestVariant(t *testing.T) {
    defer func() {
       if r := recover(); r == nil {
-          t.Errorf("Serializing an incorrect variant tag did not panic")
+         t.Errorf("Serializing an incorrect variant tag did not panic")
       }
-  }()
+   }()
 
-   variant := SystemCallTarget{Value:UInt64(0)}
+   variant := SystemCallTarget{Value: UInt64(0)}
    vb := NewVariableBlob()
    _ = variant.Serialize(vb)
+}
+
+func TestVariableBlob(t *testing.T) {
+   result := VariableBlob{0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A}
+
+   expected := []byte{0x06, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A}
+
+   if !bytes.Equal(result, expected) {
+      t.Errorf("result != expected")
+   }
 }
