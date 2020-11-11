@@ -54,6 +54,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 //  Struct: {{sname}}
 // ----------------------------------------
 
+func Test{{sname}}(t *testing.T) {
+}
+
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
@@ -70,6 +73,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 //  Variant: {{varname}}
 // ----------------------------------------
 
+func Test{{varname}}(t *testing.T) {
+}
+
 {%- endmacro -%}
 
 {%- macro basic_typedef(decl) -%}
@@ -80,6 +86,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 //  Typedef: {{tname}}
 // ----------------------------------------
 
+func Test{{tname}}(t *testing.T) {
+}
+
 {%- endif -%}
 {%- endmacro -%}
 
@@ -89,6 +98,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 //  Enum: {{ename}}
 // ----------------------------------------
 
+func Test{{ename}}(t *testing.T) {
+}
+
 {% endmacro -%}
 
 {%- macro generate_vectors() -%}
@@ -97,6 +109,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 // ----------------------------------------
 //  {{o_type}}
 // ----------------------------------------
+
+func Test{{o_type}}(t *testing.T) {
+}
 
 {% endfor -%}
 {% endmacro %}
@@ -108,6 +123,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 //  {{o_type}}
 // ----------------------------------------
 
+func Test{{o_type}}(t *testing.T) {
+}
+
 {% endfor -%}
 {% endmacro %}
 
@@ -117,6 +135,9 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 // ----------------------------------------
 //  {{fbname}}
 // ----------------------------------------
+
+func Test{{fbname}}(t *testing.T) {
+}
 
 {% endfor %}
 {% endmacro -%}
