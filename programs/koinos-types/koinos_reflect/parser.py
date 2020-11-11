@@ -314,7 +314,7 @@ def main():
         program_text = f.read()
 
     parser = Parser(program_text)
-    print(parser.parse().to_json(indent=1))
+    #print(parser.parse().to_json(indent=1))
 
 if __name__ == "__main__":
     main()

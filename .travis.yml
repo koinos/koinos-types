@@ -32,7 +32,7 @@ before_install:
   - ci/before_install.sh
 
 install:
-  - ci/install.sh
+  - source ci/install.sh
 
 script:
   - ci/build.sh && ci/test.sh
