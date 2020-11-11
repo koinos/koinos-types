@@ -114,8 +114,8 @@ def main():
     with open(sys.argv[1], "r") as f:
         program_text = f.read()
 
-    for tok in lex(program_text):
-        print(tok)
+    #for tok in lex(program_text):
+    #    print(tok)
 
 if __name__ == "__main__":
     main()

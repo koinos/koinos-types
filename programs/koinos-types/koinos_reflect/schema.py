@@ -218,7 +218,7 @@ class Schemanator:
             yield
         listener.process_typeref = process_typeref
         walk(listener, self.tree)
-        print("typerefs:", typerefs)
+        #print("typerefs:", typerefs)
 
     def sort_typemap(self):
         finder = FindDepsWalker(self.typemap)

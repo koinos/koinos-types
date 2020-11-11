@@ -3,6 +3,8 @@ build
 Testing
 libraries/pack/gen
 out
+gen
+block.schema
 
 # Mac files
 .DS_Store

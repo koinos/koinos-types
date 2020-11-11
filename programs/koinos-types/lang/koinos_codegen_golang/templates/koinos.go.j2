@@ -1,0 +1,527 @@
+{%- macro vector(tref) -%}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Vector{{v_type}}{{decl_vector(v_type)}}
+{%- endmacro -%}
+
+{%- macro template(targs) -%}
+<
+{%- for arg in targs -%}
+{{typeref(arg)}}{{"," if not loop.last}}
+{%- endfor -%}
+>
+{%- endmacro -%}
+
+{%- macro fixed_blob(tref) -%}
+{%- set length = typeref(tref["targs"][0]) -%}
+FixedBlob{{length}}{{decl_fixed_blob(length)}}
+{%- endmacro -%}
+
+{%- macro opaque(tref) -%}
+{%- set v_type = typeref(tref["targs"][0]) -%}
+Opaque{{v_type}}{{decl_opaque(v_type)}}
+{%- endmacro -%}
+
+{%- macro variant(tref) -%}
+{{tref["name"]}}
+{%- endmacro -%}
+
+{%- macro typeref(tref) -%}
+{%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
+{%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
+{%- elif tref["name"][-1] == "opaque" -%}{{opaque(tref)}}
+{%- elif tref["name"][-1] == "boolean" -%}Boolean
+{%- elif tref["name"][-1] == "string" -%}String
+{%- else -%}
+{{go_name(tref["name"][-1])}}
+{%- if tref["targs"] is not none -%}{{template(tref["targs"])}}{%- endif -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro namespaced_typeref(tref) -%}
+{%- for name in tref["name"] -%}
+{{name}}{{"::" if not loop.last}}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- macro is_struct(targ) -%}
+{{is_struct_impl(targ,decls_by_name)}}
+{%- endmacro -%}
+
+{%- macro struct_serialization(decl) -%}
+func (n *{{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
+{%- for field in decl["fields"] %}
+    vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
+    return vb
+}
+{%- endmacro -%}
+
+{%- macro struct_deserialization(decl) -%}
+func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(decl["name"])}},error) {
+    {% if decl["fields"]|length > 0 -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
+    s := {{go_name(decl["name"])}}{}
+    {% if decl["fields"]|length > 0 -%}var ovb VariableBlob{%- endif %}
+{%- for field in decl["fields"] %}
+    {%- set tname = typeref(field["tref"]) %}
+    ovb = (*vb)[i:]
+    j,t_{{field["name"]}},err := Deserialize{{tname}}(&ovb); i+=j
+    if err != nil {
+        return 0, &{{go_name(decl["name"])}}{}, err
+    }
+    s.{{go_name(field["name"])}} = *t_{{field["name"]}}{% endfor %}
+    return i, &s, nil
+}
+{%- endmacro -%}
+
+{%- macro struct(decl) -%}
+{%- set sname = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Struct: {{sname}}
+// ----------------------------------------
+
+{# // {{decl}} #}type {{sname}} struct {
+{% if decl["fields"]|length > 0 -%}
+{%- for field in decl["fields"] %}    {{go_name(field["name"])}} {{typeref(field["tref"])}} `json:"{{field["name"]}}"`
+{% endfor %}
+{%- endif -%}
+}
+
+{{struct_serialization(decl)}}
+
+{{struct_deserialization(decl)}}
+{% endmacro -%}
+
+{%- macro typedef(decl) -%}
+{%- if decl["tref"]["name"][-1] == "variant" -%}
+{{variant_def(decl)}}
+{%- else -%}
+{{basic_typedef(decl)}}
+{%- endif %}
+{% endmacro -%}
+
+{%- macro variant_def(decl) -%}
+{%- set varname = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Variant: {{varname}}
+// ----------------------------------------
+
+type {{varname}} struct {
+    Value interface{}
+}
+
+func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    var i uint64
+    switch n.Value.(type) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{arg_type}}:
+            i = {{loop.index - 1}}
+{%- endfor %}
+        default:
+            panic("Unknown variant type")
+    }
+
+    vb = EncodeVarint(vb, i)
+    ser,ok := n.Value.(Serializeable)
+    if !ok {
+        panic("Variant type is not serializeable.")
+    }
+    return ser.Serialize(vb)
+}
+
+func (n *{{varname}}) TypeToName() (string) {
+    switch n.Value.(type) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{arg_type}}:
+            return "{{namespaced_typeref(arg)}}"
+{%- endfor %}
+        default:
+            return "unknown type"
+    }
+}
+
+func (n *{{varname}}) MarshalJSON() ([]byte, error) {
+    variant := struct {
+        Type string `json:"type"`
+        Value *interface{} `json:"value"`
+    }{
+        n.TypeToName(),
+        &n.Value,
+    }
+
+    return json.Marshal(&variant)
+}
+
+func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
+    type_id,i := binary.Uvarint(*vb)
+    var j uint64
+    var v {{varname}}
+
+    if i <= 0 {
+        return 0, &v, errors.New("Could not deserialize variant tag")
+    }
+
+    switch( type_id ) {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case {{loop.index - 1}}:
+            ovb := (*vb)[i:]
+            k,x,err := Deserialize{{arg_type}}(&ovb)
+            if err != nil {
+                return 0, &v, err
+            }
+            j = k
+            v.Value = &x
+{%- endfor %}
+        default:
+            return 0, &v, errors.New("Unknown variant tag")
+    }
+
+    return uint64(i)+j,&v,nil
+}
+
+func (n *{{varname}}) UnmarshalJSON(data []byte) error {
+    variant := struct {
+        Type string `json:"type"`
+        Value interface{} `json:"value"`
+    }{}
+
+    err := json.Unmarshal(data, &variant)
+    if err != nil {
+        return err
+    }
+
+    var tmp []byte
+    tmp, err = json.Marshal(&variant.Value)
+    if err != nil {
+        return err
+    }
+
+    switch variant.Type {
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+        case "{{namespaced_typeref(arg)}}":
+{%- if is_struct(arg) == "True" %}
+            v := {{arg_type}}{}
+{%- else %}
+            v := {{arg_type}}(0)
+{%- endif %}
+            json.Unmarshal(tmp, &v)
+            n.Value = v
+{%- endfor %}
+        default:
+            return errors.New("Unknown Variant Type: " + variant.Type)
+    }
+
+    return nil
+}
+
+{%- endmacro -%}
+
+{%- macro basic_typedef(decl) -%}
+{%- set tname = go_name(decl["name"])-%}
+{%- set rname = typeref(decl["tref"])-%}
+{%- if tname != rname -%}
+// ----------------------------------------
+//  Typedef: {{tname}}
+// ----------------------------------------
+
+type {{tname}} {{rname}}
+
+func (n *{{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    ox := {{rname}}(*n)
+    return ox.Serialize(vb)
+}
+
+func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}},error) {
+    i,n,err := Deserialize{{rname}}(vb)
+    var ot {{tname}}
+    if err != nil {
+        return 0,&ot,err
+    }
+    ot = {{tname}}(*n)
+    return i,&ot,nil
+}
+
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro enum(decl) -%}
+{%- set ename = go_name(decl["name"]) -%}
+// ----------------------------------------
+//  Enum: {{ename}}
+// ----------------------------------------
+
+type {{ename}} UInt32
+
+const (
+{%- for entry in decl["entries"] %}
+    {{ename}}_{{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
+{%- endfor %}
+)
+
+func (n *{{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
+    x := UInt32(*n)
+    return x.Serialize(vb)
+}
+
+func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
+    i,item,err := DeserializeUInt32(vb)
+    var x {{ename}}
+    if err != nil {
+        return 0,&x,err
+    }
+    x = {{ename}}(*item)
+    return i,&x,nil
+}
+
+{% endmacro -%}
+
+{%- macro generate_vectors() -%}
+{% for v_type in get_vectors() -%}
+{%- set o_type = "Vector" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+type {{o_type}} []{{v_type}}
+
+func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+    header := make([]byte, binary.MaxVarintLen64)
+    bytes := binary.PutUvarint(header, uint64(len(*n)))
+    ovb := append(*vb, header[:bytes]...)
+    vb = &ovb
+    for _, item := range *n {
+        vb = item.Serialize(vb)
+    }
+
+    return vb
+}
+
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
+    size,bytes := binary.Uvarint(*vb)
+    var result {{o_type}} = {{o_type}}(make([]{{v_type}}, 0, size))
+    i := uint64(bytes)
+    var j uint64
+    var item *{{v_type}}
+    var err error
+    for num := uint64(0); num < size; num++ {
+        ovb := (*vb)[i:]
+        j,item,err = Deserialize{{v_type}}(&ovb)
+        if nil != err {
+            var v {{o_type}}
+            return 0,&v,err
+        }
+        i += j
+        result = append(result, *item)
+    }
+
+    return i, &result, nil
+}
+
+{% endfor -%}
+{% endmacro %}
+
+{%- macro generate_opaques() -%}
+{% for v_type in get_opaque() -%}
+{%- set o_type = "Opaque" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+type {{o_type}} struct {
+    blob *VariableBlob
+    native *{{v_type}}
+}
+
+func (n *{{o_type}}) GetBlob() *VariableBlob {
+    if (n.native != nil && n.blob == nil) {
+        n.serializeNative()
+    }
+
+    return n.blob
+}
+
+func (n *{{o_type}}) GetNative() *{{v_type}} {
+    if( n.native == nil ) {
+        panic("Opaque type not unboxed.")
+    }
+    if( n.blob != nil ) {
+        panic("Opaque type is not mutable.")
+    }
+
+    return n.native;
+}
+
+func (n *{{o_type}}) Box() {
+    if (n.native != nil) {
+        // Mutable -> Unboxed
+        if (n.blob == nil) {
+            n.serializeNative()
+        }
+
+        // Unboxed -> Boxed
+        n.native = nil
+    }
+}
+
+func (n *{{o_type}}) Unbox() {
+    if (n.native == nil && n.blob != nil) {
+        var err error
+        _,n.native,err = Deserialize{{v_type}}(n.blob)
+
+        if err != nil {
+            n.native = nil
+        }
+    }
+}
+
+func (n *{{o_type}}) MakeMutable() {
+    if (n.native == nil) {
+        n.Unbox()
+    }
+
+    // Unboxed -> Mutable
+    if (n.native != nil && n.blob != nil) {
+        n.blob = nil
+    }
+}
+
+func (n *{{o_type}}) MakeImmutable() {
+    if (n.native != nil && n.blob == nil) {
+        n.serializeNative()
+    }
+}
+
+func (n *{{o_type}}) IsUnboxed() bool {
+    return n.native != nil;
+}
+
+func (n *{{o_type}}) IsMutable() bool {
+    return n.native != nil && n.blob == nil;
+}
+
+func (n *{{o_type}}) serializeNative() {
+    vb := NewVariableBlob()
+    n.blob = n.native.Serialize(vb)
+}
+
+func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+    n.Box()
+    ovb := append(*vb, (*n.blob)...)
+    return &ovb
+}
+
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
+    size,nv,err := DeserializeVariableBlob(vb)
+    var o {{o_type}}
+    if err != nil {
+        return 0, &o, err
+    }
+    o = {{o_type}}{blob:nv, native:nil}
+    return size,&o,nil
+}
+
+func (n *{{o_type}}) MarshalJSON() ([]byte, error) {
+    n.Unbox()
+
+    if n.IsUnboxed() {
+        return json.Marshal(&n.native)
+    }
+
+    return json.Marshal(&n.blob)
+}
+
+func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
+    err := json.Unmarshal(data, &n.native)
+
+    if err != nil {
+        err = json.Unmarshal(data, &n.blob)
+        n.native = nil
+    } else {
+        n.blob = nil
+    }
+
+    return err
+}
+
+{% endfor -%}
+{% endmacro %}
+
+{%- macro generate_fixed_blobs() -%}
+{% for length in get_fixed_blobs() -%}
+{%- set fbname='FixedBlob'+length -%}
+// ----------------------------------------
+//  {{fbname}}
+// ----------------------------------------
+
+type {{fbname}} [{{length}}]byte
+
+func (n {{fbname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    ovb := append(*vb, n[:]...)
+    return &ovb
+}
+
+func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
+    var result {{fbname}}
+    if len(*vb) < {{length}} {
+        return 0,&result,errors.New("Unexpected EOF")
+    }
+    copy(result[:], *vb)
+    return {{length}},&result,nil
+}
+
+func (n *{{fbname}}) MarshalJSON() ([]byte, error) {
+    s := base58.Encode((*n)[:])
+    return json.Marshal("z" + s)
+}
+
+func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
+    var s string
+    if err := json.Unmarshal(b, &s); err != nil {
+        return nil
+    }
+
+    // Assume base58 encoding for now
+    sl := base58.Decode(s[1:])
+    copy((*n)[:], sl)
+
+    if len(n) < {{length}} {
+        return errors.New("{{fbname}} does not contain enough data")
+    }
+
+    return nil
+}
+
+{% endfor %}
+{% endmacro -%}
+
+//   ____                           _           _    ____          _
+//  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| |  / ___|___   __| | ___
+// | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \/ _` | | |   / _ \ / _` |/ _ \
+// | |_| |  __/ | | |  __/ | | (_| | ||  __/ (_| | | |__| (_) | (_| |  __/
+//  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|  \____\___/ \__,_|\___|
+//                         Please do not modify
+
+package koinos
+
+import (
+    "errors"
+    "encoding/binary"
+    "encoding/json"
+    "github.com/btcsuite/btcutil/base58"
+)
+
+{% for name, decl in decls_by_name.items() -%}
+{% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
+{% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
+{# {%- elif decl["info"]["type"] == "BaseType" -%} #}
+{% elif decl["info"]["type"] == "EnumClass" %}{{enum(decl)}}
+{# {%- else -%}// TODO: Unimplemented {{decl}} #}
+{%- endif -%}
+
+{% endfor %}
+{{generate_fixed_blobs()}}
+{{generate_opaques()}}
+{{generate_vectors()}}
