@@ -184,6 +184,18 @@ func TestUInt256(t *testing.T) {
    }
 }
 
+func TestMultihash(t *testing.T) {
+   m := Multihash{Id: 1, Digest: VariableBlob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A }}
+   result := NewVariableBlob()
+   result = m.Serialize(result)
+
+   expected := []byte{ 0x01, 0x06, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A }
+
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected")
+   }
+}
+
 func TestMultihashVector(t *testing.T) {
    variable_blob := NewVariableBlob()
    *variable_blob = append(*variable_blob, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
@@ -285,11 +297,13 @@ func TestVariant(t *testing.T) {
 }
 
 func TestVariableBlob(t *testing.T) {
-   result := VariableBlob{0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A}
+   variableBlob := &VariableBlob{0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A}
+   result := NewVariableBlob()
+   result = variableBlob.Serialize(result)
 
    expected := []byte{0x06, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A}
 
-   if !bytes.Equal(result, expected) {
+   if !bytes.Equal(*result, expected) {
       t.Errorf("result != expected")
    }
 }
