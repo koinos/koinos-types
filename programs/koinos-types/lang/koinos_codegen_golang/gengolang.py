@@ -129,5 +129,35 @@ def generate_golang(schema):
             result_files[relpath] = content
     return result
 
+def escape_json(obj):
+   import json
+   return json.dumps(obj).replace('"', '\\"')
+
+def generate_tests(test_data):
+    import json
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader(__package__, "test"),
+        keep_trailing_newline=True
+    )
+    test_cases = []
+
+    for test in test_data:
+        split_ns = test['type'].rsplit('::', 1)
+        namespace, typename = '', ''
+        if len(split_ns) == 2:
+            namespace = split_ns[0]
+            typename = split_ns[1]
+        else:
+            typename = split_ns[0]
+
+        test_cases.append({"typename": typename, "json": escape_json(test['json'])})
+
+    ctx = {"test_cases" : test_cases,
+           "go_name" : go_name
+          }
+
+    return env.get_template("test.go.j2").render(ctx), "test.go"
+
 def setup(app):
     app.register_target("golang", generate_golang)
+    app.register_target("golang_test", generate_tests)
