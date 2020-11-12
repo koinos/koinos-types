@@ -346,9 +346,9 @@ func TestInt128(t *testing.T) {
 }
 
 func TestUInt128(t *testing.T) {
-   to_bin := NewUInt128("36893488147419103231")
+   toBin := NewUInt128("36893488147419103231")
    result := NewVariableBlob()
-   result = to_bin.Serialize(result)
+   result = toBin.Serialize(result)
 
    expected := []byte{
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
@@ -359,12 +359,12 @@ func TestUInt128(t *testing.T) {
       t.Errorf("*result != expected (%d != %d)", *result, expected)
    }
 
-   _, from_bin, err := DeserializeUInt128(result)
+   _, fromBin, err := DeserializeUInt128(result)
    if err != nil {
       t.Errorf("err != nil")
    }
-   if to_bin.Value.Cmp(&from_bin.Value) != 0 {
-      t.Errorf("to_bin != from_bin")
+   if toBin.Value.Cmp(&fromBin.Value) != 0 {
+      t.Errorf("toBin != fromBin")
    }
 
    vb := VariableBlob{
@@ -397,7 +397,7 @@ func TestInt160(t *testing.T) {
       t.Errorf("err != nil")
    }
    if toBin.Value.Cmp(&fromBin.Value) != 0 {
-      t.Errorf("to_bin != from_bin")
+      t.Errorf("toBin != fromBin")
    }
 
    vb := VariableBlob{
@@ -482,9 +482,9 @@ func TestInt256(t *testing.T) {
 }
 
 func TestUInt256(t *testing.T) {
-   to_bin := NewUInt256("680564733841876926926749214863536422911")
+   toBin := NewUInt256("680564733841876926926749214863536422911")
    result := NewVariableBlob()
-   result = to_bin.Serialize(result)
+   result = toBin.Serialize(result)
 
    expected := []byte{
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -497,12 +497,12 @@ func TestUInt256(t *testing.T) {
       t.Errorf("*result != expected")
    }
 
-   _, from_bin, err := DeserializeUInt256(result)
+   _, fromBin, err := DeserializeUInt256(result)
    if err != nil {
       t.Errorf("err != nil")
    }
-   if to_bin.Value.Cmp(&from_bin.Value) != 0 {
-      t.Errorf("to_bin != from_bin")
+   if toBin.Value.Cmp(&fromBin.Value) != 0 {
+      t.Errorf("toBin != fromBin")
    }
 
    vb := VariableBlob{
