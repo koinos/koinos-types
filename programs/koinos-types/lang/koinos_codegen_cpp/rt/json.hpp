@@ -592,7 +592,7 @@ namespace detail::json {
       template< typename Json, typename T >
       static inline void to_json( Json& j, const T& v )
       {
-         to_json( j, (int64_t)v );
+         pack::to_json( j, (int64_t)v );
       }
 
       template< typename Json, typename T >
@@ -601,7 +601,7 @@ namespace detail::json {
          depth++;
          if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
          int64_t temp;
-         from_json(j, temp, depth);
+         pack::from_json(j, temp, depth);
          v = (T)temp;
       }
    };

@@ -751,7 +751,7 @@ namespace detail
          template< typename Stream, typename T >
          static inline void to_binary( Stream& s, const T& v )
          {
-            to_binary( s, (int64_t)v );
+            pack::to_binary( s, (int64_t)v );
          }
 
          template< typename Stream, typename T >
@@ -760,7 +760,7 @@ namespace detail
             depth++;
             if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
             int64_t temp;
-            from_binary(s, temp, depth);
+            pack::from_binary(s, temp, depth);
             v = (T)temp;
          }
       };
