@@ -833,8 +833,9 @@ func SerializeBigInt(num *big.Int, byte_size int, signed bool) *VariableBlob {
     v := VariableBlob(make([]byte, byte_size))
 
     if signed && num.Sign() == -1 {
-        num = num.Add(big.NewInt(1), num)
-        v = num.FillBytes(v)
+        x := big.NewInt(1)
+        x = x.Add(x, num)
+        v = x.FillBytes(v)
         for i := 0; i < byte_size; i++ {
             v[i] = ^v[i]
         }
