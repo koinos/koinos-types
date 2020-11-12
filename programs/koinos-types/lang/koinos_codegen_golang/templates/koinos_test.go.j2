@@ -137,6 +137,26 @@ func Test{{o_type}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{fbname}}(t *testing.T) {
+    fb := New{{fbname}}()
+    for i := 0; i < {{length}}; i++ {
+        fb[i] = byte(({{length}} + i) % 256)
+    }
+
+    vb := NewVariableBlob()
+    vb = fb.Serialize(vb)
+
+    size,nfb,err := Deserialize{{fbname}}(vb)
+    if err != nil {
+        t.Error(err)
+    }
+
+    if size != {{length}} {
+        t.Errorf("Fixedblob deserialization consumed %d bytes. Expected %d bytes.", size, {{length}})
+    }
+
+    if !bytes.Equal(fb[:], nfb[:]) {
+        t.Errorf("Deserialized fixed blob dows not match source.")
+    }
 }
 
 {% endfor %}
@@ -153,6 +173,7 @@ package koinos
 
 import (
     "testing"
+    "bytes"
 )
 
 {% for name, decl in decls_by_name.items() -%}

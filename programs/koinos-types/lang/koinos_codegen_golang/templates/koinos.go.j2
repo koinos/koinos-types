@@ -458,6 +458,11 @@ func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
 
 type {{fbname}} [{{length}}]byte
 
+func New{{fbname}}() *{{fbname}} {
+    var fb {{fbname}}
+    return &fb
+}
+
 func (n {{fbname}}) Serialize(vb *VariableBlob) *VariableBlob {
     ovb := append(*vb, n[:]...)
     return &ovb
