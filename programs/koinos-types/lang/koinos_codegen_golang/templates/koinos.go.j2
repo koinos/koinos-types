@@ -86,6 +86,10 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 {%- endif -%}
 }
 
+func New{{sname}}() *{{sname}} {
+    return &{{sname}}{}
+}
+
 {{struct_serialization(decl)}}
 
 {{struct_deserialization(decl)}}
@@ -107,6 +111,12 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 
 type {{varname}} struct {
     Value interface{}
+}
+
+func New{{varname}}() *{{varname}} {
+    v := {{varname}}{}
+    v.Value = *New{{typeref(decl["tref"]["targs"][0])}}()
+    return &v
 }
 
 func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
