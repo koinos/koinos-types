@@ -4,7 +4,6 @@ import (
    "encoding/json"
    "flag"
    "io/ioutil"
-   "os"
    . "koinos"
 )
 
@@ -14,7 +13,7 @@ func main() {
 
    flag.Parse()
 
-   var arr [][]byte
+   var arr []interface{}
    bin := NewVariableBlob()
 
    {% for test in test_cases %}
@@ -25,27 +24,17 @@ func main() {
       if err != nil {
          panic(err)
       }
-      jsonBlob, err = json.Marshal(t)
-      if err != nil {
-         panic(err)
-      }
-      arr = append(arr, jsonBlob)
+
+      arr = append(arr, t)
       bin = t.Serialize(bin)
    }
    {% endfor %}
 
-   ioutil.WriteFile(*binPtr, []byte(*bin), 0644 )
-
-   f, err := os.OpenFile(*jsonPtr, os.O_CREATE | os.O_WRONLY, 0644)
+   json_blob, err := json.Marshal(arr)
    if err != nil {
       panic(err)
    }
 
-   defer f.Close()
-
-   for i := range arr {
-      if _, err := f.WriteString(string(arr[i])); err != nil {
-         panic(err)
-      }
-   }
+   ioutil.WriteFile(*binPtr, []byte(*bin), 0644 )
+   ioutil.WriteFile(*jsonPtr, json_blob, 0644 )
 }
