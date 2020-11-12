@@ -49,7 +49,7 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {%- endmacro -%}
 
 {%- macro struct_serialization(decl) -%}
-func (n *{{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
+func (n {{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- for field in decl["fields"] %}
     vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
     return vb
@@ -109,7 +109,7 @@ type {{varname}} struct {
     Value interface{}
 }
 
-func (n *{{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
+func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     var i uint64
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
@@ -229,8 +229,8 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 
 type {{tname}} {{rname}}
 
-func (n *{{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
-    ox := {{rname}}(*n)
+func (n {{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
+    ox := {{rname}}(n)
     return ox.Serialize(vb)
 }
 
@@ -242,6 +242,21 @@ func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}},error) {
     }
     ot = {{tname}}(*n)
     return i,&ot,nil
+}
+
+func (n *{{tname}}) MarshalJSON() ([]byte, error) {
+    v := {{rname}}(*n)
+    return json.Marshal(&v)
+}
+
+func (n *{{tname}}) UnmarshalJSON(data []byte) error {
+    v := {{rname}}(*n);
+    if err := json.Unmarshal(data, &v); err != nil {
+        return err
+    }
+
+    *n = {{tname}}(v)
+    return nil
 }
 
 {%- endif -%}
@@ -261,8 +276,8 @@ const (
 {%- endfor %}
 )
 
-func (n *{{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
-    x := UInt32(*n)
+func (n {{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
+    x := UInt32(n)
     return x.Serialize(vb)
 }
 
@@ -287,12 +302,12 @@ func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
 
 type {{o_type}} []{{v_type}}
 
-func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     header := make([]byte, binary.MaxVarintLen64)
-    bytes := binary.PutUvarint(header, uint64(len(*n)))
+    bytes := binary.PutUvarint(header, uint64(len(n)))
     ovb := append(*vb, header[:bytes]...)
     vb = &ovb
-    for _, item := range *n {
+    for _, item := range n {
         vb = item.Serialize(vb)
     }
 
@@ -407,7 +422,7 @@ func (n *{{o_type}}) serializeNative() {
     n.blob = n.native.Serialize(vb)
 }
 
-func (n *{{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     n.Box()
     ovb := append(*vb, (*n.blob)...)
     return &ovb

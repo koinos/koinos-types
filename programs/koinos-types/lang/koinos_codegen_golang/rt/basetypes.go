@@ -312,11 +312,18 @@ func (n *Int128) MarshalJSON() ([]byte, error) {
 
 func (n *Int128) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewInt128(s)
     }
 
-    n = NewInt128(s)
     return nil
 }
 
@@ -361,11 +368,18 @@ func (n *UInt128) MarshalJSON() ([]byte, error) {
 
 func (n *UInt128) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewUInt128(s)
     }
 
-    n = NewUInt128(s)
     return nil
 }
 
@@ -410,11 +424,18 @@ func (n *Int160) MarshalJSON() ([]byte, error) {
 
 func (n *Int160) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewInt160(s)
     }
 
-    n = NewInt160(s)
     return nil
 }
 
@@ -459,11 +480,18 @@ func (n *UInt160) MarshalJSON() ([]byte, error) {
 
 func (n *UInt160) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewUInt160(s)
     }
 
-    n = NewUInt160(s)
     return nil
 }
 
@@ -508,11 +536,18 @@ func (n *Int256) MarshalJSON() ([]byte, error) {
 
 func (n *Int256) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewInt256(s)
     }
 
-    n = NewInt256(s)
     return nil
 }
 
@@ -557,11 +592,18 @@ func (n *UInt256) MarshalJSON() ([]byte, error) {
 
 func (n *UInt256) UnmarshalJSON(b []byte) error {
     var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
+    err := json.Unmarshal(b, &s)
+
+    if err != nil {
+        var i int64
+        if err = json.Unmarshal(b, &i); err != nil {
+            return err
+        }
+        n.Value = *big.NewInt(i)
+    } else {
+        n = NewUInt256(s)
     }
 
-    n = NewUInt256(s)
     return nil
 }
 
@@ -617,12 +659,7 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
     if err != nil {
         return err
     }
-    pdb := VariableBlob(db)
-    _,ovb,err := DeserializeVariableBlob(&pdb)
-    if err != nil {
-        return err
-    }
-    *n = *ovb
+    *n = db
 
     return nil
 }
