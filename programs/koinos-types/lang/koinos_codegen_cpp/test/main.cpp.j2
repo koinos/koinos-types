@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <koinos/pack/rt/binary.hpp>
 #include <koinos/pack/rt/json.hpp>
@@ -12,7 +13,6 @@
 
 #include <nlohmann/json.hpp>
 
-using namespace koinos::types;
 using namespace boost::program_options;
 using nlohmann::json;
 
@@ -24,11 +24,15 @@ void append( const std::string& input, json& arr, std::ofstream& bin )
    json j;
    koinos::pack::to_json( j, t );
    arr.push_back( std::move( j ) );
+   std::stringstream ss;
+   koinos::pack::to_binary( ss, t );
+   koinos::pack::to_binary( bin, (uint32_t)ss.tellp() );
    koinos::pack::to_binary( bin, t );
 }
 
 int main( int argc, char** argv )
 {
+   using namespace koinos::types;
    using namespace std::string_literals;
 
    options_description desc{ "Options" };
@@ -63,9 +67,7 @@ int main( int argc, char** argv )
       arr,
       bin_out
    );
-{%- endfor -%}
-
-
+{% endfor %}
    json_out << arr;
 
    bin_out.close();
