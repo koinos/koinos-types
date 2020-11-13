@@ -58,7 +58,7 @@ add_custom_target(make_schema ALL)
 add_custom_command(TARGET make_schema
    COMMAND ${CMAKE_COMMAND} -E make_directory ${KOINOS_SCHEMA_DIR}
    COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   python3 -m koinos_reflect.analyze
+   ${PYTHON_BINARY} -m koinos_reflect.analyze
    ${KOINOS_REFLECT_SOURCES}
    -s
    -o ${KOINOS_SCHEMA_DIR}/block.schema
@@ -68,7 +68,7 @@ add_custom_target(cpp ALL)
 add_dependencies(cpp make_schema)
 add_custom_command(TARGET cpp
    COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   python3 -m koinos_codegen.codegen
+   ${PYTHON_BINARY} -m koinos_codegen.codegen
    --target-path "${KOINOS_REFLECT_TEMPLATE_DIR}"
    --target cpp
    -p koinos/pack
@@ -80,7 +80,7 @@ add_custom_target(golang ALL)
 add_dependencies(golang make_schema)
 add_custom_command(TARGET golang
    COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   python3 -m koinos_codegen.codegen
+   ${PYTHON_BINARY} -m koinos_codegen.codegen
    --target-path "${KOINOS_REFLECT_TEMPLATE_DIR}"
    --target golang
    -p src/${GOLANG_MODULE_NAME}
@@ -102,4 +102,3 @@ target_include_directories(koinos_types INTERFACE ${KOINOS_CPP_OUTPUT_INCLUDE_DI
 if( INSTALL_KOINOS_TYPES_HEADERS )
    install( DIRECTORY ${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/ DESTINATION include )
 endif()
-
