@@ -55,7 +55,16 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 // ----------------------------------------
 
 func Test{{sname}}(t *testing.T) {
-    New{{sname}}()
+    s := New{{sname}}()
+
+    vb := NewVariableBlob()
+    vb = s.Serialize(vb)
+
+    _,_,err := Deserialize{{sname}}(vb)
+    if err != nil {
+        fmt.Println(len(*vb))
+        t.Error(err)
+    }
 }
 
 {% endmacro -%}
@@ -212,7 +221,7 @@ import (
     "testing"
     "bytes"
     "encoding/json"
-    //"fmt"
+    "fmt"
 )
 
 {% for name, decl in decls_by_name.items() -%}
