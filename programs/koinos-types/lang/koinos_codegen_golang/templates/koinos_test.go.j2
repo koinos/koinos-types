@@ -55,6 +55,7 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 // ----------------------------------------
 
 func Test{{sname}}(t *testing.T) {
+    New{{sname}}()
 }
 
 {% endmacro -%}
@@ -123,16 +124,29 @@ func Test{{o_type}}(t *testing.T) {
 //  {{o_type}}
 // ----------------------------------------
 
-func Test{{o_type}}(t *testing.T) {
-    o := {{o_type}}{}
+/*func Test{{o_type}}(t *testing.T) {
+    o := New{{o_type}}()
 
-    ot := New{{v_type}}()
-    o.blob = NewVariableBlob()
-    o.blob = ot.Serialize(o.blob)
+    o.Box()
+    if o.IsUnboxed() {
+        t.Errorf("Opaque is unboxed but should not be.")
+    }
 
-    //o.Unbox()
-    
-}
+    o.Unbox()
+    if !o.IsUnboxed() {
+        t.Errorf("Opaque not unboxed properly.")
+    }
+
+    o.MakeMutable()
+    if !o.IsMutable() {
+        t.Errorf("Opaque should be mutable but is not.")
+    }
+
+    o.Box()
+    if o.IsUnboxed() {
+        t.Errorf("Opaque should be boxed but is not.")
+    }
+}*/
 
 {% endfor -%}
 {% endmacro %}

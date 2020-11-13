@@ -48,6 +48,16 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {{is_struct_impl(targ,decls_by_name)}}
 {%- endmacro -%}
 
+{%- macro struct_new(decl) -%}
+{%- set sname = go_name(decl["name"]) -%}
+func New{{sname}}() *{{sname}} {
+    o := {{sname}}{}
+{%- for field in decl["fields"] %}
+    o.{{go_name(field["name"])}} = *New{{typeref(field["tref"])}}(){% endfor %}
+    return &o
+}
+{%- endmacro -%}
+
 {%- macro struct_serialization(decl) -%}
 func (n {{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- for field in decl["fields"] %}
@@ -86,9 +96,7 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 {%- endif -%}
 }
 
-func New{{sname}}() *{{sname}} {
-    return &{{sname}}{}
-}
+{{struct_new(decl)}}
 
 {{struct_serialization(decl)}}
 
@@ -239,6 +247,11 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 
 type {{tname}} {{rname}}
 
+func New{{tname}}() *{{tname}} {
+    o := {{tname}}(*New{{rname}}())
+    return &o
+}
+
 func (n {{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
     ox := {{rname}}(n)
     return ox.Serialize(vb)
@@ -280,6 +293,11 @@ func (n *{{tname}}) UnmarshalJSON(data []byte) error {
 
 type {{ename}} UInt32
 
+func New{{ename}}() *{{ename}} {
+    o := {{ename}}({{decl["entries"][0]["value"]}})
+    return &o
+}
+
 const (
 {%- for entry in decl["entries"] %}
     {{ename}}_{{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
@@ -311,6 +329,11 @@ func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
 // ----------------------------------------
 
 type {{o_type}} []{{v_type}}
+
+func New{{o_type}}() *{{o_type}} {
+    o := {{o_type}}(make([]{{v_type}}, 0))
+    return &o
+}
 
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     header := make([]byte, binary.MaxVarintLen64)
@@ -358,6 +381,12 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 type {{o_type}} struct {
     blob *VariableBlob
     native *{{v_type}}
+}
+
+func New{{o_type}}() *{{o_type}} {
+    o := {{o_type}}{}
+    o.native = New{{v_type}}()
+    return &o
 }
 
 func (n *{{o_type}}) GetBlob() *VariableBlob {
