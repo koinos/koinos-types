@@ -316,7 +316,7 @@ func (n *Int128) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewInt128(s)
+    *n = *NewInt128(s)
     return nil
 }
 
@@ -365,7 +365,7 @@ func (n *UInt128) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewUInt128(s)
+    *n = *NewUInt128(s)
     return nil
 }
 
@@ -414,7 +414,7 @@ func (n *Int160) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewInt160(s)
+    *n = *NewInt160(s)
     return nil
 }
 
@@ -463,7 +463,7 @@ func (n *UInt160) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewUInt160(s)
+    *n = *NewUInt160(s)
     return nil
 }
 
@@ -512,7 +512,7 @@ func (n *Int256) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewInt256(s)
+    *n = *NewInt256(s)
     return nil
 }
 
@@ -561,7 +561,7 @@ func (n *UInt256) UnmarshalJSON(b []byte) error {
         return err
     }
 
-    n = NewUInt256(s)
+    *n = *NewUInt256(s)
     return nil
 }
 
@@ -790,14 +790,7 @@ func (n *MultihashVector) UnmarshalJSON(b []byte) error {
     }
 
     n.Id = UInt64(mhv.Id)
-    size := 0
-    if len(mhv.Digests) > 0 {
-        size = len(mhv.Digests[0])
-    }
     for _, item := range mhv.Digests {
-        if len(item) != size {
-            return errors.New("Multihash vector size mismatch")
-        }
         db,err := DecodeBytes(item)
         if err != nil {
             return err
