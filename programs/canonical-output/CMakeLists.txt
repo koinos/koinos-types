@@ -1,1 +1,1 @@
-add_subdirectory(lang/cpp)
+add_subdirectory(lang)
