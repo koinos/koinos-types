@@ -18,7 +18,7 @@ message(STATUS "${KOINOS_JSON_DATA_FILES}")
 
 add_custom_command(
    COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   python3 -m koinos_codegen.testgen
+   ${PYTHON_BINARY} -m koinos_codegen.testgen
    --target-path "${KOINOS_REFLECT_TEMPLATE_DIR}"
    --target golang
    -o "${CMAKE_CURRENT_BINARY_DIR}"
