@@ -1,9 +1,9 @@
 package main
 
 import (
-   "bytes"
    "koinos"
    "testing"
+   "bytes"
    "encoding/json"
 )
 
