@@ -1,34 +1,10 @@
 find_package(Boost 1.57 REQUIRED)
 
+add_subdirectory(vendor)
+
 # C++
 set(KOINOS_CPP_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/cpp")
 set(KOINOS_CPP_OUTPUT_INCLUDE_DIR "${KOINOS_CPP_OUTPUT_DIR}/include")
-
-# Golang
-set(KOINOS_GOLANG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/golang")
-
-set(GOLANG_MODULE_NAME koinos)
-set(GOLANG_MODULE_VERSION 1.15)
-configure_file(${CMAKE_MODULE_PATH}/go.mod.in ${KOINOS_GOLANG_OUTPUT_DIR}/src/${GOLANG_MODULE_NAME}/go.mod)
-
-set(KOINOS_REFLECT_PYTHONPATH "${PROJECT_SOURCE_DIR}/programs/koinos-types")
-set(KOINOS_REFLECT_TEMPLATE_DIR "${PROJECT_SOURCE_DIR}/programs/koinos-types/lang")
-set(KOINOS_REFLECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-set(KOINOS_REFLECT_SOURCES
-   "${KOINOS_REFLECT_SRC_DIR}/block.bt"
-   "${KOINOS_REFLECT_SRC_DIR}/types.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/block.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/submit.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/system_calls.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/thunks.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/system_call_ids.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/thunk_ids.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/chain.hpp"
-   )
-
-set(KOINOS_SCHEMA_DIR "${CMAKE_BINARY_DIR}/schema")
-set(KOINOS_SCHEMA_FILES "${KOINOS_SCHEMA_DIR}/block.schema")
 
 set(KOINOS_CPP_OUTPUT_FILES
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/classes.hpp"
@@ -54,16 +30,6 @@ set(KOINOS_CPP_OUTPUT_FILES
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/util/variant_helpers.hpp"
    )
 
-add_custom_target(make_schema ALL)
-add_custom_command(TARGET make_schema
-   COMMAND ${CMAKE_COMMAND} -E make_directory ${KOINOS_SCHEMA_DIR}
-   COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   ${PYTHON_BINARY} -m koinos_reflect.analyze
-   ${KOINOS_REFLECT_SOURCES}
-   -s
-   -o ${KOINOS_SCHEMA_DIR}/block.schema
-)
-
 add_custom_target(cpp ALL)
 add_dependencies(cpp make_schema)
 add_custom_command(TARGET cpp
@@ -73,18 +39,6 @@ add_custom_command(TARGET cpp
    --target cpp
    -p koinos/pack
    -o "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}"
-   ${KOINOS_SCHEMA_FILES}
-)
-
-add_custom_target(golang ALL)
-add_dependencies(golang make_schema)
-add_custom_command(TARGET golang
-   COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   ${PYTHON_BINARY} -m koinos_codegen.codegen
-   --target-path "${KOINOS_REFLECT_TEMPLATE_DIR}"
-   --target golang
-   -p src/${GOLANG_MODULE_NAME}
-   -o "${KOINOS_GOLANG_OUTPUT_DIR}"
    ${KOINOS_SCHEMA_FILES}
 )
 

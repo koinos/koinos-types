@@ -18,8 +18,6 @@ FOREACH(subdir ${SUBDIRS})
   LIST(APPEND LANG_TARGETS "canonical-output-${subdir}")
 ENDFOREACH()
 
-message(STATUS "${LANG_TARGETS}")
-
 add_custom_target( canonical-output
-   DEPENDS ${LANG_TARGETS}
+   DEPENDS generate ${LANG_TARGETS}
 )
