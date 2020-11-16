@@ -35,5 +35,5 @@ target_include_directories( canonical-output-cpp PUBLIC ${CMAKE_CURRENT_SOURCE_D
 add_custom_command(
    TARGET canonical-output-cpp POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy
-           ${CMAKE_CURRENT_SOURCE_DIR}/driver.sh
-           ${CMAKE_CURRENT_BINARY_DIR}/driver.sh)
+           ${CMAKE_CURRENT_SOURCE_DIR}/driver.py
+           ${CMAKE_CURRENT_BINARY_DIR}/driver.py)

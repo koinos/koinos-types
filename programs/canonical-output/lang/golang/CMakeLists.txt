@@ -35,5 +35,5 @@ add_custom_target( canonical-output-golang
 add_custom_command(
    TARGET canonical-output-golang POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy
-           ${CMAKE_CURRENT_SOURCE_DIR}/driver.sh
-           ${CMAKE_CURRENT_BINARY_DIR}/driver.sh)
+           ${CMAKE_CURRENT_SOURCE_DIR}/driver.py
+           ${CMAKE_CURRENT_BINARY_DIR}/driver.py)

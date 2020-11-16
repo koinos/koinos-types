@@ -4,6 +4,7 @@ import argparse
 import functools
 import json
 import os
+import shutil
 import struct
 import subprocess
 import sys
@@ -125,13 +126,15 @@ def main(argv):
    binary_files = {}
    json_files = {}
 
+   python_bin = shutil.which("python3")
+
    # Run canonical outputs binaries and store output filenames
    for dir_name, sub_dirs, file_list in os.walk(args.lang_dir):
       if dir_name != args.lang_dir and not "CMakeFiles" in dir_name:
          dir_name = os.path.abspath(dir_name)
          target = os.path.split(dir_name)[1]
          print("Running canonical output for %s... " % target, end='')
-         p = subprocess.Popen(["./driver.sh"], cwd=dir_name)
+         p = subprocess.Popen([python_bin + "./driver.py"], cwd=dir_name, shell=True)
          p.wait()
 
          binary_files[target] = open(os.path.join(dir_name, 'types.bin'), "rb")
