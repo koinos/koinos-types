@@ -84,6 +84,16 @@ func Test{{sname}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{varname}}(t *testing.T) {
+    v := New{{varname}}()
+    vb := NewVariableBlob()
+    vb = v.Serialize(vb)
+    _,nv,err := Deserialize{{varname}}(vb)
+    if err != nil {
+        t.Error(err)
+    }
+
+    nvb := NewVariableBlob()
+    nvb = nv.Serialize(nvb)
 }
 
 {%- endmacro -%}

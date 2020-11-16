@@ -129,6 +129,7 @@ func New{{varname}}() *{{varname}} {
 
 func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     var i uint64
+    fmt.Println(n.Value)
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
@@ -195,7 +196,7 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
         default:
             return 0, &v, errors.New("Unknown variant tag")
     }
-
+    fmt.Println(v)
     return uint64(i)+j,&v,nil
 }
 
@@ -463,8 +464,7 @@ func (n *{{o_type}}) serializeNative() {
 
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
     n.Box()
-    ovb := append(*vb, (*n.blob)...)
-    return &ovb
+    return n.blob.Serialize(vb)
 }
 
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
@@ -566,6 +566,7 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 package koinos
 
 import (
+    "fmt"
     "errors"
     "encoding/binary"
     "encoding/json"
