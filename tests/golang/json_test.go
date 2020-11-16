@@ -14,6 +14,9 @@ func TestBooleanJson(t *testing.T) {
       t.Errorf("An error occurred while encoding to JSON")
    }
    var result koinos.Boolean
+   if string(bytes) != "true" {
+      t.Errorf("Unexpected JSON output")
+   }
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
@@ -24,17 +27,20 @@ func TestBooleanJson(t *testing.T) {
 }
 
 func TestInt8Json(t *testing.T) {
-   value := koinos.Int8(-127)
+   value := koinos.Int8(-128)
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "-128" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.Int8
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
    }
-   if result != value || result != koinos.Int8(-127) {
+   if result != value || result != koinos.Int8(-128) {
       t.Errorf("The resulting values are unequal")
    }
 }
@@ -44,6 +50,9 @@ func TestUInt8Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "255" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.UInt8
    err = json.Unmarshal(bytes, &result)
@@ -61,6 +70,9 @@ func TestUInt16Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "65535" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.UInt16
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -76,6 +88,9 @@ func TestInt16Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "-32768" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.Int16
    err = json.Unmarshal(bytes, &result)
@@ -93,6 +108,9 @@ func TestInt32Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "-2147483648" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.Int32
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -108,6 +126,9 @@ func TestUInt32Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "4294967295" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.UInt32
    err = json.Unmarshal(bytes, &result)
@@ -125,6 +146,9 @@ func TestInt64Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "-9223372036854775808" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.Int64
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -140,6 +164,9 @@ func TestUInt64Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "18446744073709551615" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.UInt64
    err = json.Unmarshal(bytes, &result)
@@ -157,6 +184,9 @@ func TestInt128Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "\"-170141183460469231731687303715884105728\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.Int128
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -172,6 +202,9 @@ func TestUInt128Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "\"340282366920938463463374607431768211455\"" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.UInt128
    err = json.Unmarshal(bytes, &result)
@@ -189,6 +222,9 @@ func TestInt160Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "\"-730750818665451459101842416358141509827966271488\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.Int160
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -204,6 +240,9 @@ func TestUInt160Json(t *testing.T) {
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != "\"1461501637330902918203684832716283019655932542975\"" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.UInt160
    err = json.Unmarshal(bytes, &result)
@@ -221,6 +260,9 @@ func TestInt256Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "\"-57896044618658097711785492504343953926634992332820282019728792003956564819968\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.Int256
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -237,6 +279,9 @@ func TestUInt256Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "\"115792089237316195423570985008687907853269984665640564039457584007913129639935\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.UInt256
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -252,6 +297,9 @@ func TestMultihashJson(t *testing.T) {
    b, err := json.Marshal(&value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(b) != "{\"hash\":1,\"digest\":\"z2VfUX\"}" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.Multihash
    err = json.Unmarshal(b, &result)
@@ -277,6 +325,9 @@ func TestMultihashVectorJson(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(b) != "{\"hash\":1,\"digests\":[\"z31SRtpx1\",\"zW7LcTy7\"]}" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.MultihashVector
    err = json.Unmarshal(b, &result)
    if err != nil {
@@ -296,6 +347,9 @@ func TestFixedBlobJson(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(b) != "\"zpEbmSWqJdBuR5GAyhdJxAcGKAf\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.FixedBlob20
    err = json.Unmarshal(b, &result)
    if err != nil {
@@ -312,6 +366,9 @@ func TestStringJson(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
    }
+   if string(bytes) != "\"alice bob charlie\"" {
+      t.Errorf("Unexpected JSON output")
+   }
    var result koinos.String
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -327,6 +384,9 @@ func TestVariableBlobJson(t *testing.T) {
    b, err := json.Marshal(&value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(b) != "\"zW7LcTy7\"" {
+      t.Errorf("Unexpected JSON output")
    }
    var result koinos.VariableBlob
    err = json.Unmarshal(b, &result)
