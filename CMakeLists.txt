@@ -66,7 +66,7 @@ if (NOT TARGET coverage)
   endif()
 endif()
 
-add_subdirectory(libraries)
+add_subdirectory(lang)
 add_subdirectory(programs)
 
 if( BUILD_KOINOS_TYPES_TESTS )

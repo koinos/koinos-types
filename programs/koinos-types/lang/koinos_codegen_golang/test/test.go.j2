@@ -1,6 +1,7 @@
 package main
 
 import (
+   "encoding/binary"
    "encoding/json"
    "flag"
    "io/ioutil"
@@ -26,7 +27,14 @@ func main() {
       }
 
       arr = append(arr, t)
-      bin = t.Serialize(bin)
+
+      ser := NewVariableBlob()
+      ser = t.Serialize(ser)
+      b := make([]byte, 4)
+      binary.BigEndian.PutUint32(b, uint32(len(*ser)))
+      b = append(b, *ser...)
+      new_bin := append(*bin, b...)
+      bin = &new_bin
    }
    {% endfor %}
 

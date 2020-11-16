@@ -1,9 +1,6 @@
 
 namespace koinos { namespace types { namespace system {
 
-typedef uint32 thunk_id_type;
-typedef uint32 system_call_id_type;
-
 struct system_call_target_reserved {};
 
 struct contract_call_bundle
@@ -14,7 +11,7 @@ struct contract_call_bundle
 
 typedef std::variant<
    system_call_target_reserved,
-   thunk_id_type,
+   thunks::thunk_id,
    contract_call_bundle
    > system_call_target;
 
