@@ -18,7 +18,7 @@ message(STATUS "${KOINOS_JSON_DATA_FILES}")
 
 add_custom_command(
    COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${KOINOS_REFLECT_PYTHONPATH}
-   python3 -m koinos_codegen.testgen
+   ${PYTHON_BINARY} -m koinos_codegen.testgen
    --target-path "${KOINOS_REFLECT_TEMPLATE_DIR}"
    --target golang
    -o "${CMAKE_CURRENT_BINARY_DIR}"
@@ -31,3 +31,9 @@ set_source_files_properties(${KOINOS_TEST_GEN_FILES} PROPERTIES GENERATED TRUE)
 add_custom_target( canonical-output-golang
    DEPENDS ${KOINOS_TEST_GEN_FILES}
 )
+
+add_custom_command(
+   TARGET canonical-output-golang POST_BUILD
+   COMMAND ${CMAKE_COMMAND} -E copy
+           ${CMAKE_CURRENT_SOURCE_DIR}/driver.py
+           ${CMAKE_CURRENT_BINARY_DIR}/driver.py)

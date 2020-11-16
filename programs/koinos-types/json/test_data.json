@@ -454,7 +454,7 @@
          "op" : {
             "call_id" : 8,
             "target" : {
-               "type" : "koinos::types::system::thunk_id_type",
+               "type" : "koinos::types::thunks::thunk_id",
                "value" : 9
             },
             "extensions" : {}
