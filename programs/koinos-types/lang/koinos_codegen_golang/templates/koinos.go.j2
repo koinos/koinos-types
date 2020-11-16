@@ -123,17 +123,16 @@ type {{varname}} struct {
 
 func New{{varname}}() *{{varname}} {
     v := {{varname}}{}
-    v.Value = *New{{typeref(decl["tref"]["targs"][0])}}()
+    v.Value = New{{typeref(decl["tref"]["targs"][0])}}()
     return &v
 }
 
 func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     var i uint64
-    fmt.Println(n.Value)
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case {{arg_type}}:
+        case *{{arg_type}}:
             i = {{loop.index - 1}}
 {%- endfor %}
         default:
@@ -152,7 +151,7 @@ func (n *{{varname}}) TypeToName() (string) {
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case {{arg_type}}:
+        case *{{arg_type}}:
             return "{{namespaced_typeref(arg)}}"
 {%- endfor %}
         default:
@@ -191,12 +190,11 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
                 return 0, &v, err
             }
             j = k
-            v.Value = &x
+            v.Value = x
 {%- endfor %}
         default:
             return 0, &v, errors.New("Unknown variant tag")
     }
-    fmt.Println(v)
     return uint64(i)+j,&v,nil
 }
 
@@ -566,7 +564,6 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 package koinos
 
 import (
-    "fmt"
     "errors"
     "encoding/binary"
     "encoding/json"
