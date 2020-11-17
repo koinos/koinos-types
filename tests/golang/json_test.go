@@ -179,7 +179,7 @@ func TestUInt64Json(t *testing.T) {
 }
 
 func TestInt128Json(t *testing.T) {
-   value := koinos.NewInt128("-170141183460469231731687303715884105728")
+   value, _ := koinos.NewInt128("-170141183460469231731687303715884105728")
    bytes, err := json.Marshal(value)
    if err != nil {
       t.Errorf("An error occurred while encoding to JSON")
@@ -192,8 +192,72 @@ func TestInt128Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
    }
-   if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewInt128("-170141183460469231731687303715884105728").Value.Cmp(&result.Value) != 0 {
+   if (*value).Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   value, _ = koinos.NewInt128("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"-9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
    }
 }
 
@@ -214,6 +278,70 @@ func TestUInt128Json(t *testing.T) {
    if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewUInt128("340282366920938463463374607431768211455").Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
    }
+
+   value = koinos.NewUInt128("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("0")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"0\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-1")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
 }
 
 func TestInt160Json(t *testing.T) {
@@ -232,6 +360,70 @@ func TestInt160Json(t *testing.T) {
    }
    if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewInt160("-730750818665451459101842416358141509827966271488").Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   value = koinos.NewInt160("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"-9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
    }
 }
 
@@ -252,6 +444,70 @@ func TestUInt160Json(t *testing.T) {
    if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewUInt160("1461501637330902918203684832716283019655932542975").Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
    }
+
+   value = koinos.NewUInt160("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("0")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"0\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-1")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
 }
 
 func TestInt256Json(t *testing.T) {
@@ -271,6 +527,70 @@ func TestInt256Json(t *testing.T) {
    if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewInt256("-57896044618658097711785492504343953926634992332820282019728792003956564819968").Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
    }
+
+   value = koinos.NewInt256("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"-9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
 }
 
 func TestUInt256Json(t *testing.T) {
@@ -289,6 +609,70 @@ func TestUInt256Json(t *testing.T) {
    }
    if (*value).Value.Cmp(&result.Value) != 0 || koinos.NewUInt256("115792089237316195423570985008687907853269984665640564039457584007913129639935").Value.Cmp(&result.Value) != 0 {
       t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   value = koinos.NewUInt256("10")
+   bytes = []byte("10")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if (*value).Value.Cmp(&result.Value) != 0 {
+      t.Errorf("The resulting values are unequal (%s != %s)", result.Value.String(), value.Value.String())
+   }
+
+   bytes = []byte("\"foobar\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("0")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"0\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("-1")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
    }
 }
 

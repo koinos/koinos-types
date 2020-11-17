@@ -307,7 +307,7 @@ func TestUInt64(t *testing.T) {
 }
 
 func TestInt128(t *testing.T) {
-   integer := koinos.NewInt128("-170141183460469231731687303715884105728")
+   integer, _ := koinos.NewInt128("-170141183460469231731687303715884105728")
    expected := []byte{
       0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -322,8 +322,10 @@ func TestInt128(t *testing.T) {
       t.Errorf("err != nil (%s)", err)
    }
 
-   if koinos.NewInt128("-170141183460469231731687303715884105728").Value.Cmp(&integer2.Value) != 0 {
-      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), koinos.NewInt128("-170141183460469231731687303715884105728").Value.String())
+   expected_v, _ := koinos.NewInt128("-170141183460469231731687303715884105728")
+
+   if expected_v.Value.Cmp(&integer2.Value) != 0 {
+      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), expected_v.Value.String())
    }
    if size != 16 {
       t.Errorf("size != 16 (%d != 16)", size)
