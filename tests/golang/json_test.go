@@ -337,6 +337,28 @@ func TestMultihashVectorJson(t *testing.T) {
    if result.Id != value.Id || !bytes.Equal(result.Digests[0], value.Digests[0]) || !bytes.Equal(result.Digests[1], value.Digests[1]) {
       t.Errorf("The resulting values are unequal")
    }
+
+   defer func() {
+      if r := recover(); r == nil {
+         t.Errorf("Expected panic on mismatching multihash vector size")
+      } else {
+         if r != "Multihash vector size mismatch" {
+            t.Errorf("Expected panic on mismatching multihash vector size, rather than: %s", r)
+         }
+      }
+   }()
+   vblobFail := koinos.NewVariableBlob()
+   *vblobFail = append(*vblobFail, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
+   vblobFail2 := koinos.NewVariableBlob()
+   *vblobFail2 = append(*vblobFail2, 0x01, 0x02, 0x03, 0x04, 0x05)
+   var mhvFail koinos.MultihashVector
+   mhvFail.Id = 1
+   mhvFail.Digests = append(mhvFail.Digests, *vblobFail)
+   mhvFail.Digests = append(mhvFail.Digests, *vblobFail2)
+   _, e := json.Marshal(&mhvFail)
+   if e == nil {
+      t.Errorf("Unexpected success with mismatching multihash vector sizes")
+   }
 }
 
 func TestFixedBlobJson(t *testing.T) {
