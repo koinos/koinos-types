@@ -997,15 +997,18 @@ func (n *VariableBlob) MarshalJSON() ([]byte, error) {
 func (n *VariableBlob) UnmarshalJSON(b []byte) error {
     var s string
     if err := json.Unmarshal(b, &s); err != nil {
-        return nil
+        return err
     }
 
     db,err := DecodeBytes(s)
     if err != nil {
         return err
     }
-    *n = db
+    if len(db) == 0 && len(s[1:]) > 0 {
+        return errors.New("Unable to decode base58")
+    }
 
+    *n = db
     return nil
 }
 

@@ -641,4 +641,13 @@ func TestVariableBlob(t *testing.T) {
    if !bytes.Equal(*result, expected) {
       t.Errorf("result != expected")
    }
+
+   variableBlob = &koinos.VariableBlob{0x80}
+   bytes, result, err := koinos.DeserializeVariableBlob(variableBlob)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+   if bytes != 0 {
+      t.Errorf("bytes != 0 (%d != 0)", bytes)
+   }
 }
