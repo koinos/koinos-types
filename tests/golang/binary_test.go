@@ -7,6 +7,11 @@ import (
 )
 
 func TestBoolean(t *testing.T) {
+   b := koinos.NewBoolean()
+   if *b != false {
+      t.Errorf("Boolean default value incorrect. Expected: false")
+   }
+
    value := koinos.Boolean(true)
    expected := []byte{0x01}
    result := koinos.NewVariableBlob()
@@ -51,6 +56,11 @@ func TestBoolean(t *testing.T) {
 }
 
 func TestInt8(t *testing.T) {
+   i := koinos.NewInt8()
+   if * i != 0 {
+      t.Errorf("Int8 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int8(-128)
    expected := []byte{0x80}
    result := koinos.NewVariableBlob()
@@ -83,6 +93,11 @@ func TestInt8(t *testing.T) {
 }
 
 func TestUInt8(t *testing.T) {
+   i := koinos.NewUInt8()
+   if * i != 0 {
+      t.Errorf("UInt8 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt8(255)
    expected := []byte{0xFF}
    result := koinos.NewVariableBlob()
@@ -115,6 +130,11 @@ func TestUInt8(t *testing.T) {
 }
 
 func TestInt16(t *testing.T) {
+   i := koinos.NewInt16()
+   if * i != 0 {
+      t.Errorf("Int16 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int16(-32768)
    expected := []byte{0x80, 0x00}
    result := koinos.NewVariableBlob()
@@ -147,6 +167,11 @@ func TestInt16(t *testing.T) {
 }
 
 func TestUInt16(t *testing.T) {
+   i := koinos.NewUInt16()
+   if * i != 0 {
+      t.Errorf("UInt6 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt16(65535)
    expected := []byte{0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -179,6 +204,11 @@ func TestUInt16(t *testing.T) {
 }
 
 func TestInt32(t *testing.T) {
+   i := koinos.NewInt32()
+   if * i != 0 {
+      t.Errorf("Int32 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int32(-2147483648)
    expected := []byte{0x80, 0x00, 0x00, 0x00}
    result := koinos.NewVariableBlob()
@@ -211,6 +241,11 @@ func TestInt32(t *testing.T) {
 }
 
 func TestUInt32(t *testing.T) {
+   i := koinos.NewUInt32()
+   if * i != 0 {
+      t.Errorf("UInt32 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt32(4294967295)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -243,6 +278,11 @@ func TestUInt32(t *testing.T) {
 }
 
 func TestInt64(t *testing.T) {
+   i := koinos.NewInt64()
+   if * i != 0 {
+      t.Errorf("Int64 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int64(-256)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00}
    result := koinos.NewVariableBlob()
@@ -275,6 +315,11 @@ func TestInt64(t *testing.T) {
 }
 
 func TestUInt64(t *testing.T) {
+   i := koinos.NewUInt64()
+   if * i != 0 {
+      t.Errorf("UInt64 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt64(18446744073709551615)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -579,6 +624,11 @@ func TestFixedBlob(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
+   s := koinos.NewString()
+   if *s != "" {
+      t.Errorf("String default value incorrect. Expected: \"\"")
+   }
+
    msg := koinos.String("Hello World!")
    expected := []byte{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
       0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21}

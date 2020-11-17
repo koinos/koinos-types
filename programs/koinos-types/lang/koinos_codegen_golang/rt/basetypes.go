@@ -272,6 +272,11 @@ func DeserializeUInt32(vb *VariableBlob) (uint64,*UInt32,error) {
 
 type Int64 int64
 
+func NewInt64() *Int64 {
+    o := Int64(0)
+    return &o
+}
+
 func (n *Int64) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, uint64(*n))
