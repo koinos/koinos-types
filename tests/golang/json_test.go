@@ -434,10 +434,19 @@ func TestUInt128Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
+   // JSON Bounds
    bytes = []byte("9007199254740991")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected := "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
    }
 
    bytes = []byte("\"9007199254740991\"")
@@ -445,14 +454,63 @@ func TestUInt128Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
    }
+   expected = "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
 
    bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("err == nil")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   // UInt64 Bounds
+   bytes = []byte("9223372036854775807")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9223372036854775807\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9223372036854775808")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("\"9007199254740992\"")
+   bytes = []byte("\"9223372036854775808\"")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
@@ -477,6 +535,19 @@ func TestUInt128Json(t *testing.T) {
    }
 
    bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   // Int128 Bounds
+   bytes = []byte("\"340282366920938463463374607431768211455\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"340282366920938463463374607431768211456\"")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")
@@ -517,53 +588,192 @@ func TestInt160Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("9007199254740991")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    // JSON Bounds
+    bytes = []byte("9007199254740991")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected := "9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"9007199254740991\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"9007199254740991\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("9007199254740992")
-   err = json.Unmarshal(bytes, &result)
-   if err == nil {
-      t.Errorf("err == nil")
-   }
+    bytes = []byte("9007199254740992")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("err == nil")
+    }
+    expected = "\"9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"9007199254740992\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"9007199254740992\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "\"9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("-9007199254740991")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("-9007199254740991")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "-9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"-9007199254740991\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"-9007199254740991\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "-9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("-9007199254740992")
-   err = json.Unmarshal(bytes, &result)
-   if err == nil {
-      t.Errorf("err == nil")
-   }
+    bytes = []byte("-9007199254740992")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("err == nil")
+    }
+    expected = "\"-9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"-9007199254740992\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"-9007199254740992\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "\"-9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
+
+    // Int64 Bounds
+    bytes = []byte("9223372036854775807")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"9223372036854775807\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("9223372036854775808")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"9223372036854775808\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("-9223372036854775808")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"-9223372036854775808\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("-9223372036854775809")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"-9223372036854775809\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    // Int128 Bounds
+    bytes = []byte("\"730750818665451459101842416358141509827966271487\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"730750818665451459101842416358141509827966271488\"")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"-730750818665451459101842416358141509827966271488\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"-730750818665451459101842416358141509827966271489\"")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
 }
 
 func TestUInt160Json(t *testing.T) {
@@ -600,10 +810,19 @@ func TestUInt160Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
+   // JSON Bounds
    bytes = []byte("9007199254740991")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected := "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
    }
 
    bytes = []byte("\"9007199254740991\"")
@@ -611,14 +830,63 @@ func TestUInt160Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
    }
+   expected = "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
 
    bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("err == nil")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   // UInt64 Bounds
+   bytes = []byte("9223372036854775807")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9223372036854775807\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9223372036854775808")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("\"9007199254740992\"")
+   bytes = []byte("\"9223372036854775808\"")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
@@ -643,6 +911,19 @@ func TestUInt160Json(t *testing.T) {
    }
 
    bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   // Int128 Bounds
+   bytes = []byte("\"1461501637330902918203684832716283019655932542975\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"1461501637330902918203684832716283019655932542976\"")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")
@@ -683,53 +964,192 @@ func TestInt256Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("9007199254740991")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    // JSON Bounds
+    bytes = []byte("9007199254740991")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected := "9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"9007199254740991\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"9007199254740991\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("9007199254740992")
-   err = json.Unmarshal(bytes, &result)
-   if err == nil {
-      t.Errorf("err == nil")
-   }
+    bytes = []byte("9007199254740992")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("err == nil")
+    }
+    expected = "\"9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"9007199254740992\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"9007199254740992\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "\"9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("-9007199254740991")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("-9007199254740991")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "-9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"-9007199254740991\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"-9007199254740991\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "-9007199254740991"
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("-9007199254740992")
-   err = json.Unmarshal(bytes, &result)
-   if err == nil {
-      t.Errorf("err == nil")
-   }
+    bytes = []byte("-9007199254740992")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("err == nil")
+    }
+    expected = "\"-9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
 
-   bytes = []byte("\"-9007199254740992\"")
-   err = json.Unmarshal(bytes, &result)
-   if err != nil {
-      t.Errorf("An error occurred while decoding from JSON")
-   }
+    bytes = []byte("\"-9007199254740992\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+    expected = "\"-9007199254740992\""
+    bytes, err = json.Marshal(&result)
+    if err != nil {
+       t.Errorf("An error occurred while encoding to JSON")
+    }
+    if string(bytes) != expected {
+       t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+    }
+
+    // Int64 Bounds
+    bytes = []byte("9223372036854775807")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"9223372036854775807\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("9223372036854775808")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"9223372036854775808\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("-9223372036854775808")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"-9223372036854775808\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("-9223372036854775809")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"-9223372036854775809\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    // Int128 Bounds
+    bytes = []byte("\"57896044618658097711785492504343953926634992332820282019728792003956564819967\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"57896044618658097711785492504343953926634992332820282019728792003956564819968\"")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
+
+    bytes = []byte("\"-57896044618658097711785492504343953926634992332820282019728792003956564819968\"")
+    err = json.Unmarshal(bytes, &result)
+    if err != nil {
+       t.Errorf("An error occurred while decoding from JSON")
+    }
+
+    bytes = []byte("\"-57896044618658097711785492504343953926634992332820282019728792003956564819969\"")
+    err = json.Unmarshal(bytes, &result)
+    if err == nil {
+       t.Errorf("err == nil")
+    }
 }
 
 func TestUInt256Json(t *testing.T) {
@@ -766,10 +1186,19 @@ func TestUInt256Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
+   // JSON Bounds
    bytes = []byte("9007199254740991")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected := "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
    }
 
    bytes = []byte("\"9007199254740991\"")
@@ -777,14 +1206,63 @@ func TestUInt256Json(t *testing.T) {
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
    }
+   expected = "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
 
    bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("err == nil")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   // UInt64 Bounds
+   bytes = []byte("9223372036854775807")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"9223372036854775807\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("9223372036854775808")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("\"9007199254740992\"")
+   bytes = []byte("\"9223372036854775808\"")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
       t.Errorf("An error occurred while decoding from JSON")
@@ -809,6 +1287,19 @@ func TestUInt256Json(t *testing.T) {
    }
 
    bytes = []byte("\"-1\"")
+   err = json.Unmarshal(bytes, &result)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+
+   // Int128 Bounds
+   bytes = []byte("\"115792089237316195423570985008687907853269984665640564039457584007913129639935\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+
+   bytes = []byte("\"115792089237316195423570985008687907853269984665640564039457584007913129639936\"")
    err = json.Unmarshal(bytes, &result)
    if err == nil {
       t.Errorf("err == nil")

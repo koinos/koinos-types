@@ -330,28 +330,30 @@ type Int128 struct {
 }
 
 var (
-    max *big.Int
-    min *big.Int
-    once sync.Once
+    int128Max *Int128
+    int128Min *Int128
+    int128Once sync.Once
 )
 
 func initInt128Bounds() {
-    once.Do(func() {
-        max = big.NewInt(0)
-        max, _ = max.SetString("170141183460469231731687303715884105727", 10)
-        min = big.NewInt(0)
-        min, _ = min.SetString("-170141183460469231731687303715884105728", 10)
+    int128Once.Do(func() {
+        int128Max = NewInt128()
+        nv, _ := int128Max.Value.SetString("170141183460469231731687303715884105727", 10)
+        int128Max.Value = *nv
+        int128Min = NewInt128()
+        nv, _ = int128Min.Value.SetString("-170141183460469231731687303715884105728", 10)
+        int128Min.Value = *nv
     })
 }
 
-func Int128Max() big.Int {
+func Int128Max() Int128 {
     initInt128Bounds()
-    return *max
+    return *int128Max
 }
 
-func Int128Min() big.Int {
+func Int128Min() Int128 {
     initInt128Bounds()
-    return *min
+    return *int128Min
 }
 
 func NewInt128() *Int128 {
@@ -367,7 +369,7 @@ func NewInt128FromString(value string) (*Int128,error) {
     } else {
         max := Int128Max()
         min := Int128Min()
-        if nv.Cmp(&max) == 1 || nv.Cmp(&min) == -1 {
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
             return nil, errors.New("Int128 is out of bounds")
         }
         result.Value = *nv
@@ -432,6 +434,31 @@ type UInt128 struct {
     Value big.Int
 }
 
+var (
+    uint128Max *UInt128
+    uint128Min *UInt128
+    uint128Once sync.Once
+)
+
+func initUInt128Bounds() {
+    uint128Once.Do(func() {
+        uint128Max = NewUInt128()
+        nv, _ := uint128Max.Value.SetString("340282366920938463463374607431768211455", 10)
+        uint128Max.Value = *nv
+        uint128Min = NewUInt128()
+    })
+}
+
+func UInt128Max() UInt128 {
+    initUInt128Bounds()
+    return *uint128Max
+}
+
+func UInt128Min() UInt128 {
+    initUInt128Bounds()
+    return *uint128Min
+}
+
 func NewUInt128() *UInt128 {
     result := UInt128{}
     result.Value = *big.NewInt(0)
@@ -441,8 +468,13 @@ func NewUInt128() *UInt128 {
 func NewUInt128FromString(value string) (*UInt128,error) {
     var result UInt128 = UInt128{}
     if nv, ok := result.Value.SetString(value, 10); ok == false {
-        return nil, errors.New("Could not parse Int128")
+        return nil, errors.New("Could not parse UInt128")
     } else {
+        max := UInt128Max()
+        min := UInt128Min()
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
+            return nil, errors.New("UInt128 is out of bounds")
+        }
         result.Value = *nv
     }
     return &result, nil
@@ -468,6 +500,10 @@ func DeserializeUInt128(vb *VariableBlob) (uint64,*UInt128,error) {
 }
 
 func (n *UInt128) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -480,6 +516,9 @@ func (n *UInt128) UnmarshalJSON(b []byte) error {
         var i int64
         if err = json.Unmarshal(b, &i); err != nil {
             return err
+        }
+        if i < 0 {
+            return errors.New("UInt128 is out of bounds")
         }
         n.Value = *big.NewInt(i)
     } else {
@@ -501,6 +540,33 @@ type Int160 struct {
     Value big.Int
 }
 
+var (
+    int160Max *Int160
+    int160Min *Int160
+    int160Once sync.Once
+)
+
+func initInt160Bounds() {
+    int160Once.Do(func() {
+        int160Max = NewInt160()
+        nv, _ := int160Max.Value.SetString("730750818665451459101842416358141509827966271487", 10)
+        int160Max.Value = *nv
+        int160Min = NewInt160()
+        nv, _ = int160Min.Value.SetString("-730750818665451459101842416358141509827966271488", 10)
+        int160Min.Value = *nv
+    })
+}
+
+func Int160Max() Int160 {
+    initInt160Bounds()
+    return *int160Max
+}
+
+func Int160Min() Int160 {
+    initInt160Bounds()
+    return *int160Min
+}
+
 func NewInt160() *Int160 {
     result := Int160{}
     result.Value = *big.NewInt(0)
@@ -510,8 +576,13 @@ func NewInt160() *Int160 {
 func NewInt160FromString(value string) (*Int160,error) {
     var result Int160 = Int160{}
     if nv, ok := result.Value.SetString(value, 10); ok == false {
-        return nil, errors.New("Could not parse Int128")
+        return nil, errors.New("Could not parse Int160")
     } else {
+        max := Int160Max()
+        min := Int160Min()
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
+            return nil, errors.New("Int160 is out of bounds")
+        }
         result.Value = *nv
     }
     return &result, nil
@@ -537,6 +608,10 @@ func DeserializeInt160(vb *VariableBlob) (uint64,*Int160,error) {
 }
 
 func (n *Int160) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -570,6 +645,31 @@ type UInt160 struct {
     Value big.Int
 }
 
+var (
+    uint160Max *UInt160
+    uint160Min *UInt160
+    uint160Once sync.Once
+)
+
+func initUInt160Bounds() {
+    uint160Once.Do(func() {
+        uint160Max = NewUInt160()
+        nv, _ := uint160Max.Value.SetString("1461501637330902918203684832716283019655932542975", 10)
+        uint160Max.Value = *nv
+        uint160Min = NewUInt160()
+    })
+}
+
+func UInt160Max() UInt160 {
+    initUInt160Bounds()
+    return *uint160Max
+}
+
+func UInt160Min() UInt160 {
+    initUInt160Bounds()
+    return *uint160Min
+}
+
 func NewUInt160() *UInt160 {
     result := UInt160{}
     result.Value = *big.NewInt(0)
@@ -579,8 +679,13 @@ func NewUInt160() *UInt160 {
 func NewUInt160FromString(value string) (*UInt160,error) {
     var result UInt160 = UInt160{}
     if nv, ok := result.Value.SetString(value, 10); ok == false {
-        return nil, errors.New("Could not parse Int128")
+        return nil, errors.New("Could not parse UInt160")
     } else {
+        max := UInt160Max()
+        min := UInt160Min()
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
+            return nil, errors.New("UInt160 is out of bounds")
+        }
         result.Value = *nv
     }
     return &result, nil
@@ -606,6 +711,10 @@ func DeserializeUInt160(vb *VariableBlob) (uint64,*UInt160,error) {
 }
 
 func (n *UInt160) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -618,6 +727,9 @@ func (n *UInt160) UnmarshalJSON(b []byte) error {
         var i int64
         if err = json.Unmarshal(b, &i); err != nil {
             return err
+        }
+        if i < 0 {
+            return errors.New("UInt160 is out of bounds")
         }
         n.Value = *big.NewInt(i)
     } else {
@@ -639,6 +751,33 @@ type Int256 struct {
     Value big.Int
 }
 
+var (
+    int256Max *Int256
+    int256Min *Int256
+    int256Once sync.Once
+)
+
+func initInt256Bounds() {
+    int256Once.Do(func() {
+        int256Max = NewInt256()
+        nv, _ := int256Max.Value.SetString("57896044618658097711785492504343953926634992332820282019728792003956564819967", 10)
+        int256Max.Value = *nv
+        int256Min = NewInt256()
+        nv, _ = int256Min.Value.SetString("-57896044618658097711785492504343953926634992332820282019728792003956564819968", 10)
+        int256Min.Value = *nv
+    })
+}
+
+func Int256Max() Int256 {
+    initInt256Bounds()
+    return *int256Max
+}
+
+func Int256Min() Int256 {
+    initInt256Bounds()
+    return *int256Min
+}
+
 func NewInt256() *Int256 {
     result := Int256{}
     result.Value = *big.NewInt(0)
@@ -648,8 +787,13 @@ func NewInt256() *Int256 {
 func NewInt256FromString(value string) (*Int256,error) {
     var result Int256 = Int256{}
     if nv, ok := result.Value.SetString(value, 10); ok == false {
-        return nil, errors.New("Could not parse Int128")
+        return nil, errors.New("Could not parse Int256")
     } else {
+        max := Int256Max()
+        min := Int256Min()
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
+            return nil, errors.New("Int256 is out of bounds")
+        }
         result.Value = *nv
     }
     return &result, nil
@@ -675,6 +819,10 @@ func DeserializeInt256(vb *VariableBlob) (uint64,*Int256,error) {
 }
 
 func (n *Int256) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -708,6 +856,31 @@ type UInt256 struct {
     Value big.Int
 }
 
+var (
+    uint256Max *UInt256
+    uint256Min *UInt256
+    uint256Once sync.Once
+)
+
+func initUInt256Bounds() {
+    uint256Once.Do(func() {
+        uint256Max = NewUInt256()
+        nv, _ := uint256Max.Value.SetString("115792089237316195423570985008687907853269984665640564039457584007913129639935", 10)
+        uint256Max.Value = *nv
+        uint256Min = NewUInt256()
+    })
+}
+
+func UInt256Max() UInt256 {
+    initUInt256Bounds()
+    return *uint256Max
+}
+
+func UInt256Min() UInt256 {
+    initUInt256Bounds()
+    return *uint256Min
+}
+
 func NewUInt256() *UInt256 {
     result := UInt256{}
     result.Value = *big.NewInt(0)
@@ -717,8 +890,13 @@ func NewUInt256() *UInt256 {
 func NewUInt256FromString(value string) (*UInt256,error) {
     var result UInt256 = UInt256{}
     if nv, ok := result.Value.SetString(value, 10); ok == false {
-        return nil, errors.New("Could not parse Int128")
+        return nil, errors.New("Could not parse UInt256")
     } else {
+        max := UInt256Max()
+        min := UInt256Min()
+        if nv.Cmp(&max.Value) == 1 || nv.Cmp(&min.Value) == -1 {
+            return nil, errors.New("UInt256 is out of bounds")
+        }
         result.Value = *nv
     }
     return &result, nil
@@ -744,6 +922,10 @@ func DeserializeUInt256(vb *VariableBlob) (uint64,*UInt256,error) {
 }
 
 func (n *UInt256) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -756,6 +938,9 @@ func (n *UInt256) UnmarshalJSON(b []byte) error {
         var i int64
         if err = json.Unmarshal(b, &i); err != nil {
             return err
+        }
+        if i < 0 {
+            return errors.New("UInt256 is out of bounds")
         }
         n.Value = *big.NewInt(i)
     } else {
