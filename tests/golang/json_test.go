@@ -212,6 +212,120 @@ func TestInt128Json(t *testing.T) {
       t.Errorf("err == nil")
    }
 
+   // JSON Bounds
+   bytes = []byte("9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected := "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("err == nil")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "\"9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("-9007199254740991")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "-9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"-9007199254740991\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "-9007199254740991"
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("-9007199254740992")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("err == nil")
+   }
+   expected = "\"-9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   bytes = []byte("\"-9007199254740992\"")
+   err = json.Unmarshal(bytes, &result)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   expected = "\"-9007199254740992\""
+   bytes, err = json.Marshal(&result)
+   if err != nil {
+      t.Errorf("An error occurred while encoding to JSON")
+   }
+   if string(bytes) != expected {
+      t.Errorf("Incorrect JSON serialization. Expected: %s, Was: %s", expected, string(bytes))
+   }
+
+   // Int64 Bounds
    bytes = []byte("9223372036854775807")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
@@ -260,6 +374,7 @@ func TestInt128Json(t *testing.T) {
       t.Errorf("An error occurred while decoding from JSON")
    }
 
+   // Int128 Bounds
    bytes = []byte("\"170141183460469231731687303715884105727\"")
    err = json.Unmarshal(bytes, &result)
    if err != nil {
