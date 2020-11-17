@@ -38,13 +38,13 @@ func TestBoolean(t *testing.T) {
    }
 
    vb := koinos.VariableBlob{0x02}
-   _, _, err = koinos.DeserializeInt64(&vb)
+   _, _, err = koinos.DeserializeBoolean(&vb)
    if err == nil {
       t.Errorf("err == nil")
    }
 
    vb = koinos.VariableBlob{}
-   _, _, err = koinos.DeserializeInt64(&vb)
+   _, _, err = koinos.DeserializeBoolean(&vb)
    if err == nil {
       t.Errorf("err == nil")
    }
