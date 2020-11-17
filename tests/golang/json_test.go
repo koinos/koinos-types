@@ -338,6 +338,13 @@ func TestMultihashVectorJson(t *testing.T) {
       t.Errorf("The resulting values are unequal")
    }
 
+   by := []byte(`{"hash":1,"digests":["z31SRtpx1","zW7yj"]}`)
+   var mhv koinos.MultihashVector
+   err = json.Unmarshal(by, &mhv)
+   if err == nil {
+      t.Errorf("Expected multihash vector size mismatch")
+   }
+
    defer func() {
       if r := recover(); r == nil {
          t.Errorf("Expected panic on mismatching multihash vector size")
