@@ -306,6 +306,82 @@ func TestUInt64(t *testing.T) {
    }
 }
 
+func TestTimestampType(t *testing.T) {
+   timestamp := koinos.NewTimestampType()
+   defaultTimestamp := koinos.NewTimestampType()
+   *defaultTimestamp = 0
+   if *timestamp != *defaultTimestamp {
+      t.Errorf("Unexpected default initialization of TimestampType")
+   }
+   *timestamp = 18446744073709551615
+   expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+   result := koinos.NewVariableBlob()
+   result = timestamp.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected")
+   }
+   size, integer2, err := koinos.DeserializeTimestampType(result)
+   if err != nil {
+      t.Errorf("err != nil (%s)", err)
+   }
+   if *integer2 != 18446744073709551615 {
+      t.Errorf("*integer2 != 18446744073709551615 (%d != %d)", *integer2, uint64(18446744073709551615))
+   }
+   if size != 8 {
+      t.Errorf("size != 8 (%d != 8)", size)
+   }
+
+   result = koinos.NewVariableBlob()
+   result = integer2.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected (%d != %d)", *result, expected)
+   }
+
+   vb := koinos.VariableBlob{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+   _, _, err = koinos.DeserializeTimestampType(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+}
+
+func TestBlockHeightType(t *testing.T) {
+   blockHeight := koinos.NewBlockHeightType()
+   defaultBlockHeight := koinos.NewBlockHeightType()
+   *defaultBlockHeight = 0
+   if *blockHeight != *defaultBlockHeight {
+      t.Errorf("Unexpected default initialization of BlockHeightType")
+   }
+   *blockHeight = 18446744073709551615
+   expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+   result := koinos.NewVariableBlob()
+   result = blockHeight.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected")
+   }
+   size, integer2, err := koinos.DeserializeBlockHeightType(result)
+   if err != nil {
+      t.Errorf("err != nil (%s)", err)
+   }
+   if *integer2 != 18446744073709551615 {
+      t.Errorf("*integer2 != 18446744073709551615 (%d != %d)", *integer2, uint64(18446744073709551615))
+   }
+   if size != 8 {
+      t.Errorf("size != 8 (%d != 8)", size)
+   }
+
+   result = koinos.NewVariableBlob()
+   result = integer2.Serialize(result)
+   if !bytes.Equal(*result, expected) {
+      t.Errorf("*result != expected (%d != %d)", *result, expected)
+   }
+
+   vb := koinos.VariableBlob{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+   _, _, err = koinos.DeserializeBlockHeightType(&vb)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+}
+
 func TestInt128(t *testing.T) {
    integer := koinos.NewInt128FromString("-170141183460469231731687303715884105728")
    expected := []byte{
