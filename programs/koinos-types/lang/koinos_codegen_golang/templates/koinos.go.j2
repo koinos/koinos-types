@@ -396,15 +396,15 @@ func (n *{{o_type}}) GetBlob() *VariableBlob {
     return n.blob
 }
 
-func (n *{{o_type}}) GetNative() *{{v_type}} {
+func (n *{{o_type}}) GetNative() (*{{v_type}},error) {
     if( n.native == nil ) {
-        panic("Opaque type not unboxed.")
+        return nil,errors.New("Opaque type not unboxed.")
     }
     if( n.blob != nil ) {
-        panic("Opaque type is not mutable.")
+        return nil,errors.New("Opaque type is not mutable.")
     }
 
-    return n.native;
+    return n.native,nil;
 }
 
 func (n *{{o_type}}) Box() {
@@ -530,23 +530,28 @@ func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
 }
 
 func (n *{{fbname}}) MarshalJSON() ([]byte, error) {
-    s := base58.Encode((*n)[:])
-    return json.Marshal("z" + s)
+    nfb := NewVariableBlob()
+    nfb = n.Serialize(nfb)
+    s := EncodeBytes(*nfb)
+    return json.Marshal(s)
 }
 
 func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
     var s string
     if err := json.Unmarshal(b, &s); err != nil {
-        return nil
+        return err
     }
 
-    // Assume base58 encoding for now
-    sl := base58.Decode(s[1:])
-    copy((*n)[:], sl)
-
-    if len(n) < {{length}} {
-        return errors.New("{{fbname}} does not contain enough data")
+    db,err := DecodeBytes(s)
+    if err != nil {
+        return err
     }
+
+    if len(db) != {{length}} {
+        return fmt.Errorf("Deserialized blob length %d does not match size %d", len(db), {{length}})
+    }
+
+    copy((*n)[:], db)
 
     return nil
 }
@@ -564,10 +569,10 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 package koinos
 
 import (
+    "fmt"
     "errors"
     "encoding/binary"
     "encoding/json"
-    "github.com/btcsuite/btcutil/base58"
 )
 
 {% for name, decl in decls_by_name.items() -%}
