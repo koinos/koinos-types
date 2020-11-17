@@ -1440,21 +1440,31 @@ func TestVariableBlobJson(t *testing.T) {
       t.Errorf("The resulting values are unequal (%x != %x)", result, value)
    }
 
-   bytes := []byte("10")
-   err = json.Unmarshal(bytes, &result)
+   raw := []byte("10")
+   err = json.Unmarshal(raw, &result)
    if err == nil {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("\"fo0bar\"")
-   err = json.Unmarshal(bytes, &result)
+   raw = []byte("\"fo0bar\"")
+   err = json.Unmarshal(raw, &result)
    if err == nil {
       t.Errorf("err == nil")
    }
 
-   bytes = []byte("\"zfo0bar\"")
-   err = json.Unmarshal(bytes, &result)
+   raw = []byte("\"zfo0bar\"")
+   err = json.Unmarshal(raw, &result)
    if err == nil {
       t.Errorf("err == nil")
+   }
+
+   raw = []byte("\"z\"")
+   err = json.Unmarshal(raw, &result)
+   expected := make([]byte, 0)
+   if err != nil {
+      t.Errorf("An error occurred while decoding from JSON")
+   }
+   if !bytes.Equal(result, expected) {
+      t.Errorf("The resulting values are unequal (%x != %x)", result, expected)
    }
 }
