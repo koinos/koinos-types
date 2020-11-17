@@ -900,9 +900,6 @@ func DeserializeMultihashVector(vb *VariableBlob) (uint64,*MultihashVector,error
     }
 
     for num := uint64(0); num < entries; num++ {
-        if uint64(len((*vb)[i:i+int(size)])) != size {
-            return 0, &omv, errors.New("Multihash vector size mismatch")
-        }
         omv.Digests = append(omv.Digests, (*vb)[i:i+int(size)])
         i += int(size)
     }

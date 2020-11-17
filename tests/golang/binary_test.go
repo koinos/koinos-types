@@ -543,7 +543,9 @@ func TestMultihash(t *testing.T) {
 
    _, _, err := koinos.DeserializeMultihash(&koinos.VariableBlob{ 0x01, 0x06, 0x04, 0x08, 0x0F, 0x10, 0x17 })
    if err == nil {
-      t.Errorf("Expected failure during deserialization of mismatching length")
+      if err.Error() != "Unexpected EOF" {
+         t.Errorf("Expected an EOF error")
+      }
    }
 
    mA := koinos.NewMultihash()
@@ -555,9 +557,21 @@ func TestMultihash(t *testing.T) {
    mC := koinos.NewMultihash()
    mC.Id = 2
    mC.Digest = koinos.VariableBlob{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }
+   mD := koinos.NewMultihash()
+   mD.Id = 1
+   mD.Digest = koinos.VariableBlob{ 0x00, 0x00, 0x00, 0x00, 0x00 }
 
+   if !mD.LessThan(mA) {
+      t.Errorf("Multihash LessThan has unexpected results")
+   }
    if !mA.LessThan(mB) {
       t.Errorf("Multihash LessThan has unexpected results")
+   }
+   if mB.LessThan(mA) {
+      t.Errorf("Multihash LessThan has unexpected results")
+   }
+   if !mB.GreaterThan(mA) {
+      t.Errorf("Multihash GreaterThan has unexpected results")
    }
    if !mB.Equals(mC) {
       t.Errorf("Multihash Equals has unexpected results")
@@ -614,7 +628,9 @@ func TestMultihashVector(t *testing.T) {
 
    _, _, err := koinos.DeserializeMultihashVector(failBlob)
    if err == nil {
-      t.Errorf("Expected multihash vector size mismatch")
+      if err.Error() != "Unexpected EOF" {
+         t.Errorf("Expected an EOF error")
+      }
    }
 
    defer func() {
