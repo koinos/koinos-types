@@ -7,6 +7,11 @@ import (
 )
 
 func TestBoolean(t *testing.T) {
+   b := koinos.NewBoolean()
+   if *b != false {
+      t.Errorf("Boolean default value incorrect. Expected: false")
+   }
+
    value := koinos.Boolean(true)
    expected := []byte{0x01}
    result := koinos.NewVariableBlob()
@@ -38,19 +43,24 @@ func TestBoolean(t *testing.T) {
    }
 
    vb := koinos.VariableBlob{0x02}
-   _, _, err = koinos.DeserializeInt64(&vb)
+   _, _, err = koinos.DeserializeBoolean(&vb)
    if err == nil {
       t.Errorf("err == nil")
    }
 
    vb = koinos.VariableBlob{}
-   _, _, err = koinos.DeserializeInt64(&vb)
+   _, _, err = koinos.DeserializeBoolean(&vb)
    if err == nil {
       t.Errorf("err == nil")
    }
 }
 
 func TestInt8(t *testing.T) {
+   i := koinos.NewInt8()
+   if * i != 0 {
+      t.Errorf("Int8 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int8(-128)
    expected := []byte{0x80}
    result := koinos.NewVariableBlob()
@@ -83,6 +93,11 @@ func TestInt8(t *testing.T) {
 }
 
 func TestUInt8(t *testing.T) {
+   i := koinos.NewUInt8()
+   if * i != 0 {
+      t.Errorf("UInt8 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt8(255)
    expected := []byte{0xFF}
    result := koinos.NewVariableBlob()
@@ -115,6 +130,11 @@ func TestUInt8(t *testing.T) {
 }
 
 func TestInt16(t *testing.T) {
+   i := koinos.NewInt16()
+   if * i != 0 {
+      t.Errorf("Int16 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int16(-32768)
    expected := []byte{0x80, 0x00}
    result := koinos.NewVariableBlob()
@@ -147,6 +167,11 @@ func TestInt16(t *testing.T) {
 }
 
 func TestUInt16(t *testing.T) {
+   i := koinos.NewUInt16()
+   if * i != 0 {
+      t.Errorf("UInt6 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt16(65535)
    expected := []byte{0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -179,6 +204,11 @@ func TestUInt16(t *testing.T) {
 }
 
 func TestInt32(t *testing.T) {
+   i := koinos.NewInt32()
+   if * i != 0 {
+      t.Errorf("Int32 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int32(-2147483648)
    expected := []byte{0x80, 0x00, 0x00, 0x00}
    result := koinos.NewVariableBlob()
@@ -211,6 +241,11 @@ func TestInt32(t *testing.T) {
 }
 
 func TestUInt32(t *testing.T) {
+   i := koinos.NewUInt32()
+   if * i != 0 {
+      t.Errorf("UInt32 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt32(4294967295)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -243,6 +278,11 @@ func TestUInt32(t *testing.T) {
 }
 
 func TestInt64(t *testing.T) {
+   i := koinos.NewInt64()
+   if * i != 0 {
+      t.Errorf("Int64 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.Int64(-256)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00}
    result := koinos.NewVariableBlob()
@@ -275,6 +315,11 @@ func TestInt64(t *testing.T) {
 }
 
 func TestUInt64(t *testing.T) {
+   i := koinos.NewUInt64()
+   if * i != 0 {
+      t.Errorf("UInt64 default value incorrect. Expected: 0")
+   }
+
    integer := koinos.UInt64(18446744073709551615)
    expected := []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
    result := koinos.NewVariableBlob()
@@ -383,7 +428,7 @@ func TestBlockHeightType(t *testing.T) {
 }
 
 func TestInt128(t *testing.T) {
-   integer := koinos.NewInt128FromString("-170141183460469231731687303715884105728")
+   integer, _ := koinos.NewInt128FromString("-170141183460469231731687303715884105728")
    expected := []byte{
       0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -398,8 +443,10 @@ func TestInt128(t *testing.T) {
       t.Errorf("err != nil (%s)", err)
    }
 
-   if koinos.NewInt128FromString("-170141183460469231731687303715884105728").Value.Cmp(&integer2.Value) != 0 {
-      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), koinos.NewInt128FromString("-170141183460469231731687303715884105728").Value.String())
+   expected_v, _ := koinos.NewInt128FromString("-170141183460469231731687303715884105728")
+
+   if expected_v.Value.Cmp(&integer2.Value) != 0 {
+      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), expected_v.Value.String())
    }
    if size != 16 {
       t.Errorf("size != 16 (%d != 16)", size)
@@ -422,7 +469,7 @@ func TestInt128(t *testing.T) {
 }
 
 func TestUInt128(t *testing.T) {
-   toBin := koinos.NewUInt128FromString("36893488147419103231")
+   toBin, _ := koinos.NewUInt128FromString("36893488147419103231")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -454,7 +501,7 @@ func TestUInt128(t *testing.T) {
 }
 
 func TestInt160(t *testing.T) {
-   toBin := koinos.NewInt160FromString("-730750818665451459101842416358141509827966271488")
+   toBin, _ := koinos.NewInt160FromString("-730750818665451459101842416358141509827966271488")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -488,7 +535,7 @@ func TestInt160(t *testing.T) {
 }
 
 func TestUInt160(t *testing.T) {
-   toBin := koinos.NewUInt160FromString("680564733841876926926749214863536422911")
+   toBin, _ := koinos.NewUInt160FromString("680564733841876926926749214863536422911")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -522,7 +569,7 @@ func TestUInt160(t *testing.T) {
 }
 
 func TestInt256(t *testing.T) {
-   toBin := koinos.NewInt256FromString("-57896044618658097711785492504343953926634992332820282019728792003956564819968")
+   toBin, _ := koinos.NewInt256FromString("-57896044618658097711785492504343953926634992332820282019728792003956564819968")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -558,7 +605,7 @@ func TestInt256(t *testing.T) {
 }
 
 func TestUInt256(t *testing.T) {
-   toBin := koinos.NewUInt256FromString("680564733841876926926749214863536422911")
+   toBin, _ := koinos.NewUInt256FromString("680564733841876926926749214863536422911")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -769,6 +816,11 @@ func TestFixedBlob(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
+   s := koinos.NewString()
+   if *s != "" {
+      t.Errorf("String default value incorrect. Expected: \"\"")
+   }
+
    msg := koinos.String("Hello World!")
    expected := []byte{0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20,
       0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21}
@@ -830,5 +882,14 @@ func TestVariableBlob(t *testing.T) {
 
    if !bytes.Equal(*result, expected) {
       t.Errorf("result != expected")
+   }
+
+   variableBlob = &koinos.VariableBlob{0x80}
+   bytes, result, err := koinos.DeserializeVariableBlob(variableBlob)
+   if err == nil {
+      t.Errorf("err == nil")
+   }
+   if bytes != 0 {
+      t.Errorf("bytes != 0 (%d != 0)", bytes)
    }
 }
