@@ -286,11 +286,14 @@ func (n *{{tname}}) UnmarshalJSON(data []byte) error {
 
 {%- macro enum(decl) -%}
 {%- set ename = go_name(decl["name"]) -%}
+{%- set etype = typeref(decl["tref"]) -%}
 // ----------------------------------------
 //  Enum: {{ename}}
 // ----------------------------------------
 
-type {{ename}} UInt32
+// {{decl}}
+
+type {{ename}} {{etype}}
 
 func New{{ename}}() *{{ename}} {
     o := {{ename}}({{decl["entries"][0]["value"]}})
@@ -304,18 +307,60 @@ const (
 )
 
 func (n {{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
-    x := UInt32(n)
+    if !IsValid{{ename}}(n) {
+        panic("Attempting to serialize an invalid value")
+    }
+    x := {{etype}}(n)
     return x.Serialize(vb)
 }
 
 func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
-    i,item,err := DeserializeUInt32(vb)
+    i,item,err := Deserialize{{etype}}(vb)
     var x {{ename}}
     if err != nil {
         return 0,&x,err
     }
+
     x = {{ename}}(*item)
+    if !IsValid{{ename}}(x) {
+        return i,&x,fmt.Errorf("Invalid {{ename}}: %d", x)
+    }
     return i,&x,nil
+}
+
+func (n *{{ename}}) MarshalJSON() ([]byte, error) {
+    if !IsValid{{ename}}(*n) {
+        return nil,fmt.Errorf("Invalid {{ename}}: %d", *n)
+    }
+
+    return json.Marshal({{etype}}(*n))
+}
+
+func (n *{{ename}}) UnmarshalJSON(b []byte) error {
+    var o {{etype}}
+    if err := json.Unmarshal(b, &o); err != nil {
+        return err
+    }
+
+    ov := {{ename}}(o)
+
+    if !IsValid{{ename}}(ov) {
+        return fmt.Errorf("Invalid {{ename}}: %d", o)
+    }
+
+    n = &ov
+    return nil
+}
+
+func IsValid{{ename}}(v {{ename}}) bool {
+    switch v {
+        {%- for entry in decl["entries"] %}
+        case {{ename}}_{{go_name(entry["name"])}}:
+            return true
+        {%- endfor %}
+        default:
+            return false
+    }
 }
 
 {% endmacro -%}
