@@ -307,7 +307,7 @@ func TestUInt64(t *testing.T) {
 }
 
 func TestInt128(t *testing.T) {
-   integer := koinos.NewInt128("-170141183460469231731687303715884105728")
+   integer := koinos.NewInt128FromString("-170141183460469231731687303715884105728")
    expected := []byte{
       0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -322,8 +322,8 @@ func TestInt128(t *testing.T) {
       t.Errorf("err != nil (%s)", err)
    }
 
-   if koinos.NewInt128("-170141183460469231731687303715884105728").Value.Cmp(&integer2.Value) != 0 {
-      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), koinos.NewInt128("-170141183460469231731687303715884105728").Value.String())
+   if koinos.NewInt128FromString("-170141183460469231731687303715884105728").Value.Cmp(&integer2.Value) != 0 {
+      t.Errorf("*integer2 != Int128(-170141183460469231731687303715884105728) (%s != %s)", (*integer2).Value.String(), koinos.NewInt128FromString("-170141183460469231731687303715884105728").Value.String())
    }
    if size != 16 {
       t.Errorf("size != 16 (%d != 16)", size)
@@ -346,7 +346,7 @@ func TestInt128(t *testing.T) {
 }
 
 func TestUInt128(t *testing.T) {
-   toBin := koinos.NewUInt128("36893488147419103231")
+   toBin := koinos.NewUInt128FromString("36893488147419103231")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -378,7 +378,7 @@ func TestUInt128(t *testing.T) {
 }
 
 func TestInt160(t *testing.T) {
-   toBin := koinos.NewInt160("-730750818665451459101842416358141509827966271488")
+   toBin := koinos.NewInt160FromString("-730750818665451459101842416358141509827966271488")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -412,7 +412,7 @@ func TestInt160(t *testing.T) {
 }
 
 func TestUInt160(t *testing.T) {
-   toBin := koinos.NewUInt160("680564733841876926926749214863536422911")
+   toBin := koinos.NewUInt160FromString("680564733841876926926749214863536422911")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -446,7 +446,7 @@ func TestUInt160(t *testing.T) {
 }
 
 func TestInt256(t *testing.T) {
-   toBin := koinos.NewInt256("-57896044618658097711785492504343953926634992332820282019728792003956564819968")
+   toBin := koinos.NewInt256FromString("-57896044618658097711785492504343953926634992332820282019728792003956564819968")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
@@ -482,7 +482,7 @@ func TestInt256(t *testing.T) {
 }
 
 func TestUInt256(t *testing.T) {
-   toBin := koinos.NewUInt256("680564733841876926926749214863536422911")
+   toBin := koinos.NewUInt256FromString("680564733841876926926749214863536422911")
    result := koinos.NewVariableBlob()
    result = toBin.Serialize(result)
 
