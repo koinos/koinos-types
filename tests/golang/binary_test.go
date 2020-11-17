@@ -518,7 +518,9 @@ func TestUInt256(t *testing.T) {
 }
 
 func TestMultihash(t *testing.T) {
-   m := koinos.Multihash{Id: 1, Digest: koinos.VariableBlob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A }}
+   m := koinos.NewMultihash()
+   m.Id = 1
+   m.Digest = koinos.VariableBlob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A }
    result := koinos.NewVariableBlob()
    result = m.Serialize(result)
 
@@ -527,6 +529,39 @@ func TestMultihash(t *testing.T) {
    if !bytes.Equal(*result, expected) {
       t.Errorf("*result != expected")
    }
+
+   _, resultMh, e := koinos.DeserializeMultihash(result)
+   if e != nil {
+      t.Errorf("Failed to deserialize multihash vector")
+   }
+   if resultMh.Id != m.Id {
+      t.Errorf("Multihash vector Id mismatch")
+   }
+   if !m.Equals(resultMh) {
+      t.Errorf("Multihash mismatch")
+   }
+
+   _, _, err := koinos.DeserializeMultihash(&koinos.VariableBlob{ 0x01, 0x06, 0x04, 0x08, 0x0F, 0x10, 0x17 })
+   if err == nil {
+      t.Errorf("Expected failure during deserialization of mismatching length")
+   }
+
+   mA := koinos.NewMultihash()
+   mA.Id = 1
+   mA.Digest = koinos.VariableBlob{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+   mB := koinos.NewMultihash()
+   mB.Id = 2
+   mB.Digest = koinos.VariableBlob{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }
+   mC := koinos.NewMultihash()
+   mC.Id = 2
+   mC.Digest = koinos.VariableBlob{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }
+
+   if !mA.LessThan(mB) {
+      t.Errorf("Multihash LessThan has unexpected results")
+   }
+   if !mB.Equals(mC) {
+      t.Errorf("Multihash Equals has unexpected results")
+   }
 }
 
 func TestMultihashVector(t *testing.T) {
@@ -534,7 +569,7 @@ func TestMultihashVector(t *testing.T) {
    *variableBlob = append(*variableBlob, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
    variableBlob2 := koinos.NewVariableBlob()
    *variableBlob2 = append(*variableBlob2, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
-   var multihashVector koinos.MultihashVector
+   multihashVector := koinos.NewMultihashVector()
    multihashVector.Id = 1
    multihashVector.Digests = append(multihashVector.Digests, *variableBlob)
    multihashVector.Digests = append(multihashVector.Digests, *variableBlob2)
@@ -552,6 +587,19 @@ func TestMultihashVector(t *testing.T) {
 
    if !bytes.Equal(*result, expected) {
       t.Errorf("*result != expected")
+   }
+
+   _, resultMh, e := koinos.DeserializeMultihashVector(result)
+   if e != nil {
+      t.Errorf("Failed to deserialize multihash vector")
+   }
+   if resultMh.Id != multihashVector.Id {
+      t.Errorf("Multihash vector Id mismatch")
+   }
+   for i, s := range multihashVector.Digests {
+      if !bytes.Equal(s, resultMh.Digests[i]) {
+         t.Errorf("Multihash vector digest mismatch")
+      }
    }
 
    failBytes := []byte{

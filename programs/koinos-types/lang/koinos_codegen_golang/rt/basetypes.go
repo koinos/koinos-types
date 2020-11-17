@@ -808,11 +808,10 @@ func (m0 *Multihash) Equals(m1 *Multihash) bool {
 }
 
 func (m0 *Multihash) LessThan(m1 *Multihash) bool {
-    r := m0.Id - m1.Id
-    if (r < 0) {
+    if (m0.Id < m1.Id) {
         return true
     }
-    if (r > 0) {
+    if (m0.Id > m1.Id) {
         return false
     }
     return (len(m0.Digest) - len(m1.Digest)) < 0
