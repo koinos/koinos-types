@@ -38,6 +38,8 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas" )
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
+set(PYTHON_BINARY "python3" CACHE STRING "The default python to invoke")
+
 option( BUILD_KOINOS_TYPES_TESTS "Build Koinos-Types unit tests" ON )
 option( INSTALL_KOINOS_TYPES_HEADERS "Install Koinos-Types headers" OFF )
 
@@ -64,7 +66,7 @@ if (NOT TARGET coverage)
   endif()
 endif()
 
-add_subdirectory(libraries)
+add_subdirectory(lang)
 add_subdirectory(programs)
 
 if( BUILD_KOINOS_TYPES_TESTS )
