@@ -6,10 +6,15 @@ import (
     "encoding/binary"
     "encoding/json"
     "errors"
+    "sync"
     "unicode/utf8"
 
     "github.com/btcsuite/btcutil/base58"
 )
+
+const bigIntNumericLiteralMin int64 = -9007199254740991 // -1 << 53
+const bigIntNumericLiteralMax int64 =  9007199254740991 // 1 << 53 - 1
+
 
 type Serializeable interface {
     Serialize(vb *VariableBlob) *VariableBlob
@@ -20,6 +25,11 @@ type Serializeable interface {
 // --------------------------------
 
 type String string
+
+func NewString() *String {
+    o := String("")
+    return &o
+}
 
 func (n *String) Serialize(vb *VariableBlob) *VariableBlob {
     nvb := VariableBlob(make([]byte, len(*n)))
@@ -48,6 +58,11 @@ func DeserializeString(vb *VariableBlob) (uint64,*String,error) {
 // --------------------------------
 
 type Boolean bool
+
+func NewBoolean() *Boolean {
+    o := Boolean(false)
+    return &o
+}
 
 func (n *Boolean) Serialize(vb *VariableBlob) *VariableBlob {
     var b byte
@@ -80,6 +95,11 @@ func DeserializeBoolean(vb *VariableBlob) (uint64,*Boolean,error) {
 
 type Int8 int8
 
+func NewInt8() *Int8 {
+    o := Int8(0)
+    return &o
+}
+
 func (n *Int8) Serialize(vb *VariableBlob) *VariableBlob {
     ov := append(*vb, byte(*n))
     return &ov
@@ -103,6 +123,11 @@ func DeserializeInt8(vb *VariableBlob) (uint64,*Int8,error) {
 
 type UInt8 uint8
 
+func NewUInt8() *UInt8 {
+    o := UInt8(0)
+    return &o
+}
+
 func (n *UInt8) Serialize(vb *VariableBlob) *VariableBlob {
     ov := append(*vb, byte(*n))
     return &ov
@@ -125,6 +150,11 @@ func DeserializeUInt8(vb *VariableBlob) (uint64,*UInt8,error) {
 // --------------------------------
 
 type Int16 int16
+
+func NewInt16() *Int16 {
+    o := Int16(0)
+    return &o
+}
 
 func (n *Int16) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 2)
@@ -150,6 +180,11 @@ func DeserializeInt16(vb *VariableBlob) (uint64,*Int16,error) {
 // --------------------------------
 
 type UInt16 uint16
+
+func NewUInt16() *UInt16 {
+    o := UInt16(0)
+    return &o
+}
 
 func (n *UInt16) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 2)
@@ -177,6 +212,11 @@ func DeserializeUInt16(vb *VariableBlob) (uint64,*UInt16,error) {
 
 type Int32 int32
 
+func NewInt32() *Int32 {
+    o := Int32(0)
+    return &o
+}
+
 func (n *Int32) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 4)
     binary.BigEndian.PutUint32(b, uint32(*n))
@@ -201,6 +241,11 @@ func DeserializeInt32(vb *VariableBlob) (uint64,*Int32,error) {
 // --------------------------------
 
 type UInt32 uint32
+
+func NewUInt32() *UInt32 {
+    o := UInt32(0)
+    return &o
+}
 
 func (n *UInt32) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 4)
@@ -252,6 +297,11 @@ func DeserializeInt64(vb *VariableBlob) (uint64,*Int64,error) {
 
 type UInt64 uint64
 
+func NewUInt64() *UInt64 {
+    o := UInt64(0)
+    return &o
+}
+
 func (n *UInt64) Serialize(vb *VariableBlob) *VariableBlob {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, uint64(*n))
@@ -279,11 +329,50 @@ type Int128 struct {
     Value big.Int
 }
 
-func NewInt128(value string) *Int128 {
-    var result Int128 = Int128{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+var (
+    max *big.Int
+    min *big.Int
+    once sync.Once
+)
+
+func initInt128Bounds() {
+    once.Do(func() {
+        max = big.NewInt(0)
+        max, _ = max.SetString("170141183460469231731687303715884105727", 10)
+        min = big.NewInt(0)
+        min, _ = min.SetString("-170141183460469231731687303715884105728", 10)
+    })
+}
+
+func Int128Max() big.Int {
+    initInt128Bounds()
+    return *max
+}
+
+func Int128Min() big.Int {
+    initInt128Bounds()
+    return *min
+}
+
+func NewInt128() *Int128 {
+    result := Int128{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewInt128FromString(value string) (*Int128,error) {
+    var result Int128 = Int128{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        max := Int128Max()
+        min := Int128Min()
+        if nv.Cmp(&max) == 1 || nv.Cmp(&min) == -1 {
+            return nil, errors.New("Int128 is out of bounds")
+        }
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *Int128) Serialize(vb *VariableBlob) *VariableBlob {
@@ -306,6 +395,10 @@ func DeserializeInt128(vb *VariableBlob) (uint64,*Int128,error) {
 }
 
 func (n *Int128) MarshalJSON() ([]byte, error) {
+    if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
+        return json.Marshal(i)
+    }
+
     s := n.Value.String()
     return json.Marshal(s)
 }
@@ -321,7 +414,11 @@ func (n *Int128) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewInt128(s)
+        if nv, err := NewInt128FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -335,11 +432,20 @@ type UInt128 struct {
     Value big.Int
 }
 
-func NewUInt128(value string) *UInt128 {
-    var result UInt128 = UInt128{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+func NewUInt128() *UInt128 {
+    result := UInt128{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewUInt128FromString(value string) (*UInt128,error) {
+    var result UInt128 = UInt128{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *UInt128) Serialize(vb *VariableBlob) *VariableBlob {
@@ -377,7 +483,11 @@ func (n *UInt128) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewUInt128(s)
+        if nv, err := NewUInt128FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -391,11 +501,20 @@ type Int160 struct {
     Value big.Int
 }
 
-func NewInt160(value string) *Int160 {
-    var result Int160 = Int160{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+func NewInt160() *Int160 {
+    result := Int160{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewInt160FromString(value string) (*Int160,error) {
+    var result Int160 = Int160{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *Int160) Serialize(vb *VariableBlob) *VariableBlob {
@@ -433,7 +552,11 @@ func (n *Int160) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewInt160(s)
+        if nv, err := NewInt160FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -447,11 +570,20 @@ type UInt160 struct {
     Value big.Int
 }
 
-func NewUInt160(value string) *UInt160 {
-    var result UInt160 = UInt160{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+func NewUInt160() *UInt160 {
+    result := UInt160{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewUInt160FromString(value string) (*UInt160,error) {
+    var result UInt160 = UInt160{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *UInt160) Serialize(vb *VariableBlob) *VariableBlob {
@@ -489,7 +621,11 @@ func (n *UInt160) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewUInt160(s)
+        if nv, err := NewUInt160FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -503,11 +639,20 @@ type Int256 struct {
     Value big.Int
 }
 
-func NewInt256(value string) *Int256 {
-    var result Int256 = Int256{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+func NewInt256() *Int256 {
+    result := Int256{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewInt256FromString(value string) (*Int256,error) {
+    var result Int256 = Int256{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *Int256) Serialize(vb *VariableBlob) *VariableBlob {
@@ -545,7 +690,11 @@ func (n *Int256) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewInt256(s)
+        if nv, err := NewInt256FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -559,11 +708,20 @@ type UInt256 struct {
     Value big.Int
 }
 
-func NewUInt256(value string) *UInt256 {
-    var result UInt256 = UInt256{}
-    nv,_ := result.Value.SetString(value, 10)
-    result.Value = *nv
+func NewUInt256() *UInt256 {
+    result := UInt256{}
+    result.Value = *big.NewInt(0)
     return &result
+}
+
+func NewUInt256FromString(value string) (*UInt256,error) {
+    var result UInt256 = UInt256{}
+    if nv, ok := result.Value.SetString(value, 10); ok == false {
+        return nil, errors.New("Could not parse Int128")
+    } else {
+        result.Value = *nv
+    }
+    return &result, nil
 }
 
 func (n *UInt256) Serialize(vb *VariableBlob) *VariableBlob {
@@ -601,7 +759,11 @@ func (n *UInt256) UnmarshalJSON(b []byte) error {
         }
         n.Value = *big.NewInt(i)
     } else {
-        *n = *NewUInt256(s)
+        if nv, err := NewUInt256FromString(s); err != nil {
+            return err
+        } else {
+            *n = *nv
+        }
     }
 
     return nil
@@ -668,6 +830,11 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
 
 type TimestampType UInt64
 
+func NewTimestampType() *TimestampType {
+    o := TimestampType(0)
+    return &o
+}
+
 func (n *TimestampType) Serialize(vb *VariableBlob) *VariableBlob {
     un := UInt64(*n)
     return un.Serialize(vb)
@@ -684,6 +851,11 @@ func DeserializeTimestampType(vb *VariableBlob) (uint64,*TimestampType,error) {
 // --------------------------------
 
 type BlockHeightType UInt64
+
+func NewBlockHeightType() *BlockHeightType {
+    o := BlockHeightType(0)
+    return &o
+}
 
 func (n *BlockHeightType) Serialize(vb *VariableBlob) *VariableBlob {
     un := UInt64(*n)
@@ -703,6 +875,13 @@ func DeserializeBlockHeightType(vb *VariableBlob) (uint64,*BlockHeightType,error
 type Multihash struct {
     Id UInt64 `json:"hash"`
     Digest VariableBlob `json:"digest"`
+}
+
+func NewMultihash() *Multihash {
+    o := Multihash{}
+    o.Id = UInt64(0)
+    o.Digest = *NewVariableBlob()
+    return &o
 }
 
 func (m0 *Multihash) Equals(m1 *Multihash) bool {
@@ -754,6 +933,13 @@ type MultihashVector struct {
     Digests []VariableBlob
 }
 
+func NewMultihashVector() *MultihashVector {
+    o := MultihashVector{}
+    o.Id = UInt64(0)
+    o.Digests = make([]VariableBlob, 0)
+    return &o
+}
+
 func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {
     vb = EncodeVarint(vb, uint64(n.Id))
     size := uint64(0)
@@ -764,6 +950,9 @@ func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {
     vb = EncodeVarint(vb, uint64(len(n.Digests)))
 
     for _, item := range n.Digests {
+        if uint64(len(item)) != size {
+            panic("Multihash vector size mismatch")
+        }
         *vb = append(*vb, item...)
     }
 
@@ -793,6 +982,9 @@ func DeserializeMultihashVector(vb *VariableBlob) (uint64,*MultihashVector,error
     }
 
     for num := uint64(0); num < entries; num++ {
+        if uint64(len((*vb)[i:i+int(size)])) != size {
+            return 0, &omv, errors.New("Multihash vector size mismatch")
+        }
         omv.Digests = append(omv.Digests, (*vb)[i:i+int(size)])
         i += int(size)
     }
@@ -805,8 +997,14 @@ func (n *MultihashVector) MarshalJSON() ([]byte, error) {
         Id uint64 `json:"hash"`
         Digests []string `json:"digests"`
     }{Id: uint64(n.Id)}
-
+    size := uint64(0)
+    if len(n.Digests) > 0 {
+        size = uint64(len(n.Digests[0]))
+    }
     for _,item := range n.Digests {
+        if uint64(len(item)) != size {
+            panic("Multihash vector size mismatch")
+        }
         mhv.Digests = append(mhv.Digests, EncodeBytes(item))
     }
 
@@ -825,10 +1023,18 @@ func (n *MultihashVector) UnmarshalJSON(b []byte) error {
     }
 
     n.Id = UInt64(mhv.Id)
-    for _, item := range mhv.Digests {
+    size := uint64(0)
+    for i, item := range mhv.Digests {
         db,err := DecodeBytes(item)
         if err != nil {
             return err
+        }
+        if i == 0 {
+            size = uint64(len(db))
+        } else {
+            if uint64(len(db)) != size {
+                return errors.New("Multihash vector size mismatch")
+            }
         }
         n.Digests = append(n.Digests, VariableBlob(db))
     }
