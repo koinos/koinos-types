@@ -338,8 +338,21 @@ func TestMultihashVectorJson(t *testing.T) {
       t.Errorf("The resulting values are unequal")
    }
 
-   by := []byte(`{"hash":1,"digests":["z31SRtpx1","zW7yj"]}`)
    var mhv koinos.MultihashVector
+   by := []byte(`{"hash":"1","digests":["z31SRtpx1","zW7yj"]}`)
+   err = json.Unmarshal(by, &mhv)
+   if err.Error() != "json: cannot unmarshal string into Go struct field .hash of type uint64" {
+      t.Errorf("Expected failure parsing hash id")
+   }
+
+   by = []byte(`{"hash":1,"digests":["31SRtpx1"]}`)
+   err = json.Unmarshal(by, &mhv)
+   if err.Error() != "Unknown encoding: 3" {
+      t.Errorf("Expected unknown encoding")
+   }
+
+   by = []byte(`{"hash":1,"digests":["z31SRtpx1","zW7yj"]}`)
+
    err = json.Unmarshal(by, &mhv)
    if err == nil {
       t.Errorf("Expected multihash vector size mismatch")
