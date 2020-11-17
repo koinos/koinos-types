@@ -553,6 +553,42 @@ func TestMultihashVector(t *testing.T) {
    if !bytes.Equal(*result, expected) {
       t.Errorf("*result != expected")
    }
+
+   failBytes := []byte{
+      0x01,                               // hash_id
+      0x06,                               // hash length
+      0x02,                               // num hashes
+      0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A, // digest_a
+      0x01, 0x02, 0x03, 0x04, 0x05,       // digest_b
+   }
+   failBlob := koinos.NewVariableBlob()
+   *failBlob = append(*failBlob, failBytes...)
+
+   _, _, err := koinos.DeserializeMultihashVector(failBlob)
+   if err == nil {
+      t.Errorf("Expected multihash vector size mismatch")
+   }
+
+   defer func() {
+      if r := recover(); r == nil {
+         t.Errorf("Expected panic on mismatching multihash vector size")
+      } else {
+         if r != "Multihash vector size mismatch" {
+            t.Errorf("Expected panic on mismatching multihash vector size, rather than: %s", r)
+         }
+      }
+   }()
+   vblobFail := koinos.NewVariableBlob()
+   *vblobFail = append(*vblobFail, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
+   vblobFail2 := koinos.NewVariableBlob()
+   *vblobFail2 = append(*vblobFail2, 0x01, 0x02, 0x03, 0x04, 0x05)
+   var mhvFail koinos.MultihashVector
+   mhvFail.Id = 1
+   mhvFail.Digests = append(mhvFail.Digests, *vblobFail)
+   mhvFail.Digests = append(mhvFail.Digests, *vblobFail2)
+
+   failSerialize := koinos.NewVariableBlob()
+   mhvFail.Serialize(failSerialize)
 }
 
 func TestFixedBlob(t *testing.T) {
