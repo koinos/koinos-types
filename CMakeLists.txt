@@ -62,7 +62,7 @@ if (NOT TARGET coverage)
        NAME coverage
        LCOV_ARGS "--quiet" "--no-external"
        EXECUTABLE koinos_types_tests
-       EXCLUDE "libraries/vendor/*")
+       EXCLUDE "lang/cpp/vendor/*")
   endif()
 endif()
 
