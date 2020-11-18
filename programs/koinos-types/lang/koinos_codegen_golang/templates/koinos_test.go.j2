@@ -238,7 +238,16 @@ func Test{{tname}}(t *testing.T) {
     if err != nil {
         t.Error(err)
     }
-
+{% if is_empty_struct(decl) != "True" %}
+    vb = NewVariableBlob()
+    size, _, err := Deserialize{{tname}}(vb)
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if size != 0 {
+        t.Errorf("Bytes were consumed on error")
+    }
+{% endif %}
     v,jerr := json.Marshal(o)
     if jerr != nil {
         t.Error(jerr)
@@ -549,6 +558,15 @@ func Test{{fbname}}(t *testing.T) {
 
     if !bytes.Equal(fb[:], nfb[:]) {
         t.Errorf("Binary deserialized fixed blob does not match source.")
+    }
+
+    vb = NewVariableBlob()
+    size, _, err = Deserialize{{fbname}}(vb)
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if size != 0 {
+        t.Errorf("Bytes were consumed on error")
     }
 
     j,err := json.Marshal(fb)
