@@ -12,5 +12,5 @@ if [ "$RUN_TYPE" = "test" ]; then
    # Golang tests
    go get ./build/generated/golang/src/koinos
    go test -v ./tests/golang
+   go test -v ./build/generated/golang/tests
 fi
-
