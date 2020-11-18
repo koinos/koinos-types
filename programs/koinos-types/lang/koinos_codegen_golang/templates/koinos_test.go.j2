@@ -441,12 +441,14 @@ func Test{{fbname}}(t *testing.T) {
 //  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|   |_|\___||___/\__|___/
 //                         Please do not modify
 
-package koinos
+package main
 
 import (
     "testing"
     "bytes"
     "encoding/json"
+
+    . "koinos"
 )
 
 {% for name, decl in decls_by_name.items() -%}
