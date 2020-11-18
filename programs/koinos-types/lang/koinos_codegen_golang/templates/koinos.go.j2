@@ -328,12 +328,12 @@ func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
     return i,&x,nil
 }
 
-func (n *{{ename}}) MarshalJSON() ([]byte, error) {
-    if !IsValid{{ename}}(*n) {
-        return nil,fmt.Errorf("Invalid {{ename}}: %d", *n)
+func (n {{ename}}) MarshalJSON() ([]byte, error) {
+    if !IsValid{{ename}}(n) {
+        return nil,fmt.Errorf("Invalid {{ename}}: %d", n)
     }
 
-    return json.Marshal({{etype}}(*n))
+    return json.Marshal({{etype}}(n))
 }
 
 func (n *{{ename}}) UnmarshalJSON(b []byte) error {
