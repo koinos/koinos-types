@@ -110,29 +110,41 @@ func Test{{sname}}(t *testing.T) {
 
 func Test{{varname}}(t *testing.T) {
     o := New{{varname}}()
+    exercise{{varname}}Serialization(o, t)
 
+    {%- for arg in decl["tref"]["targs"] %}
+    {
+    {%- set arg_type = typeref(arg) %}
+        v := New{{varname}}()
+        v.Value = New{{arg_type}}()
+	exercise{{varname}}Serialization(v, t)
+    }
+    {%- endfor %}
+
+    // Test nonsensical json
+    o = New{{varname}}()
+    if jerr := json.Unmarshal([]byte("!@#$%^&*"), o); jerr == nil {
+        t.Errorf("Unmarshaling nonsense JSON did not give error.")
+    }
+}
+
+func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
     vb := NewVariableBlob()
-    vb = o.Serialize(vb)
+    vb = v.Serialize(vb)
 
     _,_,err := Deserialize{{varname}}(vb)
     if err != nil {
         t.Error(err)
     }
 
-    v,jerr := json.Marshal(o)
+    jv,jerr := json.Marshal(v)
     if jerr != nil {
         t.Error(jerr)
     }
 
-    jo := New{{varname}}()
-    jerr = json.Unmarshal(v, jo)
-    if jerr != nil {
+    nv := New{{varname}}()
+    if jerr = json.Unmarshal(jv, nv); jerr != nil {
         t.Error(jerr)
-    }
-
-    jerr = json.Unmarshal([]byte("!@#$%^&*"), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
 }
 
@@ -179,12 +191,98 @@ func Test{{tname}}(t *testing.T) {
 
 {%- macro enum(decl) -%}
 {%- set ename = go_name(decl["name"]) -%}
+{%- set etype = typeref(decl["tref"]) -%}
 // ----------------------------------------
 //  Enum: {{ename}}
 // ----------------------------------------
 
 func Test{{ename}}(t *testing.T) {
-    
+    vals := []{{ename}}{
+        {%- for entry in decl["entries"] %}
+        {{ename}}_{{go_name(entry["name"])}},{%- endfor %}
+    }
+
+    // Make sure all types properly serialize
+    for _,x := range vals {
+        vb := NewVariableBlob()
+        vb = x.Serialize(vb)
+
+        nvb := NewVariableBlob()
+        ox := {{etype}}(x)
+        nvb = ox.Serialize(nvb)
+
+        if !bytes.Equal(*vb, *nvb) {
+            t.Errorf("Serialized enum does match ideal serialization.")
+        }
+
+        _,y,err := Deserialize{{ename}}(vb)
+        if err != nil {
+            t.Error(err)
+        }
+	
+        if x != *y {
+            t.Errorf("Deserialized enum does not match original.")
+        }
+
+        // Test JSON
+        jx,err := json.Marshal(x)
+        if err != nil {
+            t.Error(err)
+        }
+
+        jox,err := json.Marshal(ox)
+        if err != nil {
+            t.Error(err)
+        }
+
+        if !bytes.Equal(jx, jox) {
+            t.Error(err)
+        }
+
+        r := New{{ename}}()
+        if json.Unmarshal(jx, r); err != nil {
+            t.Error(err)
+        }
+    }
+
+    // Find a value that is NOT an enum value
+    w := getInvalid{{ename}}()
+
+    tw := {{etype}}(w)
+    vb := NewVariableBlob()
+    vb = tw.Serialize(vb)
+
+    if _,_,err := Deserialize{{ename}}(vb); err == nil {
+        t.Errorf("Deserializing an invalid value did not return an error.")
+    }
+
+    je := New{{ename}}()
+    if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
+        t.Errorf("Deserializing an invalid JSON value did not return an error.")
+    }
+}
+
+func Test{{ename}}Panic(t *testing.T) {
+    defer func() {
+        if r := recover(); r == nil {
+            t.Errorf("Serializing an invalid enum value did not panic.")
+        }
+    }()
+
+    // Find a value that is NOT an enum value
+    w := getInvalid{{ename}}()
+
+    vb := NewVariableBlob()
+    vb = w.Serialize(vb)
+}
+
+func getInvalid{{ename}}() {{ename}} {
+    w := {{ename}}_{{go_name(decl["entries"][-1]["name"])}}
+    for IsValid{{ename}}(w) {
+        w += 1
+    }
+
+    return w
 }
 
 {% endmacro -%}
@@ -445,6 +543,7 @@ func Test{{fbname}}(t *testing.T) {
 package koinos
 
 import (
+    "fmt"
     "testing"
     "bytes"
     "encoding/json"
