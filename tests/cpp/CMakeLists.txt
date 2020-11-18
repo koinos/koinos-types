@@ -4,9 +4,9 @@ if( GPERFTOOLS_FOUND )
     list( APPEND PLATFORM_SPECIFIC_LIBS tcmalloc )
 endif()
 
-INCLUDE(CTest)
+include(CTest)
 
-ENABLE_TESTING()
+enable_testing()
 
 file(GLOB UNIT_TESTS "src/*.cpp")
 file(GLOB_RECURSE TEST_FIXTURES "include/*.hpp")
