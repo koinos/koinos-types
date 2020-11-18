@@ -97,14 +97,19 @@ def is_empty_struct(targ, decls_by_name):
             return True
 
         for field in field_type["fields"]:
-            if is_empty_struct(field, decls_by_name):
-                return True
+            if not is_empty_struct(field, decls_by_name):
+                return False
 
-        return False
-    elif type_info == "BaseType" or type_info == "Typeref":
+        return True
+    elif type_info == "BaseType":
         return False
     else:
-        return is_empty_struct(field_type["tref"], decls_by_name)
+        type_name = ""
+        if "tref" in targ and targ["tref"] != None:
+            type_name = ns.join(targ["tref"]["name"])
+        else:
+            type_name = ns.join(targ["name"])
+        return is_empty_struct(decls_by_name[type_name], decls_by_name)
 
 def get_bad_bytes(targ, decls_by_name, field=None):
     ns = "::"
@@ -134,7 +139,11 @@ def get_bad_bytes(targ, decls_by_name, field=None):
         type_name = ns.join(targ["name"])
         return ""
     else:
-        type_name = ns.join(targ["tref"]["name"])
+        type_name = ""
+        if "tref" in targ and targ["tref"] != None:
+            type_name = ns.join(targ["tref"]["name"])
+        else:
+            type_name = ns.join(targ["name"])
         return get_bad_bytes(decls_by_name[type_name], decls_by_name)
 
 

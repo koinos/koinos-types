@@ -52,17 +52,6 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {{get_bad_bytes_impl(targ, decls_by_name, field)}}
 {%- endmacro -%}
 
-{% macro test_bad_bytes(decl, field) %}
-    vb = &VariableBlob{ {{get_bad_bytes_impl(decl, decls_by_name, field)}} }
-    n,_,err = Deserialize{{sname}}(vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
-{% endmacro %}
-
 {%- macro is_empty_struct(targ) -%}
 {{is_empty_struct_impl(targ, decls_by_name)}}
 {%- endmacro -%}
@@ -148,7 +137,17 @@ func Test{{varname}}(t *testing.T) {
     {%- set arg_type = typeref(arg) %}
         v := New{{varname}}()
         v.Value = New{{arg_type}}()
-	exercise{{varname}}Serialization(v, t)
+	    exercise{{varname}}Serialization(v, t)
+{% if is_empty_struct(arg) != "True" %}
+        vb := VariableBlob{ {{loop.index - 1}} }
+        n,_,err := Deserialize{{varname}}(&vb)
+        if err == nil {
+            t.Errorf("err == nil")
+        }
+        if n != 0 {
+            t.Errorf("Bytes were consumed on error")
+        }
+{%- endif %}
     }
     {%- endfor %}
 
