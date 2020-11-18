@@ -172,9 +172,12 @@ func (n *{{varname}}) MarshalJSON() ([]byte, error) {
 }
 
 func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
-    type_id,i := binary.Uvarint(*vb)
-    var j uint64
     var v {{varname}}
+    type_id,i := binary.Uvarint(*vb)
+    if i <= 0 {
+        return 0, &v, errors.New("Could not deserialize multihash id")
+    }
+    var j uint64
 
     if i <= 0 {
         return 0, &v, errors.New("Could not deserialize variant tag")
@@ -392,8 +395,12 @@ func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
+    var result {{o_type}}
     size,bytes := binary.Uvarint(*vb)
-    var result {{o_type}} = {{o_type}}(make([]{{v_type}}, 0, size))
+    if bytes <= 0 {
+        return 0, &result, errors.New("Could not deserialize multihash id")
+    }
+    result = {{o_type}}(make([]{{v_type}}, 0, size))
     i := uint64(bytes)
     var j uint64
     var item *{{v_type}}
