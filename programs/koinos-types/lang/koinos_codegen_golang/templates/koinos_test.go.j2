@@ -134,7 +134,7 @@ func Test{{varname}}(t *testing.T) {
 
     {%- for arg in decl["tref"]["targs"] %}
     {
-    {%- set arg_type = typeref(arg) %}
+        {%- set arg_type = typeref(arg) %}
         v := New{{varname}}()
         v.Value = New{{arg_type}}()
 	    exercise{{varname}}Serialization(v, t)
@@ -151,11 +151,51 @@ func Test{{varname}}(t *testing.T) {
     }
     {%- endfor %}
 
+    // Test bad variant tag
+    vb := VariableBlob{0x80}
+    n, _, err := Deserialize{{varname}}(&vb)
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if n != 0 {
+        t.Errorf("Bytes were consumed on error")
+    }
+
     // Test nonsensical json
     o = New{{varname}}()
-    if jerr := json.Unmarshal([]byte("!@#$%^&*"), o); jerr == nil {
+    if jerr := json.Unmarshal([]byte("\"!@#$%^&*\""), o); jerr == nil {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
+
+    // Test bad tag
+    if jerr := json.Unmarshal([]byte("{\"type\":\"foobar\", \"value\":0}"), o); jerr == nil {
+        t.Errorf("Unmarshaling nonsense JSON did not give error.")
+    }
+
+    // Test panic when serializing an unknown variant tag
+    func() {
+        defer func() {
+            if r := recover(); r == nil {
+                t.Errorf("Serializing an incorrect variant tag did not panic")
+            }
+        }()
+
+        variant := {{varname}}{Value: int64(0)}
+        vb := NewVariableBlob()
+        _ = variant.Serialize(vb)
+    }()
+
+    // Test panic when jsonifying an unknown variant tag
+    func() {
+        defer func() {
+            if r := recover(); r == nil {
+                t.Errorf("Serializing an incorrect variant tag did not panic")
+            }
+        }()
+
+        variant := {{varname}}{Value: int64(0)}
+        _, _ = json.Marshal(&variant)
+    }()
 }
 
 func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
