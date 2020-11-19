@@ -476,9 +476,10 @@ func (n *{{o_type}}) Box() {
 func (n *{{o_type}}) Unbox() {
     if (n.native == nil && n.blob != nil) {
         var err error
-        _,n.native,err = Deserialize{{v_type}}(n.blob)
+        var b uint64
+        b,n.native,err = Deserialize{{v_type}}(n.blob)
 
-        if err != nil {
+        if err != nil || b != uint64(len(*n.blob)) {
             n.native = nil
         }
     }

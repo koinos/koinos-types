@@ -412,6 +412,16 @@ func Test{{o_type}}(t *testing.T) {
     if err != nil {
         t.Error(err)
     }
+
+    // Test no data in the vector
+    vb = &VariableBlob{0x01}
+    n,_,err := Deserialize{{o_type}}(vb)
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if n != 0 {
+        t.Errorf("Bytes were consumed on error")
+    }
 }
 
 {% endfor -%}
@@ -515,6 +525,18 @@ func Test{{o_type}}(t *testing.T) {
 
     vb := NewVariableBlob()
     vb = o.Serialize(vb)
+    b := o.GetBlob()
+
+    o.Box()
+    if !bytes.Equal(*b, (*vb)[1:]) {
+        t.Errorf("GetBlob and Serialization do not match")
+    }
+
+    o.Unbox()
+    b = o.GetBlob()
+    if !bytes.Equal(*b, (*vb)[1:]) {
+        t.Errorf("GetBlob and Serialization do not match")
+    }
 
     _,_,err2 := Deserialize{{o_type}}(vb)
     if err2 != nil {
@@ -535,6 +557,25 @@ func Test{{o_type}}(t *testing.T) {
     jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
     if jerr == nil {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
+    }
+
+    jerr = json.Unmarshal([]byte("\"zt1Zv2yaZ\""), jo)
+    if jerr != nil {
+        t.Error(jerr)
+    }
+
+    jo.Unbox()
+    if jo.IsUnboxed() {
+        t.Errorf("Unboxed incompatible serialization")
+    }
+
+    expected := []byte("\"zt1Zv2yaZ\"")
+    v,jerr = json.Marshal(jo)
+    if jerr != nil {
+        t.Error(jerr)
+    }
+    if !bytes.Equal(v, expected) {
+        t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
     }
 }
 
