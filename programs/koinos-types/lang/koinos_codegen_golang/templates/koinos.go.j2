@@ -425,13 +425,11 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 //  Opaque Helpers
 // ----------------------------------------
 
-type opaqueJSONDetails struct {
-    Type string `json:type`
-    Value VariableBlob `json:value`
-}
-
 type opaqueJSON struct {
-    Opaque opaqueJSONDetails `json:opaque`
+    Opaque struct {
+        Type string `json:"type"`
+        Value VariableBlob `json:"value"`
+    }`json:"opaque"`
 }
 
 {% for v_type in get_opaque() -%}
@@ -546,7 +544,7 @@ func (n {{o_type}}) MarshalJSON() ([]byte, error) {
         return json.Marshal(&n.native)
     }
 
-    v := opaqueJSON{opaqueJSONDetails{}}
+    v := opaqueJSON{}
     v.Opaque.Type = "{{v_type[1]}}"
     v.Opaque.Value = *n.blob
 
@@ -554,21 +552,30 @@ func (n {{o_type}}) MarshalJSON() ([]byte, error) {
 }
 
 func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
-    err := json.Unmarshal(data, &n.native)
+    var j map[string]interface{}
+    if err := json.Unmarshal(data, &j); err != nil {
+        return err
+    }
+    _, is_opaque := j["opaque"]
 
-    if err != nil {
-        v := opaqueJSON{}
-        err = json.Unmarshal(data, &v)
-	if err != nil {
-	    return err
-	}
-	n.blob = &v.Opaque.Value
+    if is_opaque {
+        var obj opaqueJSON
+
+        if err := json.Unmarshal(data, &obj); err != nil {
+            return err
+        }
+        if strings.Compare(obj.Opaque.Type, "{{v_type[1]}}") != 0 {
+            return errors.New("Unexpected Opaque type name")
+        }
+        n.blob = &obj.Opaque.Value
         n.native = nil
     } else {
-        n.blob = nil
+        if err := json.Unmarshal(data, &n.native); err != nil {
+            return err
+        }
     }
 
-    return err
+    return nil
 }
 
 {% endfor -%}
@@ -646,6 +653,7 @@ import (
     "errors"
     "encoding/binary"
     "encoding/json"
+    "strings"
 )
 
 {% for name, decl in decls_by_name.items() -%}

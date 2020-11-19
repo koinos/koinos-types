@@ -11,6 +11,8 @@ import sys
 
 def check_binary(files, test_data, canon):
    ok = True
+   print("Checking Binary")
+
    for test in test_data:
       data = {}
 
@@ -62,7 +64,7 @@ def check_json(files, test_data, canon):
    ok = True
    data = {}
 
-   print("Checking json")
+   print("Checking JSON")
 
    # Load json
    for target, f in files.items():
