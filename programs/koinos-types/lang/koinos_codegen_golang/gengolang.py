@@ -45,8 +45,8 @@ def get_fixed_blobs():
     fb_list.sort()
     return fb_list
 
-def decl_opaque(o_type):
-    opaque.add(o_type)
+def decl_opaque(o_type, typename):
+    opaque.add((o_type, typename))
     return ""
 
 def get_opaque():

@@ -18,7 +18,7 @@ FixedBlob{{length}}{{decl_fixed_blob(length)}}
 
 {%- macro opaque(tref) -%}
 {%- set v_type = typeref(tref["targs"][0]) -%}
-Opaque{{v_type}}{{decl_opaque(v_type)}}
+Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 {%- endmacro -%}
 
 {%- macro variant(tref) -%}
@@ -353,11 +353,6 @@ func Test{{ename}}(t *testing.T) {
         t.Errorf("Deserializing an invalid value did not return an error.")
     }
 
-    _,err := json.Marshal(w)
-    if err == nil {
-        t.Errorf("Deserializing an invalid JSON value did not return an error.")
-    }
-
     je := New{{ename}}()
     if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
         t.Errorf("Deserializing an invalid JSON value did not return an error.")
@@ -460,7 +455,7 @@ func Test{{o_type}}(t *testing.T) {
 
 {%- macro generate_opaques() -%}
 {% for v_type in get_opaque() -%}
-{%- set o_type = "Opaque" + v_type -%}
+{%- set o_type = "Opaque" + v_type[0] -%}
 // ----------------------------------------
 //  {{o_type}}
 // ----------------------------------------
@@ -590,7 +585,7 @@ func Test{{o_type}}(t *testing.T) {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
 
-    jerr = json.Unmarshal([]byte("\"zt1Zv2yaZ\""), jo)
+    jerr = json.Unmarshal([]byte("{\"opaque\": { \"type\": \"{{v_type[1]}}\", \"value\": \"zt1Zv2yaZ\"} }"), jo)
     if jerr != nil {
         t.Error(jerr)
     }
