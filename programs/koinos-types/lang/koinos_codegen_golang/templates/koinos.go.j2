@@ -148,7 +148,7 @@ func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     return ser.Serialize(vb)
 }
 
-func (n *{{varname}}) TypeToName() (string) {
+func (n {{varname}}) TypeToName() (string) {
     switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
@@ -160,7 +160,7 @@ func (n *{{varname}}) TypeToName() (string) {
     }
 }
 
-func (n *{{varname}}) MarshalJSON() ([]byte, error) {
+func (n {{varname}}) MarshalJSON() ([]byte, error) {
     variant := struct {
         Type string `json:"type"`
         Value *interface{} `json:"value"`
@@ -267,8 +267,8 @@ func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}},error) {
 {%- endif -%}
 }
 
-func (n *{{tname}}) MarshalJSON() ([]byte, error) {
-    v := {{rname}}(*n)
+func (n {{tname}}) MarshalJSON() ([]byte, error) {
+    v := {{rname}}(n)
     return json.Marshal(&v)
 }
 
@@ -526,7 +526,7 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
     return size,&o,nil
 }
 
-func (n *{{o_type}}) MarshalJSON() ([]byte, error) {
+func (n {{o_type}}) MarshalJSON() ([]byte, error) {
     n.Unbox()
 
     if n.IsUnboxed() {
@@ -580,7 +580,7 @@ func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
     return {{length}},&result,nil
 }
 
-func (n *{{fbname}}) MarshalJSON() ([]byte, error) {
+func (n {{fbname}}) MarshalJSON() ([]byte, error) {
     nfb := NewVariableBlob()
     nfb = n.Serialize(nfb)
     s := EncodeBytes(*nfb)

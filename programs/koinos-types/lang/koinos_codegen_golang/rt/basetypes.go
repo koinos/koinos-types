@@ -401,9 +401,9 @@ func DeserializeInt128(vb *VariableBlob) (uint64,*Int128,error) {
     return 16, &i, nil
 }
 
-func (n *Int128) MarshalJSON() ([]byte, error) {
+func (n Int128) MarshalJSON() ([]byte, error) {
     if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
-        return json.Marshal(i)
+        return json.Marshal(&i)
     }
 
     s := n.Value.String()
@@ -504,9 +504,9 @@ func DeserializeUInt128(vb *VariableBlob) (uint64,*UInt128,error) {
     return 16, &i, nil
 }
 
-func (n *UInt128) MarshalJSON() ([]byte, error) {
+func (n UInt128) MarshalJSON() ([]byte, error) {
     if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
-        return json.Marshal(i)
+        return json.Marshal(&i)
     }
 
     s := n.Value.String()
@@ -715,9 +715,9 @@ func DeserializeUInt160(vb *VariableBlob) (uint64,*UInt160,error) {
     return 20, &i, nil
 }
 
-func (n *UInt160) MarshalJSON() ([]byte, error) {
+func (n UInt160) MarshalJSON() ([]byte, error) {
     if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
-        return json.Marshal(i)
+        return json.Marshal(&i)
     }
 
     s := n.Value.String()
@@ -823,9 +823,9 @@ func DeserializeInt256(vb *VariableBlob) (uint64,*Int256,error) {
     return 32, &i, nil
 }
 
-func (n *Int256) MarshalJSON() ([]byte, error) {
+func (n Int256) MarshalJSON() ([]byte, error) {
     if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
-        return json.Marshal(i)
+        return json.Marshal(&i)
     }
 
     s := n.Value.String()
@@ -926,9 +926,9 @@ func DeserializeUInt256(vb *VariableBlob) (uint64,*UInt256,error) {
     return 32, &i, nil
 }
 
-func (n *UInt256) MarshalJSON() ([]byte, error) {
+func (n UInt256) MarshalJSON() ([]byte, error) {
     if i := n.Value.Int64(); n.Value.IsInt64() && i <= bigIntNumericLiteralMax && i >= bigIntNumericLiteralMin {
-        return json.Marshal(i)
+        return json.Marshal(&i)
     }
 
     s := n.Value.String()
@@ -994,8 +994,8 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64,*VariableBlob,error) {
     return uint64(uint64(bytes)+size), &ovb, nil
 }
 
-func (n *VariableBlob) MarshalJSON() ([]byte, error) {
-    s := EncodeBytes(*n)
+func (n VariableBlob) MarshalJSON() ([]byte, error) {
+    s := EncodeBytes(n)
     return json.Marshal(s)
 }
 
@@ -1181,7 +1181,7 @@ func DeserializeMultihashVector(vb *VariableBlob) (uint64,*MultihashVector,error
     return uint64(i), &omv, nil
 }
 
-func (n *MultihashVector) MarshalJSON() ([]byte, error) {
+func (n MultihashVector) MarshalJSON() ([]byte, error) {
     mhv := struct {
         Id uint64 `json:"hash"`
         Digests []string `json:"digests"`
