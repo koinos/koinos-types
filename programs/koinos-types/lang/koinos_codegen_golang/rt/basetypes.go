@@ -609,7 +609,7 @@ func DeserializeInt160(vb *VariableBlob) (uint64,*Int160,error) {
 
     i.Value = *bi_ptr
 
-    return 16, &i, nil
+    return 20, &i, nil
 }
 
 func (n *Int160) MarshalJSON() ([]byte, error) {
@@ -712,7 +712,7 @@ func DeserializeUInt160(vb *VariableBlob) (uint64,*UInt160,error) {
 
     i.Value = *bi_ptr
 
-    return 16, &i, nil
+    return 20, &i, nil
 }
 
 func (n *UInt160) MarshalJSON() ([]byte, error) {
@@ -820,7 +820,7 @@ func DeserializeInt256(vb *VariableBlob) (uint64,*Int256,error) {
 
     i.Value = *bi_ptr
 
-    return 16, &i, nil
+    return 32, &i, nil
 }
 
 func (n *Int256) MarshalJSON() ([]byte, error) {
@@ -923,7 +923,7 @@ func DeserializeUInt256(vb *VariableBlob) (uint64,*UInt256,error) {
 
     i.Value = *bi_ptr
 
-    return 16, &i, nil
+    return 32, &i, nil
 }
 
 func (n *UInt256) MarshalJSON() ([]byte, error) {

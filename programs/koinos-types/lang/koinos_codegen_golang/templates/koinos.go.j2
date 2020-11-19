@@ -48,6 +48,10 @@ Opaque{{v_type}}{{decl_opaque(v_type)}}
 {{is_struct_impl(targ,decls_by_name)}}
 {%- endmacro -%}
 
+{%- macro is_empty_struct(targ) -%}
+{{is_empty_struct_impl(targ, decls_by_name)}}
+{%- endmacro -%}
+
 {%- macro struct_new(decl) -%}
 {%- set sname = go_name(decl["name"]) -%}
 func New{{sname}}() *{{sname}} {
@@ -68,10 +72,10 @@ func (n {{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 
 {%- macro struct_deserialization(decl) -%}
 func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(decl["name"])}},error) {
-    {% if decl["fields"]|length > 0 -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
+    {% if is_empty_struct(decl) != "True" -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
     s := {{go_name(decl["name"])}}{}
-    {% if decl["fields"]|length > 0 -%}var ovb VariableBlob{%- endif %}
-{%- for field in decl["fields"] %}
+    {% if is_empty_struct(decl) != "True" -%}var ovb VariableBlob{%- endif %}
+{%- for field in decl["fields"] if is_empty_struct(field) != "True" %}
     {%- set tname = typeref(field["tref"]) %}
     ovb = (*vb)[i:]
     j,t_{{field["name"]}},err := Deserialize{{tname}}(&ovb); i+=j
@@ -140,10 +144,7 @@ func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
     }
 
     vb = EncodeVarint(vb, i)
-    ser,ok := n.Value.(Serializeable)
-    if !ok {
-        panic("Variant type is not serializeable.")
-    }
+    ser,_ := n.Value.(Serializeable)
     return ser.Serialize(vb)
 }
 
@@ -155,7 +156,7 @@ func (n *{{varname}}) TypeToName() (string) {
             return "{{namespaced_typeref(arg)}}"
 {%- endfor %}
         default:
-            return "unknown type"
+            panic("Variant type is not serializeable.")
     }
 }
 
@@ -172,18 +173,18 @@ func (n *{{varname}}) MarshalJSON() ([]byte, error) {
 }
 
 func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
-    type_id,i := binary.Uvarint(*vb)
-    var j uint64
     var v {{varname}}
-
+    type_id,i := binary.Uvarint(*vb)
     if i <= 0 {
         return 0, &v, errors.New("Could not deserialize variant tag")
     }
+    var j uint64
 
     switch( type_id ) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
         case {{loop.index - 1}}:
+{%- if is_empty_struct(arg) != "True" %}
             ovb := (*vb)[i:]
             k,x,err := Deserialize{{arg_type}}(&ovb)
             if err != nil {
@@ -191,6 +192,9 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
             }
             j = k
             v.Value = x
+{%- else %}
+            v.Value = New{{arg_type}}()
+{%- endif -%}
 {%- endfor %}
         default:
             return 0, &v, errors.New("Unknown variant tag")
@@ -210,10 +214,7 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
     }
 
     var tmp []byte
-    tmp, err = json.Marshal(&variant.Value)
-    if err != nil {
-        return err
-    }
+    tmp, _ = json.Marshal(&variant.Value)
 
     switch variant.Type {
 {%- for arg in decl["tref"]["targs"] %}
@@ -257,13 +258,17 @@ func (n {{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}},error) {
-    i,n,err := Deserialize{{rname}}(vb)
     var ot {{tname}}
+{%- if is_empty_struct(decl) != "True" %}
+    i,n,err := Deserialize{{rname}}(vb)
     if err != nil {
         return 0,&ot,err
     }
     ot = {{tname}}(*n)
     return i,&ot,nil
+{%- else %}
+    return 0,&ot,nil
+{%- endif -%}
 }
 
 func (n *{{tname}}) MarshalJSON() ([]byte, error) {
@@ -330,7 +335,7 @@ func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
 
 func (n {{ename}}) MarshalJSON() ([]byte, error) {
     if !IsValid{{ename}}(n) {
-        return nil,fmt.Errorf("Invalid {{ename}}: %d", n)
+        panic("Attempting to serialize an invalid value")
     }
 
     return json.Marshal({{etype}}(n))
@@ -392,8 +397,12 @@ func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
+    var result {{o_type}}
     size,bytes := binary.Uvarint(*vb)
-    var result {{o_type}} = {{o_type}}(make([]{{v_type}}, 0, size))
+    if bytes <= 0 {
+        return 0, &result, errors.New("Could not deserialize multihash id")
+    }
+    result = {{o_type}}(make([]{{v_type}}, 0, size))
     i := uint64(bytes)
     var j uint64
     var item *{{v_type}}
@@ -467,9 +476,10 @@ func (n *{{o_type}}) Box() {
 func (n *{{o_type}}) Unbox() {
     if (n.native == nil && n.blob != nil) {
         var err error
-        _,n.native,err = Deserialize{{v_type}}(n.blob)
+        var b uint64
+        b,n.native,err = Deserialize{{v_type}}(n.blob)
 
-        if err != nil {
+        if err != nil || b != uint64(len(*n.blob)) {
             n.native = nil
         }
     }

@@ -79,6 +79,129 @@ def is_struct(targ, decls_by_name):
     else:
         return is_struct(decls_by_name[type_name]["tref"], decls_by_name)
 
+def is_empty_struct(targ, decls_by_name):
+    ns = "::"
+
+    if targ["info"]["type"] == "Field":
+        type_name = ns.join(targ["name"])
+        type_name = ns.join(targ["tref"]["name"])
+
+        field_type = decls_by_name[type_name]
+        type_info = field_type["info"]["type"]
+    else:
+        field_type = targ
+        type_info = field_type["info"]["type"]
+
+    if type_info == "Struct":
+        if len(field_type["fields"]) == 0:
+            return True
+
+        for field in field_type["fields"]:
+            if not is_empty_struct(field, decls_by_name):
+                return False
+
+        return True
+    elif type_info == "BaseType":
+        return False
+    else:
+        type_name = ""
+        if "tref" in targ and targ["tref"] != None:
+            type_name = ns.join(targ["tref"]["name"])
+        else:
+            type_name = ns.join(targ["name"])
+        return is_empty_struct(decls_by_name[type_name], decls_by_name)
+
+def get_bad_bytes(targ, decls_by_name, field=None):
+    ns = "::"
+    type_info = targ["info"]["type"]
+
+    if type_info == "Struct":
+        b = ""
+        if field == None:
+            if len(targ["fields"]) > 0:
+                field_type_name = ns.join(targ["fields"][0]["tref"]["name"])
+                return get_bad_bytes(decls_by_name[field_type_name], decls_by_name)
+            else:
+                return ""
+
+        for f in targ["fields"]:
+            field_type_name = ns.join(f["tref"]["name"])
+
+            if f["name"] == field["name"]:
+                b += get_bad_bytes(decls_by_name[field_type_name], decls_by_name)
+                return b
+
+            b += get_good_bytes(decls_by_name[field_type_name], decls_by_name) + ","
+
+        b = b[:-1]
+        return b
+    elif type_info == "BaseType":
+        type_name = ns.join(targ["name"])
+        return ""
+    else:
+        type_name = ""
+        if "tref" in targ and targ["tref"] != None:
+            type_name = ns.join(targ["tref"]["name"])
+        else:
+            type_name = ns.join(targ["name"])
+        return get_bad_bytes(decls_by_name[type_name], decls_by_name)
+
+
+good_bytes = {
+    "std::vector" : "0x00",
+    "std::variant" : "0x00",
+    "std::string" : "0x00",
+    "koinos::types::boolean" : "0x00",
+    "koinos::types::int8" : "0x00",
+    "koinos::types::uint8" : "0x00",
+    "koinos::types::int16" : "0x00,0x00",
+    "koinos::types::uint16" : "0x00,0x00",
+    "koinos::types::int32" : "0x00,0x00,0x00,0x00",
+    "koinos::types::uint32" : "0x00,0x00,0x00,0x00",
+    "koinos::types::int64" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::uint64" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::int128" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::uint128" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::int160" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::uint160" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::int256" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::uint256" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::multihash" : "0x00,0x00",
+    "koinos::types::multihash_vector" : "0x00,0x00,0x00",
+    "koinos::types::variable_blob" : "0x00",
+    "koinos::types::fixed_blob" : "",
+    "koinos::types::timestamp_type" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::block_height_type" : "0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00",
+    "koinos::types::opaque" : "0x00",
+}
+
+def get_good_bytes(targ, decls_by_name):
+    ns = "::"
+    type_name = ns.join(targ["name"])
+
+    if "targs" in targ and targ["targs"] != None:
+        type_name = ns.join(targ["targs"][0]["name"])
+    elif "tref" in targ and targ["tref"] != None:
+        type_name = ns.join(targ["tref"]["name"])
+
+    type_info = targ["info"]["type"]
+
+    if type_name == "koinos::types::fixed_blob":
+        n = targ["tref"]["targs"][0]["value"]
+        return (n - 1) * (good_bytes["koinos::types::int8"] + ",") + good_bytes["koinos::types::int8"]
+    elif type_info == "Struct":
+        b = ""
+        for f in targ["fields"]:
+            field_type_name = ns.join(f["tref"]["name"])
+            b += get_good_bytes(decls_by_name[field_type_name], decls_by_name) + ","
+        b = b[:-1]
+        return b
+    elif type_info == "BaseType":
+        return good_bytes[type_name]
+    else:
+        return get_good_bytes(decls_by_name[type_name], decls_by_name)
+
+
 def generate_golang(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -99,7 +222,9 @@ def generate_golang(schema):
            "get_opaque" : get_opaque,
            "decl_vector": decl_vector,
            "get_vectors": get_vectors,
-           "is_struct_impl" : is_struct
+           "is_struct_impl" : is_struct,
+           "get_bad_bytes_impl" : get_bad_bytes,
+           "is_empty_struct_impl" : is_empty_struct
           }
     #for name, val in ctx["decls_by_name"].items():
     #    print(name)
