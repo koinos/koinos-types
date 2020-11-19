@@ -91,14 +91,15 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
    nlohmann::json expected_json;
-   expected_json = "z31SRtpx1";
+   expected_json["opaque"]["type"] = "opaque_test_object";
+   expected_json["opaque"]["value"] = "z31SRtpx1";
    o = variable_blob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
 
    nlohmann::json actual_json;
    to_json( actual_json, o );
    BOOST_CHECK( actual_json == expected_json );
 
-   expected_json = "z1111";
+   expected_json["opaque"]["value"] = "z1111";
    from_json( expected_json, o );
    to_json( actual_json, o );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), bad_bin.begin(), bad_bin.end() ) );
