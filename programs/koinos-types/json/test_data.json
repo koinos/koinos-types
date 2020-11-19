@@ -157,7 +157,12 @@
                   }
                ]
             },
-            "z4J725obzBtuEy6g4NWm2oht9s"
+            {
+               "opaque" : {
+                  "type" : "koinos::types::protocol::transaction",
+                  "value" : "z4J725obzBtuEy6g4NWm2oht9s"
+               }
+            }
          ]
       }
    },
@@ -264,7 +269,12 @@
                      }
                   ]
                },
-               "z4J725obzBtuEy6g4NWm2oht9s"
+               {
+                  "opaque" : {
+                     "type" : "koinos::types::protocol::transaction",
+                     "value" : "z4J725obzBtuEy6g4NWm2oht9s"
+                  }
+               }
             ]
          },
          "verify_passive_data" : true,
@@ -382,7 +392,12 @@
                      }
                   ]
                },
-               "z4J725obzBtuEy6g4NWm2oht9s"
+               {
+                  "opaque" : {
+                     "type" : "koinos::types::protocol::transaction",
+                     "value" : "z4J725obzBtuEy6g4NWm2oht9s"
+                  }
+               }
             ]
          },
          "enable_check_passive_data" : true,
