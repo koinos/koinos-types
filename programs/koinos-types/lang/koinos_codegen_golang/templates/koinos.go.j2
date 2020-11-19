@@ -220,11 +220,7 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
         case "{{namespaced_typeref(arg)}}":
-{%- if is_struct(arg) == "True" %}
-            v := {{arg_type}}{}
-{%- else %}
-            v := {{arg_type}}(0)
-{%- endif %}
+            v := New{{arg_type}}()
             json.Unmarshal(tmp, &v)
             n.Value = v
 {%- endfor %}
@@ -353,7 +349,7 @@ func (n *{{ename}}) UnmarshalJSON(b []byte) error {
         return fmt.Errorf("Invalid {{ename}}: %d", o)
     }
 
-    n = &ov
+    *n = ov
     return nil
 }
 

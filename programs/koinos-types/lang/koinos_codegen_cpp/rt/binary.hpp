@@ -141,17 +141,17 @@ inline void to_binary( Stream& s, const unsigned_int& v )
    uint32_t len = 0;
    while(true)
    {
-      tmp[len] = (n & 0x7F) | (len ? 0x80 : 0x00);
+      tmp[len] = (n & 0x7F);
       if (n <= 0x7F)
          break;
+      tmp[len] |= 0x80;
       n = (n >> 7);
       len++;
    }
-
-   do
+   for(uint32_t i = 0; i <= len; i++)
    {
-      s.write( tmp + len, sizeof(char) );
-   } while( len-- );
+      s.write(tmp + i, sizeof(char));
+   }
 }
 
 template< typename Stream >
@@ -159,12 +159,13 @@ inline void from_binary( Stream& s, unsigned_int& v,  uint32_t depth )
 {
    v.value = 0;
    char chData = 0;
-
+   uint32_t i = 0;
    do
    {
       s.get(chData);
       if( !(s.good()) ) throw stream_error( "Error reading from stream" );
-      v.value = (v.value << 7) | (chData & 0x7F);
+      v.value |= (chData & 0x7f) << i;
+      i += 7;
    } while( chData & 0x80 );
 }
 
@@ -751,7 +752,7 @@ namespace detail
          template< typename Stream, typename T >
          static inline void to_binary( Stream& s, const T& v )
          {
-            pack::to_binary( s, (int64_t)v );
+            pack::to_binary( s, (typename reflector< T >::enum_type) v );
          }
 
          template< typename Stream, typename T >
@@ -759,7 +760,7 @@ namespace detail
          {
             depth++;
             if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
-            int64_t temp;
+            typename reflector< T >::enum_type temp;
             pack::from_binary(s, temp, depth);
             v = (T)temp;
          }

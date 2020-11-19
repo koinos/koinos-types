@@ -455,7 +455,7 @@
             "call_id" : 8,
             "target" : {
                "type" : "koinos::types::thunks::thunk_id",
-               "value" : 9
+               "value" : 2406348109
             },
             "extensions" : {}
          }

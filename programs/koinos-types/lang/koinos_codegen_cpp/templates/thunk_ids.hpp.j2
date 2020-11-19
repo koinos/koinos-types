@@ -20,7 +20,7 @@ enum class thunk_id : {{ mac.typeref( decls_by_name["koinos::types::thunks::thun
 
 } } } // koinos::types::thunks
 
-KOINOS_REFLECT_ENUM( koinos::types::thunks::thunk_id,
+KOINOS_REFLECT_ENUM( koinos::types::thunks::thunk_id, {{ mac.typeref( decls_by_name["koinos::types::thunks::thunk_id"]["tref"] ) }},
 {%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
    ({{ thunk.name}})
 {%- endfor -%}
