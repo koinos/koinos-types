@@ -329,7 +329,7 @@ func Test{{ename}}(t *testing.T) {
         }
 
         r := New{{ename}}()
-        if json.Unmarshal(jx, r); err != nil {
+        if err = json.Unmarshal(jx, r); err != nil {
             t.Error(err)
         }
     }
@@ -339,6 +339,14 @@ func Test{{ename}}(t *testing.T) {
 
     tw := {{etype}}(w)
     vb := NewVariableBlob()
+    n, _, err := Deserialize{{ename}}(vb);
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if n != 0 {
+        t.Errorf("Bytes were consumed on error")
+    }
+
     vb = tw.Serialize(vb)
 
     if _,_,err := Deserialize{{ename}}(vb); err == nil {
@@ -349,20 +357,38 @@ func Test{{ename}}(t *testing.T) {
     if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
         t.Errorf("Deserializing an invalid JSON value did not return an error.")
     }
+
+    if err = json.Unmarshal([]byte("\"foobar\""), &je); err == nil {
+        t.Errorf("err == nil")
+    }
+
+
 }
 
 func Test{{ename}}Panic(t *testing.T) {
-    defer func() {
-        if r := recover(); r == nil {
-            t.Errorf("Serializing an invalid enum value did not panic.")
-        }
-    }()
-
     // Find a value that is NOT an enum value
     w := getInvalid{{ename}}()
 
-    vb := NewVariableBlob()
-    vb = w.Serialize(vb)
+    func() {
+        defer func() {
+            if r := recover(); r == nil {
+                t.Errorf("Serializing an invalid enum value did not panic.")
+            }
+        }()
+
+        vb := NewVariableBlob()
+        vb = w.Serialize(vb)
+    }()
+
+    func() {
+        defer func() {
+            if r := recover(); r == nil {
+                t.Errorf("Serializing an invalid enum value did not panic.")
+            }
+        }()
+
+        _, _ = json.Marshal(w)
+    }()
 }
 
 func getInvalid{{ename}}() {{ename}} {
