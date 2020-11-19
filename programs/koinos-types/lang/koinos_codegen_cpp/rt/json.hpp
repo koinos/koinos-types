@@ -471,7 +471,10 @@ inline void to_json( json& j, const opaque< T >& v )
    try { v.unbox(); } catch( ... ) {}
 
    if( v.is_unboxed() ) to_json( j, *v );
-   else to_json( j, v.get_blob() );
+   else {
+      j["opaque"]["type"] = get_typename< T >::name();
+      to_json(j["opaque"]["value"], v.get_blob());
+   }
 }
 
 template< typename T >
@@ -479,11 +482,22 @@ inline void from_json( const json& j, opaque< T >& v, uint32_t depth )
 {
    depth++;
    if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object expected" );
 
-   if( j.is_string() ) // Assume it is base 58
+   if( j.contains("opaque") )
    {
+      const auto& opaque_json = j["opaque"];
+      if( !(opaque_json.is_object()) ) throw json_type_mismatch( "Unexpected Opaque JSON type: object expected" );
+      if( !(opaque_json.contains( "type" )) ) throw json_type_mismatch( "Opaque JSON type must contain field 'type'" );
+      if( !(opaque_json["type"].is_string()) ) throw json_type_mismatch( "Opaque JSON field 'type' must be a string" );
+      if( !(opaque_json.contains( "value" )) ) throw json_type_mismatch( "Opaque JSON type must contain field 'value'" );
+      if( !(opaque_json["type"].is_string()) ) throw json_type_mismatch( "Opaque JSON field 'value' must be a string" );
+
+      std::string name = opaque_json["type"].template get<std::string>();
+      if( name != get_typename< T >::name() ) throw json_type_mismatch( "Invalid type name in JSON opaque" );
+
       variable_blob tmp_blob;
-      from_json( j, tmp_blob, depth );
+      from_json( opaque_json["value"], tmp_blob, depth );
       v = std::move( tmp_blob );
    }
    else
