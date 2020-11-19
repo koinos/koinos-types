@@ -96,7 +96,7 @@ func Test{{sname}}(t *testing.T) {
         t.Error(jerr)
     }
 
-    jerr = json.Unmarshal([]byte("!@#$%^&*"), jo)
+    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
     if jerr == nil {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
@@ -154,6 +154,16 @@ func Test{{varname}}(t *testing.T) {
     // Test bad variant tag
     vb := VariableBlob{0x80}
     n, _, err := Deserialize{{varname}}(&vb)
+    if err == nil {
+        t.Errorf("err == nil")
+    }
+    if n != 0 {
+        t.Errorf("Bytes were consumed on error")
+    }
+
+    // Test unknown tag
+    vb = VariableBlob{ {{decl["tref"]["targs"]|length}} }
+    n, _, err = Deserialize{{varname}}(&vb)
     if err == nil {
         t.Errorf("err == nil")
     }
@@ -259,7 +269,7 @@ func Test{{tname}}(t *testing.T) {
         t.Error(jerr)
     }
 
-    jerr = json.Unmarshal([]byte("!@#$%^&*"), jo)
+    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
     if jerr == nil {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
@@ -522,7 +532,7 @@ func Test{{o_type}}(t *testing.T) {
         t.Error(jerr)
     }
 
-    jerr = json.Unmarshal([]byte("!@#$%^&*"), jo)
+    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
     if jerr == nil {
         t.Errorf("Unmarshaling nonsense JSON did not give error.")
     }
