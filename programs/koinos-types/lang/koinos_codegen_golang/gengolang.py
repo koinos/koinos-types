@@ -52,6 +52,7 @@ def decl_opaque(o_type, typename):
 def get_opaque():
     o_list = list(opaque)
     o_list.sort()
+    print(o_list)
     return o_list
 
 def decl_vector(v_type):
@@ -226,10 +227,10 @@ def generate_golang(schema):
            "get_bad_bytes_impl" : get_bad_bytes,
            "is_empty_struct_impl" : is_empty_struct
           }
-    #for name, val in ctx["decls_by_name"].items():
-    #    print(name)
-    #    import json
-    #    print(json.dumps(val))
+    for name, val in ctx["decls_by_name"].items():
+        print(name)
+        import json
+        print(json.dumps(val))
 
     result = collections.OrderedDict()
     result_files = collections.OrderedDict()

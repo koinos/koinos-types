@@ -603,6 +603,24 @@ func Test{{o_type}}(t *testing.T) {
     if !bytes.Equal(v, expected) {
         t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
     }
+
+    jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
+    if jerr == nil {
+        t.Errorf("jerr == nil")
+    }
+
+    jerr = json.Unmarshal([]byte("{\"opaque\":10}"), jo)
+    if jerr == nil {
+        t.Errorf("jerr == nil")
+    }
+{% if is_empty_struct(decls_by_name[v_type[1]]) != "True" %}
+    jerr = json.Unmarshal([]byte("{
+{%- for field in decls_by_name[v_type[1]]["fields"] -%}\"{{field["name"]}}\":0{{"," if not loop.last}}{%- endfor -%}
+}"), jo)
+    if jerr == nil {
+        t.Errorf("jerr == nil")
+    }
+{%- endif %}
 }
 
 {% endfor -%}
