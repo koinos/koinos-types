@@ -26,8 +26,6 @@ func main() {
          panic(err)
       }
 
-      arr = append(arr, t)
-
       ser := NewVariableBlob()
       ser = t.Serialize(ser)
       b := make([]byte, 4)
@@ -35,6 +33,16 @@ func main() {
       b = append(b, *ser...)
       new_bin := append(*bin, b...)
       bin = &new_bin
+
+      n, obj, err := Deserialize{{ go_name(test.typename) }}(ser)
+      if err != nil {
+         panic(err)
+      }
+      if n != uint64(len(*ser)) {
+         panic("Not all bytes were consumed when deserializing from binary.")
+      }
+
+      arr = append(arr, *obj)
    }
    {% endfor %}
 

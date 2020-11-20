@@ -111,6 +111,8 @@ def check_json(files, test_data, canon):
 
       test_num += 1
 
+   return ok
+
 def main(argv):
    argparser = argparse.ArgumentParser(description="Check Canonical Output")
 

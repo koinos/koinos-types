@@ -499,6 +499,7 @@ inline void from_binary( Stream& s, multihash_vector& v, uint32_t depth )
    if( !(uint128_t( digest_size.value ) * num_digests.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Array allocation exceeded" );
 
    v.id = id.value;
+   v.digests.clear();
    v.digests.reserve( num_digests.value );
 
    for( size_t i = 0; i < num_digests.value; ++i )
