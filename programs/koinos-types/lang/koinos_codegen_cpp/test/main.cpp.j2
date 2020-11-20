@@ -21,13 +21,22 @@ void append( const std::string& input, json& arr, std::ofstream& bin )
 {
    T t;
    koinos::pack::from_json< T >( json::parse(input), t );
-   json j;
-   koinos::pack::to_json( j, t );
-   arr.push_back( std::move( j ) );
+
    std::stringstream ss;
    koinos::pack::to_binary( ss, t );
    koinos::pack::to_binary( bin, (uint32_t)ss.tellp() );
    koinos::pack::to_binary( bin, t );
+
+   koinos::pack::from_binary( ss, t );
+   if( ss.tellp() != ss.tellg() )
+   {
+      std::cout << "Not all bytes were consumed when deserializing from binary.\n";
+      exit( EXIT_FAILURE );
+   }
+
+   json j;
+   koinos::pack::to_json( j, t );
+   arr.push_back( std::move( j ) );
 }
 
 int main( int argc, char** argv )

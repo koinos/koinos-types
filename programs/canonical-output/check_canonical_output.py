@@ -11,6 +11,8 @@ import sys
 
 def check_binary(files, test_data, canon):
    ok = True
+   print("Checking Binary")
+
    for test in test_data:
       data = {}
 
@@ -62,7 +64,7 @@ def check_json(files, test_data, canon):
    ok = True
    data = {}
 
-   print("Checking json")
+   print("Checking JSON")
 
    # Load json
    for target, f in files.items():
@@ -109,6 +111,8 @@ def check_json(files, test_data, canon):
 
       test_num += 1
 
+   return ok
+
 def main(argv):
    argparser = argparse.ArgumentParser(description="Check Canonical Output")
 
@@ -118,10 +122,10 @@ def main(argv):
    args = argparser.parse_args(argv)
 
    if args.lang_dir == "":
-      sys.exit("Required: lang-lir")
+      sys.exit("Required: lang-dir")
 
    if args.test_data == "":
-      sys.exit("Required: test-file")
+      sys.exit("Required: test-data")
 
    binary_files = {}
    json_files = {}
@@ -129,17 +133,33 @@ def main(argv):
    python_bin = shutil.which("python3")
 
    # Run canonical outputs binaries and store output filenames
-   for dir_name, sub_dirs, file_list in os.walk(args.lang_dir):
-      if dir_name != args.lang_dir and not "CMakeFiles" in dir_name:
-         dir_name = os.path.abspath(dir_name)
+   for dir_name in os.listdir(args.lang_dir):
+      dir_name = os.path.join(args.lang_dir, dir_name)
+      if os.path.isdir(dir_name):
          target = os.path.split(dir_name)[1]
+
          print("Running canonical output for %s... " % target, end='')
-         p = subprocess.Popen([python_bin + "./driver.py"], cwd=dir_name, shell=True)
+         p = subprocess.Popen([python_bin + " ./driver.py"], cwd=dir_name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
          p.wait()
 
-         binary_files[target] = open(os.path.join(dir_name, 'types.bin'), "rb")
-         json_files[target] = open(os.path.join(dir_name, 'types.json'), "r")
-         print("Done!")
+         types_bin = os.path.join(dir_name, 'types.bin')
+         types_json = os.path.join(dir_name, 'types.json')
+
+         if not os.path.isfile(types_bin):
+            print("Failed (Language target %s did not produce the output file: types.bin)" % target)
+            print(p.communicate()[0].decode("utf-8"), file=sys.stdout)
+            print(p.communicate()[1].decode("utf-8"), file=sys.stderr)
+            return 1
+
+         if not os.path.isfile(types_json):
+            print("Failed (Language target %s did not produce the output file: types.json" % target)
+            print(p.communicate()[0].decode("utf-8"), file=sys.stdout)
+            print(p.communicate()[1].decode("utf-8"), file=sys.stderr)
+            return 1
+
+         binary_files[target] = open(types_bin, "rb")
+         json_files[target] = open(types_json, "r")
+         print("Success")
 
    if not args.canon in binary_files:
       sys.exit("Canon language not found")

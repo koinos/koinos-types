@@ -156,11 +156,12 @@ template<> struct reflector<TYPE> {\
 #define KOINOS_REFLECT_ENUM_FROM_STRING_CASE( r, enum_type, elem ) \
    case enum_type::elem:
 
-#define KOINOS_REFLECT_ENUM( ENUM, FIELDS ) \
+#define KOINOS_REFLECT_ENUM( ENUM, TYPE, FIELDS ) \
 namespace koinos::pack { \
 template<> struct reflector<ENUM> { \
     typedef std::true_type is_defined; \
     typedef std::true_type is_enum; \
+    typedef TYPE enum_type; \
     static const char* to_string(ENUM elem) { \
       switch( elem ) { \
         BOOST_PP_SEQ_FOR_EACH( KOINOS_REFLECT_ENUM_TO_STRING, ENUM, FIELDS ) \
@@ -204,4 +205,3 @@ template<> struct reflector<ENUM> { \
 };  \
 template<> struct get_typename<ENUM>  { static const char* name()  { return BOOST_PP_STRINGIZE(ENUM);  } }; \
 }
-

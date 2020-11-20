@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/koinos/koinos-types.svg?token=299mUDbUKyJPxqjj5R9G&branch=master)](https://travis-ci.com/koinos/koinos-types) [![Coverage Status](https://coveralls.io/repos/github/koinos/koinos-types/badge.svg?branch=master&t=oZ3L9T)](https://coveralls.io/github/koinos/koinos-types?branch=master)
+[![Build Status](https://travis-ci.com/koinos/koinos-types.svg?token=299mUDbUKyJPxqjj5R9G&branch=master)](https://travis-ci.com/koinos/koinos-types) [![Coverage Status](https://coveralls.io/repos/github/koinos/koinos-types/badge.svg?branch=master&t=RyUCbH)](https://coveralls.io/github/koinos/koinos-types?branch=master)
 
-# koinos-types
+# Koinos Types
 
 ## Base Types
 

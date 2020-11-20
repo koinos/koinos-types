@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( unsigned_varint_test )
    unsigned_int to_bin = 256;
    to_binary( ss, to_bin );
 
-   vector< uint8_t > expected = { 0x82, 0x00 };
+   vector< uint8_t > expected = { 0x80, 0x02 };
    REQUIRE_DEEP_EQUAL( ss, expected );
 
    unsigned_int from_bin = 0;
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE( signed_varint_test )
    signed_int to_bin = -254;
    to_binary( ss, to_bin );
 
-   vector< uint8_t > expected = { 0x83, 0x7B };
+   vector< uint8_t > expected = { 0xFB, 0x03 };
    REQUIRE_DEEP_EQUAL( ss, expected );
 
    signed_int from_bin;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( signed_varint_test )
    to_bin = 256;
    to_binary( ss, to_bin );
 
-   expected = { 0x84, 0x00 };
+   expected = { 0x80, 0x04 };
    REQUIRE_DEEP_EQUAL( ss, expected );
 
    from_binary( ss, from_bin );
@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE( vector_test )
    try
    {
       from_binary( ss, from_bin );
-      BOOST_FAIL( "allcoation_violation not thrown" );
+      BOOST_FAIL( "allocation_violation not thrown" );
    }
    catch( allocation_violation& ) {}
 }
