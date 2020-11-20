@@ -111,6 +111,8 @@ def check_json(files, test_data, canon):
 
       test_num += 1
 
+   return ok
+
 def main(argv):
    argparser = argparse.ArgumentParser(description="Check Canonical Output")
 
@@ -131,9 +133,9 @@ def main(argv):
    python_bin = shutil.which("python3")
 
    # Run canonical outputs binaries and store output filenames
-   for dir_name, sub_dirs, file_list in os.walk(args.lang_dir):
-      if dir_name != args.lang_dir and not "CMakeFiles" in dir_name:
-         dir_name = os.path.abspath(dir_name)
+   for dir_name in os.listdir(args.lang_dir):
+      dir_name = os.path.join(args.lang_dir, dir_name)
+      if os.path.isdir(dir_name):
          target = os.path.split(dir_name)[1]
          print("Running canonical output for %s... " % target, end='')
          p = subprocess.Popen([python_bin + " ./driver.py"], cwd=dir_name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
