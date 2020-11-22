@@ -1,56 +1,56 @@
 package main
 
 import (
-   "encoding/binary"
-   "encoding/json"
-   "flag"
-   "io/ioutil"
-   . "koinos"
+	"encoding/binary"
+	"encoding/json"
+	"flag"
+	"io/ioutil"
+	"koinos"
 )
 
 func main() {
-   binPtr  := flag.String("binary", "types.bin", "The binary output file")
-   jsonPtr := flag.String("json", "types.json", "The JSON output file")
+	binPtr  := flag.String("binary", "types.bin", "The binary output file")
+	jsonPtr := flag.String("json", "types.json", "The JSON output file")
 
-   flag.Parse()
+	flag.Parse()
 
-   var arr []interface{}
-   bin := NewVariableBlob()
+	var arr []interface{}
+	bin := NewVariableBlob()
 
-   {% for test in test_cases %}
-   {
-      var t {{ go_name(test.typename) }}
-      jsonBlob := []byte("{{ test.json }}")
-      err := json.Unmarshal(jsonBlob, &t)
-      if err != nil {
-         panic(err)
-      }
+	{% for test in test_cases %}
+	{
+		var t koinos.{{ go_name(test.typename) }}
+		jsonBlob := []byte("{{ test.json }}")
+		err := json.Unmarshal(jsonBlob, &t)
+		if err != nil {
+			panic(err)
+		}
 
-      ser := NewVariableBlob()
-      ser = t.Serialize(ser)
-      b := make([]byte, 4)
-      binary.BigEndian.PutUint32(b, uint32(len(*ser)))
-      b = append(b, *ser...)
-      new_bin := append(*bin, b...)
-      bin = &new_bin
+		ser := koinos.NewVariableBlob()
+		ser = t.Serialize(ser)
+		b := make([]byte, 4)
+		binary.BigEndian.PutUint32(b, uint32(len(*ser)))
+		b = append(b, *ser...)
+		newBin := append(*bin, b...)
+		bin = &newBin
 
-      n, obj, err := Deserialize{{ go_name(test.typename) }}(ser)
-      if err != nil {
-         panic(err)
-      }
-      if n != uint64(len(*ser)) {
-         panic("Not all bytes were consumed when deserializing from binary.")
-      }
+		n, obj, err := koinos.Deserialize{{ go_name(test.typename) }}(ser)
+		if err != nil {
+			panic(err)
+		}
+		if n != uint64(len(*ser)) {
+			panic("Not all bytes were consumed when deserializing from binary.")
+		}
 
-      arr = append(arr, *obj)
-   }
-   {% endfor %}
+		arr = append(arr, *obj)
+	}
+	{% endfor %}
 
-   json_blob, err := json.Marshal(arr)
-   if err != nil {
-      panic(err)
-   }
+	jsonBlob, err := json.Marshal(arr)
+	if err != nil {
+		panic(err)
+	}
 
-   ioutil.WriteFile(*binPtr, []byte(*bin), 0644 )
-   ioutil.WriteFile(*jsonPtr, json_blob, 0644 )
+	ioutil.WriteFile(*binPtr, []byte(*bin), 0644 )
+	ioutil.WriteFile(*jsonPtr, jsonBlob, 0644 )
 }

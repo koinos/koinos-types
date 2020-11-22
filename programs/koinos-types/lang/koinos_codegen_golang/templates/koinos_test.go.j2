@@ -63,55 +63,54 @@ Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 // ----------------------------------------
 
 func Test{{sname}}(t *testing.T) {
-    o := New{{sname}}()
+	o := New{{sname}}()
 
-    vb := NewVariableBlob()
-    vb = o.Serialize(vb)
+	vb := NewVariableBlob()
+	vb = o.Serialize(vb)
 
-    _,_,err := Deserialize{{sname}}(vb)
-    if err != nil {
-        t.Error(err)
-    }
+	_, _, err := Deserialize{{sname}}(vb)
+	if err != nil {
+		t.Error(err)
+	}
 
 {%- for field in decl["fields"] if is_empty_struct(field) != "True" -%}
-{{"\n\n    var n uint64" if loop.first}}
-    // Test {{field["name"]}}
-    vb = &VariableBlob{ {{get_bad_bytes_impl(decl, decls_by_name, field)}} }
-    n,_,err = Deserialize{{sname}}(vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+{{"\n\n\tvar n uint64" if loop.first}}
+	// Test {{field["name"]}}
+	vb = &VariableBlob{% raw %}{{% endraw %}{{get_bad_bytes_impl(decl, decls_by_name, field)}}{% raw %}}{% endraw %}
+	n, _, err = Deserialize{{sname}}(vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if n != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 {% endfor %}
-    v,jerr := json.Marshal(o)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	v, jerr := json.Marshal(o)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jo := New{{sname}}()
-    jerr = json.Unmarshal(v, jo)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	jo := New{{sname}}()
+	jerr = json.Unmarshal(v, jo)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
+	if jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 
-    jerr = json.Unmarshal([]byte("[1,2,3,4,5]"), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	jerr = json.Unmarshal([]byte("[1,2,3,4,5]"), jo)
+	if jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 
-    jerr = json.Unmarshal([]byte("{1:2, 3:4}"), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	jerr = json.Unmarshal([]byte("{1:2, 3:4}"), jo)
+	if jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 }
-
 {% endmacro -%}
 
 {%- macro typedef(decl) -%}
@@ -129,105 +128,104 @@ func Test{{sname}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{varname}}(t *testing.T) {
-    o := New{{varname}}()
-    exercise{{varname}}Serialization(o, t)
+	o := New{{varname}}()
+	exercise{{varname}}Serialization(o, t)
 
-    {%- for arg in decl["tref"]["targs"] %}
-    {
-        {%- set arg_type = typeref(arg) %}
-        v := New{{varname}}()
-        v.Value = New{{arg_type}}()
-	    exercise{{varname}}Serialization(v, t)
+	{%- for arg in decl["tref"]["targs"] %}
+	{
+		{%- set arg_type = typeref(arg) %}
+		v := New{{varname}}()
+		v.Value = New{{arg_type}}()
+		exercise{{varname}}Serialization(v, t)
 {% if is_empty_struct(arg) != "True" %}
-        vb := VariableBlob{ {{loop.index - 1}} }
-        n,_,err := Deserialize{{varname}}(&vb)
-        if err == nil {
-            t.Errorf("err == nil")
-        }
-        if n != 0 {
-            t.Errorf("Bytes were consumed on error")
-        }
+		vb := VariableBlob{% raw %}{{% endraw %}{{loop.index - 1}}{% raw %}}{% endraw %}
+		n, _, err := Deserialize{{varname}}(&vb)
+		if err == nil {
+			t.Errorf("err == nil")
+		}
+		if n != 0 {
+			t.Errorf("Bytes were consumed on error")
+		}
 {%- endif %}
-    }
-    {%- endfor %}
+	}
+	{%- endfor %}
 
-    // Test bad variant tag
-    vb := VariableBlob{0x80}
-    n, _, err := Deserialize{{varname}}(&vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	// Test bad variant tag
+	vb := VariableBlob{0x80}
+	n, _, err := Deserialize{{varname}}(&vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if n != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 
-    // Test unknown tag
-    vb = VariableBlob{ {{decl["tref"]["targs"]|length}} }
-    n, _, err = Deserialize{{varname}}(&vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	// Test unknown tag
+	vb = VariableBlob{% raw %}{{% endraw %}{{decl["tref"]["targs"]|length}}{% raw %}}{% endraw %}
+	n, _, err = Deserialize{{varname}}(&vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if n != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 
-    // Test nonsensical json
-    o = New{{varname}}()
-    if jerr := json.Unmarshal([]byte("\"!@#$%^&*\""), o); jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	// Test nonsensical json
+	o = New{{varname}}()
+	if jerr := json.Unmarshal([]byte("\"!@#$%^&*\""), o); jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 
-    // Test bad tag
-    if jerr := json.Unmarshal([]byte("{\"type\":\"foobar\", \"value\":0}"), o); jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	// Test bad tag
+	if jerr := json.Unmarshal([]byte("{\"type\":\"foobar\", \"value\":0}"), o); jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 
-    // Test panic when serializing an unknown variant tag
-    func() {
-        defer func() {
-            if r := recover(); r == nil {
-                t.Errorf("Serializing an incorrect variant tag did not panic")
-            }
-        }()
+	// Test panic when serializing an unknown variant tag
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Serializing an incorrect variant tag did not panic")
+			}
+		}()
 
-        variant := {{varname}}{Value: int64(0)}
-        vb := NewVariableBlob()
-        _ = variant.Serialize(vb)
-    }()
+		variant := {{varname}}{Value: int64(0)}
+		vb := NewVariableBlob()
+		_ = variant.Serialize(vb)
+	}()
 
-    // Test panic when jsonifying an unknown variant tag
-    func() {
-        defer func() {
-            if r := recover(); r == nil {
-                t.Errorf("Serializing an incorrect variant tag did not panic")
-            }
-        }()
+	// Test panic when jsonifying an unknown variant tag
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Serializing an incorrect variant tag did not panic")
+			}
+		}()
 
-        variant := {{varname}}{Value: int64(0)}
-        _, _ = json.Marshal(&variant)
-    }()
+		variant := {{varname}}{Value: int64(0)}
+		_, _ = json.Marshal(&variant)
+	}()
 }
 
 func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
-    vb := NewVariableBlob()
-    vb = v.Serialize(vb)
+	vb := NewVariableBlob()
+	vb = v.Serialize(vb)
 
-    _,_,err := Deserialize{{varname}}(vb)
-    if err != nil {
-        t.Error(err)
-    }
+	_, _, err := Deserialize{{varname}}(vb)
+	if err != nil {
+		t.Error(err)
+	}
 
-    jv,jerr := json.Marshal(v)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	jv, jerr := json.Marshal(v)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    nv := New{{varname}}()
-    if jerr = json.Unmarshal(jv, nv); jerr != nil {
-        t.Error(jerr)
-    }
+	nv := New{{varname}}()
+	if jerr = json.Unmarshal(jv, nv); jerr != nil {
+		t.Error(jerr)
+	}
 }
-
 {%- endmacro -%}
 
 {%- macro basic_typedef(decl) -%}
@@ -239,42 +237,41 @@ func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
 // ----------------------------------------
 
 func Test{{tname}}(t *testing.T) {
-    o := New{{tname}}()
+	o := New{{tname}}()
 
-    vb := NewVariableBlob()
-    vb = o.Serialize(vb)
+	vb := NewVariableBlob()
+	vb = o.Serialize(vb)
 
-    _,_,err := Deserialize{{tname}}(vb)
-    if err != nil {
-        t.Error(err)
-    }
+	_, _, err := Deserialize{{tname}}(vb)
+	if err != nil {
+		t.Error(err)
+	}
 {% if is_empty_struct(decl) != "True" %}
-    vb = NewVariableBlob()
-    size, _, err := Deserialize{{tname}}(vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if size != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	vb = NewVariableBlob()
+	size, _, err := Deserialize{{tname}}(vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if size != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 {% endif %}
-    v,jerr := json.Marshal(o)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	v, jerr := json.Marshal(o)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jo := New{{tname}}()
-    jerr = json.Unmarshal(v, jo)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	jo := New{{tname}}()
+	jerr = json.Unmarshal(v, jo)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
+	if jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 }
-
 {%- endif -%}
 {%- endmacro -%}
 
@@ -286,120 +283,117 @@ func Test{{tname}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{ename}}(t *testing.T) {
-    vals := []{{ename}}{
-        {%- for entry in decl["entries"] %}
-        {{ename}}_{{go_name(entry["name"])}},{%- endfor %}
-    }
+	vals := []{{ename}}{
+		{%- for entry in decl["entries"] %}
+		{{ename}}{{go_name(entry["name"])}},{%- endfor %}
+	}
 
-    // Make sure all types properly serialize
-    for _,x := range vals {
-        vb := NewVariableBlob()
-        vb = x.Serialize(vb)
+	// Make sure all types properly serialize
+	for _, x := range vals {
+		vb := NewVariableBlob()
+		vb = x.Serialize(vb)
 
-        nvb := NewVariableBlob()
-        ox := {{etype}}(x)
-        nvb = ox.Serialize(nvb)
+		nvb := NewVariableBlob()
+		ox := {{etype}}(x)
+		nvb = ox.Serialize(nvb)
 
-        if !bytes.Equal(*vb, *nvb) {
-            t.Errorf("Serialized enum does match ideal serialization.")
-        }
+		if !bytes.Equal(*vb, *nvb) {
+			t.Errorf("Serialized enum does match ideal serialization.")
+		}
 
-        _,y,err := Deserialize{{ename}}(vb)
-        if err != nil {
-            t.Error(err)
-        }
+		_, y, err := Deserialize{{ename}}(vb)
+		if err != nil {
+			t.Error(err)
+		}
 
-        if x != *y {
-            t.Errorf("Deserialized enum does not match original.")
-        }
+		if x != *y {
+			t.Errorf("Deserialized enum does not match original.")
+		}
 
-        // Test JSON
-        jx,err := json.Marshal(x)
-        if err != nil {
-            t.Error(err)
-        }
+		// Test JSON
+		jx, err := json.Marshal(x)
+		if err != nil {
+			t.Error(err)
+		}
 
-        jox,err := json.Marshal(ox)
-        if err != nil {
-            t.Error(err)
-        }
+		jox, err := json.Marshal(ox)
+		if err != nil {
+			t.Error(err)
+		}
 
-        if !bytes.Equal(jx, jox) {
-            t.Error(err)
-        }
+		if !bytes.Equal(jx, jox) {
+			t.Error(err)
+		}
 
-        r := New{{ename}}()
-        if err = json.Unmarshal(jx, r); err != nil {
-            t.Error(err)
-        }
-    }
+		r := New{{ename}}()
+		if err = json.Unmarshal(jx, r); err != nil {
+			t.Error(err)
+		}
+	}
 
-    // Find a value that is NOT an enum value
-    w := getInvalid{{ename}}()
+	// Find a value that is NOT an enum value
+	w := getInvalid{{ename}}()
 
-    tw := {{etype}}(w)
-    vb := NewVariableBlob()
-    n, _, err := Deserialize{{ename}}(vb);
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	tw := {{etype}}(w)
+	vb := NewVariableBlob()
+	n, _, err := Deserialize{{ename}}(vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if n != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 
-    vb = tw.Serialize(vb)
+	vb = tw.Serialize(vb)
 
-    if _,_,err := Deserialize{{ename}}(vb); err == nil {
-        t.Errorf("Deserializing an invalid value did not return an error.")
-    }
+	if _, _, err := Deserialize{{ename}}(vb); err == nil {
+		t.Errorf("Deserializing an invalid value did not return an error.")
+	}
 
-    je := New{{ename}}()
-    if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
-        t.Errorf("Deserializing an invalid JSON value did not return an error.")
-    }
+	je := New{{ename}}()
+	if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
+		t.Errorf("Deserializing an invalid JSON value did not return an error.")
+	}
 
-    if err = json.Unmarshal([]byte("\"foobar\""), &je); err == nil {
-        t.Errorf("err == nil")
-    }
-
-
+	if err = json.Unmarshal([]byte("\"foobar\""), &je); err == nil {
+		t.Errorf("err == nil")
+	}
 }
 
 func Test{{ename}}Panic(t *testing.T) {
-    // Find a value that is NOT an enum value
-    w := getInvalid{{ename}}()
+	// Find a value that is NOT an enum value
+	w := getInvalid{{ename}}()
 
-    func() {
-        defer func() {
-            if r := recover(); r == nil {
-                t.Errorf("Serializing an invalid enum value did not panic.")
-            }
-        }()
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Serializing an invalid enum value did not panic.")
+			}
+		}()
 
-        vb := NewVariableBlob()
-        vb = w.Serialize(vb)
-    }()
+		vb := NewVariableBlob()
+		vb = w.Serialize(vb)
+	}()
 
-    func() {
-        defer func() {
-            if r := recover(); r == nil {
-                t.Errorf("Serializing an invalid enum value did not panic.")
-            }
-        }()
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Serializing an invalid enum value did not panic.")
+			}
+		}()
 
-        _, _ = json.Marshal(w)
-    }()
+		_, _ = json.Marshal(w)
+	}()
 }
 
 func getInvalid{{ename}}() {{ename}} {
-    w := {{ename}}_{{go_name(decl["entries"][-1]["name"])}}
-    for IsValid{{ename}}(w) {
-        w += 1
-    }
+	w := {{ename}}{{go_name(decl["entries"][-1]["name"])}}
+	for IsValid{{ename}}(w) {
+		w++
+	}
 
-    return w
+	return w
 }
-
 {% endmacro -%}
 
 {%- macro generate_vectors() -%}
@@ -410,44 +404,44 @@ func getInvalid{{ename}}() {{ename}} {
 // ----------------------------------------
 
 func Test{{o_type}}(t *testing.T) {
-    v := New{{o_type}}()
-    for i := 0; i < 16; i++ {
-        no := New{{v_type}}()
-        *v = append(*v, *no)
-    }
+	v := New{{o_type}}()
+	for i := 0; i < 16; i++ {
+		no := New{{v_type}}()
+		*v = append(*v, *no)
+	}
 
-    vb := NewVariableBlob()
-    vb = v.Serialize(vb)
+	vb := NewVariableBlob()
+	vb = v.Serialize(vb)
 
-    _,nv,err := Deserialize{{o_type}}(vb)
-    if err != nil {
-        t.Error(err)
-    }
+	_, nv, err := Deserialize{{o_type}}(vb)
+	if err != nil {
+		t.Error(err)
+	}
 
-    if len(*nv) != len(*v) {
-        t.Errorf("Deserialized vector length does not match original.")
-    }
+	if len(*nv) != len(*v) {
+		t.Errorf("Deserialized vector length does not match original.")
+	}
 
-    j,err := json.Marshal(v)
-    if err != nil {
-        t.Error(err)
-    }
+	j, err := json.Marshal(v)
+	if err != nil {
+		t.Error(err)
+	}
 
-    jv := New{{o_type}}()
-    err = json.Unmarshal(j, &jv)
-    if err != nil {
-        t.Error(err)
-    }
+	jv := New{{o_type}}()
+	err = json.Unmarshal(j, &jv)
+	if err != nil {
+		t.Error(err)
+	}
 
-    // Test no data in the vector
-    vb = &VariableBlob{0x01}
-    n,_,err := Deserialize{{o_type}}(vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if n != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	// Test no data in the vector
+	vb = &VariableBlob{0x01}
+	n, _, err := Deserialize{{o_type}}(vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if n != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 }
 
 {% endfor -%}
@@ -461,165 +455,165 @@ func Test{{o_type}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{o_type}}(t *testing.T) {
-    o := New{{o_type}}()
+	o := New{{o_type}}()
 
-    o.Box()
-    if o.IsUnboxed() {
-        t.Errorf("Opaque is unboxed but should not be.")
-    }
+	o.Box()
+	if o.IsUnboxed() {
+		t.Errorf("Opaque is unboxed but should not be.")
+	}
 
-    // Test getting native on Boxed
-    _,err := o.GetNative()
-    if err == nil {
-        t.Errorf("Getting native on boxed should fail.")
-    }
+	// Test getting native on Boxed
+	_, err := o.GetNative()
+	if err == nil {
+		t.Errorf("Getting native on boxed should fail.")
+	}
 
-    o.Box() // Call Box() on Boxed
-    if o.IsUnboxed() {
-        t.Errorf("Boxed -> Boxed failed.")
-    }
+	o.Box() // Call Box() on Boxed
+	if o.IsUnboxed() {
+		t.Errorf("Boxed -> Boxed failed.")
+	}
 
-    o.MakeImmutable() // Call MakeImmutable() on Boxed
-    if o.IsUnboxed() {
-        t.Errorf("Unboxed -> MakeImmutable failed.")
-    }
+	o.MakeImmutable() // Call MakeImmutable() on Boxed
+	if o.IsUnboxed() {
+		t.Errorf("Unboxed -> MakeImmutable failed.")
+	}
 
-    o.Unbox() // Call Unbox() on Boxed
-    if !o.IsUnboxed() {
-        t.Errorf("Boxed -> Uboxed failed.")
-    }
+	o.Unbox() // Call Unbox() on Boxed
+	if !o.IsUnboxed() {
+		t.Errorf("Boxed -> Uboxed failed.")
+	}
 
-    // Test getting native on Unboxed
-    _,err = o.GetNative()
-    if err == nil {
-        t.Errorf("Getting native on Unboxed should fail.")
-    }
+	// Test getting native on Unboxed
+	_, err = o.GetNative()
+	if err == nil {
+		t.Errorf("Getting native on Unboxed should fail.")
+	}
 
-    o.Unbox() // Call Unbox() on Unboxed
-    if !o.IsUnboxed() {
-        t.Errorf("Unboxed -> Unboxed failed.")
-    }
+	o.Unbox() // Call Unbox() on Unboxed
+	if !o.IsUnboxed() {
+		t.Errorf("Unboxed -> Unboxed failed.")
+	}
 
-    o.MakeImmutable() // Call MakeImmutable() on Unboxed
-    if !o.IsUnboxed() {
-        t.Errorf("Unboxed -> MakeImmutable failed.")
-    }
+	o.MakeImmutable() // Call MakeImmutable() on Unboxed
+	if !o.IsUnboxed() {
+		t.Errorf("Unboxed -> MakeImmutable failed.")
+	}
 
-    o.MakeMutable() // Call MakeMutable() on Unboxed
-    if !o.IsMutable() {
-        t.Errorf("Unboxed -> Mutable failed.")
-    }
+	o.MakeMutable() // Call MakeMutable() on Unboxed
+	if !o.IsMutable() {
+		t.Errorf("Unboxed -> Mutable failed.")
+	}
 
-    o.MakeMutable() // Call MakeMutable() on Mutable
-    if !o.IsMutable() {
-        t.Errorf("Mutable -> Mutable failed.")
-    }
+	o.MakeMutable() // Call MakeMutable() on Mutable
+	if !o.IsMutable() {
+		t.Errorf("Mutable -> Mutable failed.")
+	}
 
-    // Test getting native on Mutable
-    _,err = o.GetNative()
-    if err != nil {
-        t.Errorf("Getting native on boxed should not fail.")
-    }
+	// Test getting native on Mutable
+	_, err = o.GetNative()
+	if err != nil {
+		t.Errorf("Getting native on boxed should not fail.")
+	}
 
-    o.Unbox() // Call Unbox() on Mutable
-    if !o.IsMutable(){
-        t.Errorf("Mutable -> Unboxed failed.")
-    }
+	o.Unbox() // Call Unbox() on Mutable
+	if !o.IsMutable() {
+		t.Errorf("Mutable -> Unboxed failed.")
+	}
 
-    o.Box() // Call Box() on Mutable
-    if o.IsUnboxed() {
-        t.Errorf("Mutable -> Boxed failed.")
-    }
+	o.Box() // Call Box() on Mutable
+	if o.IsUnboxed() {
+		t.Errorf("Mutable -> Boxed failed.")
+	}
 
-    o.MakeMutable()
-    o.MakeImmutable() // Call MakeImmutable() on Mutable
-    if !o.IsUnboxed() {
-        t.Errorf("Mutable -> Immutable failed.")
-    }
+	o.MakeMutable()
+	o.MakeImmutable() // Call MakeImmutable() on Mutable
+	if !o.IsUnboxed() {
+		t.Errorf("Mutable -> Immutable failed.")
+	}
 
-    o.Box() // Call Box() on Unboxed
-    if o.IsUnboxed() {
-        t.Errorf("Unboxed -> Boxed failed.")
-    }
+	o.Box() // Call Box() on Unboxed
+	if o.IsUnboxed() {
+		t.Errorf("Unboxed -> Boxed failed.")
+	}
 
-    o.MakeMutable() // Call MakeMutable() on Boxed
-    if !o.IsMutable(){
-        t.Errorf("Boxed -> Mutable failed.")
-    }
+	o.MakeMutable() // Call MakeMutable() on Boxed
+	if !o.IsMutable() {
+		t.Errorf("Boxed -> Mutable failed.")
+	}
 
-    // Test serialization
+	// Test serialization
 
-    vb := NewVariableBlob()
-    vb = o.Serialize(vb)
-    b := o.GetBlob()
+	vb := NewVariableBlob()
+	vb = o.Serialize(vb)
+	b := o.GetBlob()
 
-    o.Box()
-    if !bytes.Equal(*b, (*vb)[1:]) {
-        t.Errorf("GetBlob and Serialization do not match")
-    }
+	o.Box()
+	if !bytes.Equal(*b, (*vb)[1:]) {
+		t.Errorf("GetBlob and Serialization do not match")
+	}
 
-    o.Unbox()
-    b = o.GetBlob()
-    if !bytes.Equal(*b, (*vb)[1:]) {
-        t.Errorf("GetBlob and Serialization do not match")
-    }
+	o.Unbox()
+	b = o.GetBlob()
+	if !bytes.Equal(*b, (*vb)[1:]) {
+		t.Errorf("GetBlob and Serialization do not match")
+	}
 
-    _,_,err2 := Deserialize{{o_type}}(vb)
-    if err2 != nil {
-        t.Error(err2)
-    }
+	_, _, err2 := Deserialize{{o_type}}(vb)
+	if err2 != nil {
+		t.Error(err2)
+	}
 
-    v,jerr := json.Marshal(o)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	v, jerr := json.Marshal(o)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jo := New{{o_type}}()
-    jerr = json.Unmarshal(v, jo)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	jo := New{{o_type}}()
+	jerr = json.Unmarshal(v, jo)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
-    if jerr == nil {
-        t.Errorf("Unmarshaling nonsense JSON did not give error.")
-    }
+	jerr = json.Unmarshal([]byte("\"!@#$%^&*\""), jo)
+	if jerr == nil {
+		t.Errorf("Unmarshaling nonsense JSON did not give error.")
+	}
 
-    jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
-    if jerr != nil {
-        t.Error(jerr)
-    }
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
+	if jerr != nil {
+		t.Error(jerr)
+	}
 
-    jo.Unbox()
-    if jo.IsUnboxed() {
-        t.Errorf("Unboxed incompatible serialization")
-    }
+	jo.Unbox()
+	if jo.IsUnboxed() {
+		t.Errorf("Unboxed incompatible serialization")
+	}
 
-    expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}")
-    v,jerr = json.Marshal(jo)
-    if jerr != nil {
-        t.Error(jerr)
-    }
-    if !bytes.Equal(v, expected) {
-        t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
-    }
+	expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}")
+	v, jerr = json.Marshal(jo)
+	if jerr != nil {
+		t.Error(jerr)
+	}
+	if !bytes.Equal(v, expected) {
+		t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
+	}
 
-    jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
-    if jerr == nil {
-        t.Errorf("jerr == nil")
-    }
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
+	if jerr == nil {
+		t.Errorf("jerr == nil")
+	}
 
-    jerr = json.Unmarshal([]byte("{\"opaque\":10}"), jo)
-    if jerr == nil {
-        t.Errorf("jerr == nil")
-    }
+	jerr = json.Unmarshal([]byte("{\"opaque\":10}"), jo)
+	if jerr == nil {
+		t.Errorf("jerr == nil")
+	}
 {% if is_empty_struct(decls_by_name[v_type[1]]) != "True" %}
-    jerr = json.Unmarshal([]byte("{
+	jerr = json.Unmarshal([]byte("{
 {%- for field in decls_by_name[v_type[1]]["fields"] -%}\"{{field["name"]}}\":0{{"," if not loop.last}}{%- endfor -%}
 }"), jo)
-    if jerr == nil {
-        t.Errorf("jerr == nil")
-    }
+	if jerr == nil {
+		t.Errorf("jerr == nil")
+	}
 {%- endif %}
 }
 
@@ -634,83 +628,83 @@ func Test{{o_type}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{fbname}}(t *testing.T) {
-    fb := New{{fbname}}()
-    for i := 0; i < {{length}}; i++ {
-        fb[i] = byte(({{length}} + i) % 256)
-    }
+	fb := New{{fbname}}()
+	for i := 0; i < {{length}}; i++ {
+		fb[i] = byte(({{length}} + i) % 256)
+	}
 
-    vb := NewVariableBlob()
-    vb = fb.Serialize(vb)
+	vb := NewVariableBlob()
+	vb = fb.Serialize(vb)
 
-    size,nfb,err := Deserialize{{fbname}}(vb)
-    if err != nil {
-        t.Error(err)
-    }
+	size, nfb, err := Deserialize{{fbname}}(vb)
+	if err != nil {
+		t.Error(err)
+	}
 
-    if size != {{length}} {
-        t.Errorf("Fixedblob deserialization consumed %d bytes. Expected %d bytes.", size, {{length}})
-    }
+	if size != {{length}} {
+		t.Errorf("Fixedblob deserialization consumed %d bytes. Expected %d bytes.", size, {{length}})
+	}
 
-    if !bytes.Equal(fb[:], nfb[:]) {
-        t.Errorf("Binary deserialized fixed blob does not match source.")
-    }
+	if !bytes.Equal(fb[:], nfb[:]) {
+		t.Errorf("Binary deserialized fixed blob does not match source.")
+	}
 
-    vb = NewVariableBlob()
-    size, _, err = Deserialize{{fbname}}(vb)
-    if err == nil {
-        t.Errorf("err == nil")
-    }
-    if size != 0 {
-        t.Errorf("Bytes were consumed on error")
-    }
+	vb = NewVariableBlob()
+	size, _, err = Deserialize{{fbname}}(vb)
+	if err == nil {
+		t.Errorf("err == nil")
+	}
+	if size != 0 {
+		t.Errorf("Bytes were consumed on error")
+	}
 
-    j,err := json.Marshal(fb)
-    if err != nil {
-        t.Error(err)
-    }
+	j, err := json.Marshal(fb)
+	if err != nil {
+		t.Error(err)
+	}
 
-    jfb := New{{fbname}}()
-    err = json.Unmarshal(j, &jfb)
-    if err != nil {
-        t.Error(err)
-    }
+	jfb := New{{fbname}}()
+	err = json.Unmarshal(j, &jfb)
+	if err != nil {
+		t.Error(err)
+	}
 
-    if !bytes.Equal(fb[:], jfb[:]) {
-        t.Errorf("JSON deserialized fixed blob does not match source.")
-    }
+	if !bytes.Equal(fb[:], jfb[:]) {
+		t.Errorf("JSON deserialized fixed blob does not match source.")
+	}
 
-    err = json.Unmarshal([]byte("[1,2,3,4,5]"), &jfb)
-    if err == nil {
-        t.Errorf("Fixed blob unmarshaled from invalid JSON object.")
-    }
+	err = json.Unmarshal([]byte("[1,2,3,4,5]"), &jfb)
+	if err == nil {
+		t.Errorf("Fixed blob unmarshaled from invalid JSON object.")
+	}
 
-    err = json.Unmarshal([]byte("\"gdtdgh5td\""), &jfb)
-    if err == nil {
-        t.Errorf("Fixed blob unmarshaled from invalid JSON object.")
-    }
+	err = json.Unmarshal([]byte("\"gdtdgh5td\""), &jfb)
+	if err == nil {
+		t.Errorf("Fixed blob unmarshaled from invalid JSON object.")
+	}
 
-    // Encode a value that is incorrectly sized and ensure it returns an error
-    wfb := make([]byte, {{length}}+1)
-    for i := 0; i < {{length}}+1; i++ {
-        wfb[i] = byte(({{length}} + i) % 256)
-    }
-    s := EncodeBytes(wfb)
-    err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
-    if err == nil {
-        t.Errorf("deserialized JSON from a string which was not the proper size.")
-    }
+	// Encode a value that is incorrectly sized and ensure it returns an error
+	wfb := make([]byte, {{length}}+1)
+	for i := 0; i < {{length}}+1; i++ {
+		wfb[i] = byte(({{length}} + i) % 256)
+	}
+	s := EncodeBytes(wfb)
+	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
+	if err == nil {
+		t.Errorf("deserialized JSON from a string which was not the proper size.")
+	}
 
-    // Encode with invalid start character of '0' and ensure it returns an error
-    wfb = make([]byte, {{length}})
-    for i := 0; i < {{length}}; i++ {
-        wfb[i] = byte(({{length}} + i) % 256)
-    }
-    s = EncodeBytes(wfb)
-    s = "0" + s[1:]
-    err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
-    if err == nil {
-        t.Errorf("Deserialized JSON from a string which contained an invalid encoding character.")
-    }
+	// Encode with invalid start character of '0' and ensure it returns an error
+	wfb = make([]byte, {{length}})
+	for i := 0; i < {{length}}; i++ {
+		wfb[i] = byte(({{length}} + i) % 256)
+	}
+	s = EncodeBytes(wfb)
+	s = "0" + s[1:]
+	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
+	if err == nil {
+		t.Errorf("Deserialized JSON from a string which contained an invalid encoding character.")
+	}
 }
 
 {% endfor %}
@@ -726,20 +720,17 @@ func Test{{fbname}}(t *testing.T) {
 package main
 
 import (
-    "fmt"
-    "testing"
-    "bytes"
-    "encoding/json"
-
-    . "koinos"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	. "koinos"
+	"testing"
 )
 
 {% for name, decl in decls_by_name.items() -%}
 {% if decl["info"]["type"] == "Struct" %}{{struct(decl)}}
 {% elif decl["info"]["type"] == "Typedef" %}{{typedef(decl)}}
-{# {%- elif decl["info"]["type"] == "BaseType" -%} #}
 {% elif decl["info"]["type"] == "EnumClass" %}{{enum(decl)}}
-{# {%- else -%}// TODO: Unimplemented {{decl}} #}
 {%- endif -%}
 
 {% endfor %}
