@@ -54,36 +54,39 @@ Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 
 {%- macro struct_new(decl) -%}
 {%- set sname = go_name(decl["name"]) -%}
+// New{{sname}} factory
 func New{{sname}}() *{{sname}} {
-    o := {{sname}}{}
+	o := {{sname}}{}
 {%- for field in decl["fields"] %}
-    o.{{go_name(field["name"])}} = *New{{typeref(field["tref"])}}(){% endfor %}
-    return &o
+	o.{{go_name(field["name"])}} = *New{{typeref(field["tref"])}}(){% endfor %}
+	return &o
 }
 {%- endmacro -%}
 
 {%- macro struct_serialization(decl) -%}
+// Serialize {{go_name(decl["name"])}}
 func (n {{go_name(decl["name"])}}) Serialize(vb *VariableBlob) *VariableBlob {
 {%- for field in decl["fields"] %}
-    vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
-    return vb
+	vb = n.{{go_name(field["name"])}}.Serialize(vb){% endfor %}
+	return vb
 }
 {%- endmacro -%}
 
 {%- macro struct_deserialization(decl) -%}
+// Deserialize{{go_name(decl["name"])}} function
 func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(decl["name"])}},error) {
-    {% if is_empty_struct(decl) != "True" -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
-    s := {{go_name(decl["name"])}}{}
-    {% if is_empty_struct(decl) != "True" -%}var ovb VariableBlob{%- endif %}
+	{% if is_empty_struct(decl) != "True" -%}var i,j uint64 = 0,0{%- else -%}var i uint64 = 0{%- endif %}
+	s := {{go_name(decl["name"])}}{}
+	{% if is_empty_struct(decl) != "True" -%}var ovb VariableBlob{%- endif %}
 {%- for field in decl["fields"] if is_empty_struct(field) != "True" %}
-    {%- set tname = typeref(field["tref"]) %}
-    ovb = (*vb)[i:]
-    j,t_{{field["name"]}},err := Deserialize{{tname}}(&ovb); i+=j
-    if err != nil {
-        return 0, &{{go_name(decl["name"])}}{}, err
-    }
-    s.{{go_name(field["name"])}} = *t_{{field["name"]}}{% endfor %}
-    return i, &s, nil
+	{%- set tname = typeref(field["tref"]) %}
+	ovb = (*vb)[i:]
+	j,t{{go_name(field["name"])}},err := Deserialize{{tname}}(&ovb); i+=j
+	if err != nil {
+		return 0, &{{go_name(decl["name"])}}{}, err
+	}
+	s.{{go_name(field["name"])}} = *t{{go_name(field["name"])}}{% endfor %}
+	return i, &s, nil
 }
 {%- endmacro -%}
 
@@ -93,6 +96,7 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 //  Struct: {{sname}}
 // ----------------------------------------
 
+// {{sname}} type
 {# // {{decl}} #}type {{sname}} struct {
 {% if decl["fields"]|length > 0 -%}
 {%- for field in decl["fields"] %}    {{go_name(field["name"])}} {{typeref(field["tref"])}} `json:"{{field["name"]}}"`
@@ -121,114 +125,121 @@ func Deserialize{{go_name(decl["name"])}}(vb *VariableBlob) (uint64,*{{go_name(d
 //  Variant: {{varname}}
 // ----------------------------------------
 
+// {{varname}} type
 type {{varname}} struct {
-    Value interface{}
+	Value interface{}
 }
 
+// New{{varname}} factory
 func New{{varname}}() *{{varname}} {
-    v := {{varname}}{}
-    v.Value = New{{typeref(decl["tref"]["targs"][0])}}()
-    return &v
+	v := {{varname}}{}
+	v.Value = New{{typeref(decl["tref"]["targs"][0])}}()
+	return &v
 }
 
+// Serialize {{varname}}
 func (n {{varname}}) Serialize(vb *VariableBlob) *VariableBlob {
-    var i uint64
-    switch n.Value.(type) {
+	var i uint64
+	switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case *{{arg_type}}:
-            i = {{loop.index - 1}}
+		case *{{arg_type}}:
+			i = {{loop.index - 1}}
 {%- endfor %}
-        default:
-            panic("Unknown variant type")
-    }
+		default:
+			panic("Unknown variant type")
+	}
 
-    vb = EncodeVarint(vb, i)
-    ser,_ := n.Value.(Serializeable)
-    return ser.Serialize(vb)
+	vb = EncodeVarint(vb, i)
+	ser,_ := n.Value.(Serializeable)
+	return ser.Serialize(vb)
 }
 
+// TypeToName {{varname}}
 func (n {{varname}}) TypeToName() (string) {
-    switch n.Value.(type) {
+	switch n.Value.(type) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case *{{arg_type}}:
-            return "{{namespaced_typeref(arg)}}"
+		case *{{arg_type}}:
+			return "{{namespaced_typeref(arg)}}"
 {%- endfor %}
-        default:
-            panic("Variant type is not serializeable.")
-    }
+		default:
+			panic("Variant type is not serializeable.")
+	}
 }
 
+// MarshalJSON {{varname}}
 func (n {{varname}}) MarshalJSON() ([]byte, error) {
-    variant := struct {
-        Type string `json:"type"`
-        Value *interface{} `json:"value"`
-    }{
-        n.TypeToName(),
-        &n.Value,
-    }
+	variant := struct {
+		Type string `json:"type"`
+		Value *interface{} `json:"value"`
+	}{
+		n.TypeToName(),
+		&n.Value,
+	}
 
-    return json.Marshal(&variant)
+	return json.Marshal(&variant)
 }
 
+// Deserialize{{varname}} function
 func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
-    var v {{varname}}
-    type_id,i := binary.Uvarint(*vb)
-    if i <= 0 {
-        return 0, &v, errors.New("Could not deserialize variant tag")
-    }
-    var j uint64
+	var v {{varname}}
+	typeID,i := binary.Uvarint(*vb)
+	if i <= 0 {
+		return 0, &v, errors.New("could not deserialize variant tag")
+	}
+	var j uint64
 
-    switch( type_id ) {
+	switch( typeID ) {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case {{loop.index - 1}}:
+		case {{loop.index - 1}}:
 {%- if is_empty_struct(arg) != "True" %}
-            ovb := (*vb)[i:]
-            k,x,err := Deserialize{{arg_type}}(&ovb)
-            if err != nil {
-                return 0, &v, err
-            }
-            j = k
-            v.Value = x
+			ovb := (*vb)[i:]
+			k,x,err := Deserialize{{arg_type}}(&ovb)
+			if err != nil {
+				return 0, &v, err
+			}
+			j = k
+			v.Value = x
 {%- else %}
-            v.Value = New{{arg_type}}()
+			v.Value = New{{arg_type}}()
 {%- endif -%}
 {%- endfor %}
-        default:
-            return 0, &v, errors.New("Unknown variant tag")
-    }
-    return uint64(i)+j,&v,nil
+		default:
+			return 0, &v, errors.New("unknown variant tag")
+	}
+	return uint64(i)+j,&v,nil
 }
 
+// UnmarshalJSON *{{varname}}
 func (n *{{varname}}) UnmarshalJSON(data []byte) error {
-    variant := struct {
-        Type string `json:"type"`
-        Value interface{} `json:"value"`
-    }{}
+	variant := struct {
+		Type string `json:"type"`
+		Value interface{} `json:"value"`
+	}{}
 
-    err := json.Unmarshal(data, &variant)
-    if err != nil {
-        return err
-    }
+	err := json.Unmarshal(data, &variant)
+	if err != nil {
+		return err
+	}
 
-    var tmp []byte
-    tmp, _ = json.Marshal(&variant.Value)
+	var tmp []byte
+	tmp, _ = json.Marshal(&variant.Value)
 
-    switch variant.Type {
+	switch variant.Type {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
-        case "{{namespaced_typeref(arg)}}":
-            v := New{{arg_type}}()
-            json.Unmarshal(tmp, &v)
-            n.Value = v
+		case "{{namespaced_typeref(arg)}}":
+			v := New{{arg_type}}()
+			json.Unmarshal(tmp, &v)
+			n.Value = v
 {%- endfor %}
-        default:
-            return errors.New("Unknown Variant Type: " + variant.Type)
-    }
+		default:
+			return errors.New("unknown variant type: " + variant.Type)
+	}
 
-    return nil
+	return nil
 }
 
 {%- endmacro -%}
@@ -241,45 +252,51 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 //  Typedef: {{tname}}
 // ----------------------------------------
 
+// {{tname}} type
 type {{tname}} {{rname}}
 
+// New{{tname}} factory
 func New{{tname}}() *{{tname}} {
-    o := {{tname}}(*New{{rname}}())
-    return &o
+	o := {{tname}}(*New{{rname}}())
+	return &o
 }
 
+// Serialize {{tname}}
 func (n {{tname}}) Serialize(vb *VariableBlob) *VariableBlob {
-    ox := {{rname}}(n)
-    return ox.Serialize(vb)
+	ox := {{rname}}(n)
+	return ox.Serialize(vb)
 }
 
+// Deserialize{{tname}} function
 func Deserialize{{tname}}(vb *VariableBlob) (uint64,*{{tname}},error) {
-    var ot {{tname}}
+	var ot {{tname}}
 {%- if is_empty_struct(decl) != "True" %}
-    i,n,err := Deserialize{{rname}}(vb)
-    if err != nil {
-        return 0,&ot,err
-    }
-    ot = {{tname}}(*n)
-    return i,&ot,nil
+	i,n,err := Deserialize{{rname}}(vb)
+	if err != nil {
+		return 0,&ot,err
+	}
+	ot = {{tname}}(*n)
+	return i,&ot,nil
 {%- else %}
-    return 0,&ot,nil
+	return 0,&ot,nil
 {%- endif -%}
 }
 
+// MarshalJSON {{tname}}
 func (n {{tname}}) MarshalJSON() ([]byte, error) {
-    v := {{rname}}(n)
-    return json.Marshal(&v)
+	v := {{rname}}(n)
+	return json.Marshal(&v)
 }
 
+// UnmarshalJSON *{{tname}}
 func (n *{{tname}}) UnmarshalJSON(data []byte) error {
-    v := {{rname}}(*n);
-    if err := json.Unmarshal(data, &v); err != nil {
-        return err
-    }
+	v := {{rname}}(*n);
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
 
-    *n = {{tname}}(v)
-    return nil
+	*n = {{tname}}(v)
+	return nil
 }
 
 {%- endif -%}
@@ -294,74 +311,82 @@ func (n *{{tname}}) UnmarshalJSON(data []byte) error {
 
 // {{decl}}
 
+// {{ename}} type
 type {{ename}} {{etype}}
 
+// New{{ename}} factory
 func New{{ename}}() *{{ename}} {
-    o := {{ename}}({{decl["entries"][0]["value"]}})
-    return &o
+	o := {{ename}}({{decl["entries"][0]["value"]}})
+	return &o
 }
 
+// {{ename}} values
 const (
 {%- for entry in decl["entries"] %}
-    {{ename}}_{{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
+	{{ename}}{{go_name(entry["name"])}} {{ename}} = {{entry["value"]}}
 {%- endfor %}
 )
 
+// Serialize {{ename}}
 func (n {{ename}}) Serialize(vb *VariableBlob) *VariableBlob {
-    if !IsValid{{ename}}(n) {
-        panic("Attempting to serialize an invalid value")
-    }
-    x := {{etype}}(n)
-    return x.Serialize(vb)
+	if !IsValid{{ename}}(n) {
+		panic("Attempting to serialize an invalid value")
+	}
+	x := {{etype}}(n)
+	return x.Serialize(vb)
 }
 
+// Deserialize{{ename}} function
 func Deserialize{{ename}}(vb *VariableBlob) (uint64,*{{ename}},error) {
-    i,item,err := Deserialize{{etype}}(vb)
-    var x {{ename}}
-    if err != nil {
-        return 0,&x,err
-    }
+	i,item,err := Deserialize{{etype}}(vb)
+	var x {{ename}}
+	if err != nil {
+		return 0,&x,err
+	}
 
-    x = {{ename}}(*item)
-    if !IsValid{{ename}}(x) {
-        return i,&x,fmt.Errorf("Invalid {{ename}}: %d", x)
-    }
-    return i,&x,nil
+	x = {{ename}}(*item)
+	if !IsValid{{ename}}(x) {
+		return i,&x,fmt.Errorf("invalid {{ename}}: %d", x)
+	}
+	return i,&x,nil
 }
 
+// MarshalJSON {{ename}}
 func (n {{ename}}) MarshalJSON() ([]byte, error) {
-    if !IsValid{{ename}}(n) {
-        panic("Attempting to serialize an invalid value")
-    }
+	if !IsValid{{ename}}(n) {
+		panic("Attempting to serialize an invalid value")
+	}
 
-    return json.Marshal({{etype}}(n))
+	return json.Marshal({{etype}}(n))
 }
 
+// UnmarshalJSON *{{ename}}
 func (n *{{ename}}) UnmarshalJSON(b []byte) error {
-    var o {{etype}}
-    if err := json.Unmarshal(b, &o); err != nil {
-        return err
-    }
+	var o {{etype}}
+	if err := json.Unmarshal(b, &o); err != nil {
+		return err
+	}
 
-    ov := {{ename}}(o)
+	ov := {{ename}}(o)
 
-    if !IsValid{{ename}}(ov) {
-        return fmt.Errorf("Invalid {{ename}}: %d", o)
-    }
+	if !IsValid{{ename}}(ov) {
+		return fmt.Errorf("invalid {{ename}}: %d", o)
+	}
 
-    *n = ov
-    return nil
+	*n = ov
+	return nil
 }
 
+// IsValid{{ename}} validator
 func IsValid{{ename}}(v {{ename}}) bool {
-    switch v {
-        {%- for entry in decl["entries"] %}
-        case {{ename}}_{{go_name(entry["name"])}}:
-            return true
-        {%- endfor %}
-        default:
-            return false
-    }
+	switch v {
+		{%- for entry in decl["entries"] %}
+		case {{ename}}{{go_name(entry["name"])}}:
+			return true
+		{%- endfor %}
+		default:
+			return false
+	}
 }
 
 {% endmacro -%}
@@ -373,48 +398,51 @@ func IsValid{{ename}}(v {{ename}}) bool {
 //  {{o_type}}
 // ----------------------------------------
 
+// {{o_type}} type
 type {{o_type}} []{{v_type}}
 
+// New{{o_type}} factory
 func New{{o_type}}() *{{o_type}} {
-    o := {{o_type}}(make([]{{v_type}}, 0))
-    return &o
+	o := {{o_type}}(make([]{{v_type}}, 0))
+	return &o
 }
 
+// Serialize {{o_type}}
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
-    header := make([]byte, binary.MaxVarintLen64)
-    bytes := binary.PutUvarint(header, uint64(len(n)))
-    ovb := append(*vb, header[:bytes]...)
-    vb = &ovb
-    for _, item := range n {
-        vb = item.Serialize(vb)
-    }
+	header := make([]byte, binary.MaxVarintLen64)
+	bytes := binary.PutUvarint(header, uint64(len(n)))
+	ovb := append(*vb, header[:bytes]...)
+	vb = &ovb
+	for _, item := range n {
+		vb = item.Serialize(vb)
+	}
 
-    return vb
+	return vb
 }
-
+// Deserialize{{o_type}} function
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
-    var result {{o_type}}
-    size,bytes := binary.Uvarint(*vb)
-    if bytes <= 0 {
-        return 0, &result, errors.New("Could not deserialize multihash id")
-    }
-    result = {{o_type}}(make([]{{v_type}}, 0, size))
-    i := uint64(bytes)
-    var j uint64
-    var item *{{v_type}}
-    var err error
-    for num := uint64(0); num < size; num++ {
-        ovb := (*vb)[i:]
-        j,item,err = Deserialize{{v_type}}(&ovb)
-        if nil != err {
-            var v {{o_type}}
-            return 0,&v,err
-        }
-        i += j
-        result = append(result, *item)
-    }
+	var result {{o_type}}
+	size,bytes := binary.Uvarint(*vb)
+	if bytes <= 0 {
+		return 0, &result, errors.New("could not deserialize multihash id")
+	}
+	result = {{o_type}}(make([]{{v_type}}, 0, size))
+	i := uint64(bytes)
+	var j uint64
+	var item *{{v_type}}
+	var err error
+	for num := uint64(0); num < size; num++ {
+		ovb := (*vb)[i:]
+		j,item,err = Deserialize{{v_type}}(&ovb)
+		if nil != err {
+			var v {{o_type}}
+			return 0,&v,err
+		}
+		i += j
+		result = append(result, *item)
+	}
 
-    return i, &result, nil
+	return i, &result, nil
 }
 
 {% endfor -%}
@@ -426,10 +454,10 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 // ----------------------------------------
 
 type opaqueJSON struct {
-    Opaque struct {
-        Type string `json:"type"`
-        Value VariableBlob `json:"value"`
-    }`json:"opaque"`
+	Opaque struct {
+		Type string `json:"type"`
+		Value VariableBlob `json:"value"`
+	}`json:"opaque"`
 }
 
 {% for v_type in get_opaque() -%}
@@ -438,144 +466,158 @@ type opaqueJSON struct {
 //  {{o_type}}
 // ----------------------------------------
 
+// {{o_type}} type
 type {{o_type}} struct {
-    blob *VariableBlob
-    native *{{v_type[0]}}
+	blob *VariableBlob
+	native *{{v_type[0]}}
 }
 
+// New{{o_type}} factory
 func New{{o_type}}() *{{o_type}} {
-    o := {{o_type}}{}
-    o.native = New{{v_type[0]}}()
-    return &o
+	o := {{o_type}}{}
+	o.native = New{{v_type[0]}}()
+	return &o
 }
 
+// GetBlob *{{o_type}}
 func (n *{{o_type}}) GetBlob() *VariableBlob {
-    if (n.native != nil && n.blob == nil) {
-        n.serializeNative()
-    }
+	if (n.native != nil && n.blob == nil) {
+		n.serializeNative()
+	}
 
-    return n.blob
+	return n.blob
 }
 
+// GetNative *{{o_type}}
 func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
-    if( n.native == nil ) {
-        return nil,errors.New("Opaque type not unboxed.")
-    }
-    if( n.blob != nil ) {
-        return nil,errors.New("Opaque type is not mutable.")
-    }
+	if( n.native == nil ) {
+		return nil,errors.New("opaque type not unboxed")
+	}
+	if( n.blob != nil ) {
+		return nil,errors.New("opaque type is not mutable")
+	}
 
-    return n.native,nil;
+	return n.native,nil;
 }
 
+// Box *{{o_type}}
 func (n *{{o_type}}) Box() {
-    if (n.native != nil) {
-        // Mutable -> Unboxed
-        if (n.blob == nil) {
-            n.serializeNative()
-        }
+	if (n.native != nil) {
+		// Mutable -> Unboxed
+		if (n.blob == nil) {
+			n.serializeNative()
+		}
 
-        // Unboxed -> Boxed
-        n.native = nil
-    }
+		// Unboxed -> Boxed
+		n.native = nil
+	}
 }
 
+// Unbox *{{o_type}}
 func (n *{{o_type}}) Unbox() {
-    if (n.native == nil && n.blob != nil) {
-        var err error
-        var b uint64
-        b,n.native,err = Deserialize{{v_type[0]}}(n.blob)
+	if (n.native == nil && n.blob != nil) {
+		var err error
+		var b uint64
+		b,n.native,err = Deserialize{{v_type[0]}}(n.blob)
 
-        if err != nil || b != uint64(len(*n.blob)) {
-            n.native = nil
-        }
-    }
+		if err != nil || b != uint64(len(*n.blob)) {
+			n.native = nil
+		}
+	}
 }
 
+// MakeMutable *{{o_type}}
 func (n *{{o_type}}) MakeMutable() {
-    if (n.native == nil) {
-        n.Unbox()
-    }
+	if (n.native == nil) {
+		n.Unbox()
+	}
 
-    // Unboxed -> Mutable
-    if (n.native != nil && n.blob != nil) {
-        n.blob = nil
-    }
+	// Unboxed -> Mutable
+	if (n.native != nil && n.blob != nil) {
+		n.blob = nil
+	}
 }
 
+// MakeImmutable *{{o_type}}
 func (n *{{o_type}}) MakeImmutable() {
-    if (n.native != nil && n.blob == nil) {
-        n.serializeNative()
-    }
+	if (n.native != nil && n.blob == nil) {
+		n.serializeNative()
+	}
 }
 
+// IsUnboxed *{{o_type}}
 func (n *{{o_type}}) IsUnboxed() bool {
-    return n.native != nil;
+	return n.native != nil;
 }
 
+// IsMutable *{{o_type}}
 func (n *{{o_type}}) IsMutable() bool {
-    return n.native != nil && n.blob == nil;
+	return n.native != nil && n.blob == nil;
 }
 
 func (n *{{o_type}}) serializeNative() {
-    vb := NewVariableBlob()
-    n.blob = n.native.Serialize(vb)
+	vb := NewVariableBlob()
+	n.blob = n.native.Serialize(vb)
 }
 
+// Serialize {{o_type}}
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
-    n.Box()
-    return n.blob.Serialize(vb)
+	n.Box()
+	return n.blob.Serialize(vb)
 }
 
+// Deserialize{{o_type}} function
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
-    size,nv,err := DeserializeVariableBlob(vb)
-    var o {{o_type}}
-    if err != nil {
-        return 0, &o, err
-    }
-    o = {{o_type}}{blob:nv, native:nil}
-    return size,&o,nil
+	size,nv,err := DeserializeVariableBlob(vb)
+	var o {{o_type}}
+	if err != nil {
+		return 0, &o, err
+	}
+	o = {{o_type}}{blob:nv, native:nil}
+	return size,&o,nil
 }
 
+// MarshalJSON {{o_type}}
 func (n {{o_type}}) MarshalJSON() ([]byte, error) {
-    n.Unbox()
+	n.Unbox()
 
-    if n.IsUnboxed() {
-        return json.Marshal(&n.native)
-    }
+	if n.IsUnboxed() {
+		return json.Marshal(&n.native)
+	}
 
-    v := opaqueJSON{}
-    v.Opaque.Type = "{{v_type[1]}}"
-    v.Opaque.Value = *n.blob
+	v := opaqueJSON{}
+	v.Opaque.Type = "{{v_type[1]}}"
+	v.Opaque.Value = *n.blob
 
-    return json.Marshal(&v)
+	return json.Marshal(&v)
 }
 
+// UnmarshalJSON *{{o_type}}
 func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
-    var j map[string]interface{}
-    if err := json.Unmarshal(data, &j); err != nil {
-        return err
-    }
-    _, is_opaque := j["opaque"]
+	var j map[string]interface{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		return err
+	}
+	_, isOpaque := j["opaque"]
 
-    if is_opaque {
-        var obj opaqueJSON
+	if isOpaque {
+		var obj opaqueJSON
 
-        if err := json.Unmarshal(data, &obj); err != nil {
-            return err
-        }
-        if strings.Compare(obj.Opaque.Type, "{{v_type[1]}}") != 0 {
-            return errors.New("Unexpected Opaque type name")
-        }
-        n.blob = &obj.Opaque.Value
-        n.native = nil
-    } else {
-        if err := json.Unmarshal(data, &n.native); err != nil {
-            return err
-        }
-    }
+		if err := json.Unmarshal(data, &obj); err != nil {
+			return err
+		}
+		if strings.Compare(obj.Opaque.Type, "{{v_type[1]}}") != 0 {
+			return errors.New("unexpected opaque type name")
+		}
+		n.blob = &obj.Opaque.Value
+		n.native = nil
+	} else {
+		if err := json.Unmarshal(data, &n.native); err != nil {
+			return err
+		}
+	}
 
-    return nil
+	return nil
 }
 
 {% endfor -%}
@@ -588,52 +630,58 @@ func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
 //  {{fbname}}
 // ----------------------------------------
 
+// {{fbname}} type
 type {{fbname}} [{{length}}]byte
 
+// New{{fbname}} factory
 func New{{fbname}}() *{{fbname}} {
-    var fb {{fbname}}
-    return &fb
+	var fb {{fbname}}
+	return &fb
 }
 
+// Serialize {{fbname}}
 func (n {{fbname}}) Serialize(vb *VariableBlob) *VariableBlob {
-    ovb := append(*vb, n[:]...)
-    return &ovb
+	ovb := append(*vb, n[:]...)
+	return &ovb
 }
 
+// Deserialize{{fbname}} function
 func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
-    var result {{fbname}}
-    if len(*vb) < {{length}} {
-        return 0,&result,errors.New("Unexpected EOF")
-    }
-    copy(result[:], *vb)
-    return {{length}},&result,nil
+	var result {{fbname}}
+	if len(*vb) < {{length}} {
+		return 0,&result,errors.New("unexpected eof")
+	}
+	copy(result[:], *vb)
+	return {{length}},&result,nil
 }
 
+// MarshalJSON {{fbname}}
 func (n {{fbname}}) MarshalJSON() ([]byte, error) {
-    nfb := NewVariableBlob()
-    nfb = n.Serialize(nfb)
-    s := EncodeBytes(*nfb)
-    return json.Marshal(s)
+	nfb := NewVariableBlob()
+	nfb = n.Serialize(nfb)
+	s := EncodeBytes(*nfb)
+	return json.Marshal(s)
 }
 
+// UnmarshalJSON {{fbname}}
 func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
-    var s string
-    if err := json.Unmarshal(b, &s); err != nil {
-        return err
-    }
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
 
-    db,err := DecodeBytes(s)
-    if err != nil {
-        return err
-    }
+	db,err := DecodeBytes(s)
+	if err != nil {
+		return err
+	}
 
-    if len(db) != {{length}} {
-        return fmt.Errorf("Deserialized blob length %d does not match size %d", len(db), {{length}})
-    }
+	if len(db) != {{length}} {
+		return fmt.Errorf("deserialized blob length %d does not match size %d", len(db), {{length}})
+	}
 
-    copy((*n)[:], db)
+	copy((*n)[:], db)
 
-    return nil
+	return nil
 }
 
 {% endfor %}
@@ -649,11 +697,11 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 package koinos
 
 import (
-    "fmt"
-    "errors"
-    "encoding/binary"
-    "encoding/json"
-    "strings"
+	"fmt"
+	"errors"
+	"encoding/binary"
+	"encoding/json"
+	"strings"
 )
 
 {% for name, decl in decls_by_name.items() -%}
