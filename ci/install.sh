@@ -12,6 +12,8 @@ source ~/.gimme/envs/go1.15.4.env
 export GOPATH=~/go:$(pwd)/build/generated/golang
 export PATH=$PATH:~/go/bin
 
+go get -u golang.org/x/lint/golint
+
 if [ "$RUN_TYPE" = "coverage" ]; then
    sudo apt-get install -y lcov ruby
    sudo gem install coveralls-lcov
