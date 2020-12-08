@@ -1,4 +1,4 @@
-package main
+package koinos_test
 
 import (
 	"bytes"

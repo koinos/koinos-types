@@ -20,12 +20,3 @@ add_custom_command(TARGET golang
    -o "${KOINOS_GOLANG_OUTPUT_DIR}"
    ${KOINOS_SCHEMA_FILES}
 )
-
-add_custom_command(
-   TARGET golang POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy
-           ${KOINOS_GOLANG_OUTPUT_DIR}/src/koinos/koinos_test.go
-           ${KOINOS_GOLANG_OUTPUT_DIR}/${GOLANG_MODULE_NAME}/koinos_test.go
-   COMMAND ${CMAKE_COMMAND} -E remove
-           ${KOINOS_GOLANG_OUTPUT_DIR}/src/koinos/koinos_test.go
-)
