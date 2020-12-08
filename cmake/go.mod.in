@@ -2,3 +2,4 @@ module @GOLANG_MODULE_NAME@
 
 go @GOLANG_MODULE_VERSION@
 
+require github.com/btcsuite/btcutil v1.0.2

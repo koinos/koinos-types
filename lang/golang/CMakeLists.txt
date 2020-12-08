@@ -1,7 +1,7 @@
 # Golang
 set(KOINOS_GOLANG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/golang")
 
-set(GOLANG_MODULE_NAME koinos)
+set(GOLANG_MODULE_NAME github.com/koinos/koinos-types-golang)
 set(GOLANG_MODULE_VERSION 1.15)
 configure_file(${CMAKE_MODULE_PATH}/go.mod.in ${KOINOS_GOLANG_OUTPUT_DIR}/src/${GOLANG_MODULE_NAME}/go.mod)
 
@@ -25,7 +25,7 @@ add_custom_command(
    TARGET golang POST_BUILD
    COMMAND ${CMAKE_COMMAND} -E copy
            ${KOINOS_GOLANG_OUTPUT_DIR}/src/koinos/koinos_test.go
-           ${KOINOS_GOLANG_OUTPUT_DIR}/tests/koinos_test.go
+           ${KOINOS_GOLANG_OUTPUT_DIR}/${GOLANG_MODULE_NAME}/koinos_test.go
    COMMAND ${CMAKE_COMMAND} -E remove
            ${KOINOS_GOLANG_OUTPUT_DIR}/src/koinos/koinos_test.go
 )
