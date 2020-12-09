@@ -9,21 +9,22 @@ macro(SUBDIRLIST result curdir)
   set(${result} ${dirlist})
 endmacro()
 
+macro(LISTDIR result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(filelist "")
+  foreach(child ${children})
+    if(NOT IS_DIRECTORY ${curdir}/${child})
+      list(APPEND filelist "${curdir}/${child}")
+    endif()
+  endforeach()
+  set(${result} ${filelist})
+endmacro()
+
 set(KOINOS_REFLECT_PYTHONPATH "${PROJECT_SOURCE_DIR}/programs/koinos-types")
 set(KOINOS_REFLECT_TEMPLATE_DIR "${PROJECT_SOURCE_DIR}/programs/koinos-types/lang")
 set(KOINOS_REFLECT_SRC_DIR "${PROJECT_SOURCE_DIR}/types")
 
-set(KOINOS_REFLECT_SOURCES
-   "${KOINOS_REFLECT_SRC_DIR}/block.bt"
-   "${KOINOS_REFLECT_SRC_DIR}/types.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/block.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/submit.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/system_calls.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/thunks.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/system_call_ids.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/thunk_ids.hpp"
-   "${KOINOS_REFLECT_SRC_DIR}/chain.hpp"
-   )
+listdir(KOINOS_REFLECT_SOURCES ${KOINOS_REFLECT_SRC_DIR})
 
 set(KOINOS_SCHEMA_DIR "${CMAKE_BINARY_DIR}/schema")
 set(KOINOS_SCHEMA_FILES "${KOINOS_SCHEMA_DIR}/block.schema")
