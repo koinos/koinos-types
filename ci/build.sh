@@ -14,9 +14,8 @@ elif [ "$RUN_TYPE" = "coverage" ]; then
    cmake --build . --config Debug --parallel 3 --target coverage --target golang
 
    popd
-   go get ./build/generated/golang/src/koinos
-   go test ./tests/golang -coverprofile=./build/go-coverage.out -coverpkg=./build/generated/golang/src/koinos
-   go test ./build/generated/golang/tests -coverprofile=./build/go-generated-coverage.out -coverpkg=./build/generated/golang/src/koinos
+   go test ./tests/golang -coverprofile=./build/go-coverage.out -coverpkg=./build/generated/golang/src/github.com/koinos/koinos-types-golang
+   go test ./build/... -coverprofile=./build/go-generated-coverage.out -coverpkg=./build/generated/golang/src/github.com/koinos/koinos-types-golang
    gcov2lcov -infile=./build/go-coverage.out -outfile=./build/go-coverage.info
    gcov2lcov -infile=./build/go-generated-coverage.out -outfile=./build/go-generated-coverage.info
 

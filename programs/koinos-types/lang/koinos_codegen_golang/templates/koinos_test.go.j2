@@ -63,12 +63,12 @@ Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 // ----------------------------------------
 
 func Test{{sname}}(t *testing.T) {
-	o := New{{sname}}()
+	o := koinos.New{{sname}}()
 
-	vb := NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = o.Serialize(vb)
 
-	_, _, err := Deserialize{{sname}}(vb)
+	_, _, err := koinos.Deserialize{{sname}}(vb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -76,8 +76,8 @@ func Test{{sname}}(t *testing.T) {
 {%- for field in decl["fields"] if is_empty_struct(field) != "True" -%}
 {{"\n\n\tvar n uint64" if loop.first}}
 	// Test {{field["name"]}}
-	vb = &VariableBlob{% raw %}{{% endraw %}{{get_bad_bytes_impl(decl, decls_by_name, field)}}{% raw %}}{% endraw %}
-	n, _, err = Deserialize{{sname}}(vb)
+	vb = &koinos.VariableBlob{% raw %}{{% endraw %}{{get_bad_bytes_impl(decl, decls_by_name, field)}}{% raw %}}{% endraw %}
+	n, _, err = koinos.Deserialize{{sname}}(vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -90,7 +90,7 @@ func Test{{sname}}(t *testing.T) {
 		t.Error(jerr)
 	}
 
-	jo := New{{sname}}()
+	jo := koinos.New{{sname}}()
 	jerr = json.Unmarshal(v, jo)
 	if jerr != nil {
 		t.Error(jerr)
@@ -128,18 +128,18 @@ func Test{{sname}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{varname}}(t *testing.T) {
-	o := New{{varname}}()
+	o := koinos.New{{varname}}()
 	exercise{{varname}}Serialization(o, t)
 
 	{%- for arg in decl["tref"]["targs"] %}
 	{
 		{%- set arg_type = typeref(arg) %}
-		v := New{{varname}}()
-		v.Value = New{{arg_type}}()
+		v := koinos.New{{varname}}()
+		v.Value = koinos.New{{arg_type}}()
 		exercise{{varname}}Serialization(v, t)
 {% if is_empty_struct(arg) != "True" %}
-		vb := VariableBlob{% raw %}{{% endraw %}{{loop.index - 1}}{% raw %}}{% endraw %}
-		n, _, err := Deserialize{{varname}}(&vb)
+		vb := koinos.VariableBlob{% raw %}{{% endraw %}{{loop.index - 1}}{% raw %}}{% endraw %}
+		n, _, err := koinos.Deserialize{{varname}}(&vb)
 		if err == nil {
 			t.Errorf("err == nil")
 		}
@@ -151,8 +151,8 @@ func Test{{varname}}(t *testing.T) {
 	{%- endfor %}
 
 	// Test bad variant tag
-	vb := VariableBlob{0x80}
-	n, _, err := Deserialize{{varname}}(&vb)
+	vb := koinos.VariableBlob{0x80}
+	n, _, err := koinos.Deserialize{{varname}}(&vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -161,8 +161,8 @@ func Test{{varname}}(t *testing.T) {
 	}
 
 	// Test unknown tag
-	vb = VariableBlob{% raw %}{{% endraw %}{{decl["tref"]["targs"]|length}}{% raw %}}{% endraw %}
-	n, _, err = Deserialize{{varname}}(&vb)
+	vb = koinos.VariableBlob{% raw %}{{% endraw %}{{decl["tref"]["targs"]|length}}{% raw %}}{% endraw %}
+	n, _, err = koinos.Deserialize{{varname}}(&vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -171,7 +171,7 @@ func Test{{varname}}(t *testing.T) {
 	}
 
 	// Test nonsensical json
-	o = New{{varname}}()
+	o = koinos.New{{varname}}()
 	if jerr := json.Unmarshal([]byte("\"!@#$%^&*\""), o); jerr == nil {
 		t.Errorf("Unmarshaling nonsense JSON did not give error.")
 	}
@@ -189,8 +189,8 @@ func Test{{varname}}(t *testing.T) {
 			}
 		}()
 
-		variant := {{varname}}{Value: int64(0)}
-		vb := NewVariableBlob()
+		variant := koinos.{{varname}}{Value: int64(0)}
+		vb := koinos.NewVariableBlob()
 		_ = variant.Serialize(vb)
 	}()
 
@@ -202,16 +202,16 @@ func Test{{varname}}(t *testing.T) {
 			}
 		}()
 
-		variant := {{varname}}{Value: int64(0)}
+		variant := koinos.{{varname}}{Value: int64(0)}
 		_, _ = json.Marshal(&variant)
 	}()
 }
 
-func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
-	vb := NewVariableBlob()
+func exercise{{varname}}Serialization(v *koinos.{{varname}}, t *testing.T) {
+	vb := koinos.NewVariableBlob()
 	vb = v.Serialize(vb)
 
-	_, _, err := Deserialize{{varname}}(vb)
+	_, _, err := koinos.Deserialize{{varname}}(vb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -221,7 +221,7 @@ func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
 		t.Error(jerr)
 	}
 
-	nv := New{{varname}}()
+	nv := koinos.New{{varname}}()
 	if jerr = json.Unmarshal(jv, nv); jerr != nil {
 		t.Error(jerr)
 	}
@@ -237,18 +237,18 @@ func exercise{{varname}}Serialization(v *{{varname}}, t *testing.T) {
 // ----------------------------------------
 
 func Test{{tname}}(t *testing.T) {
-	o := New{{tname}}()
+	o := koinos.New{{tname}}()
 
-	vb := NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = o.Serialize(vb)
 
-	_, _, err := Deserialize{{tname}}(vb)
+	_, _, err := koinos.Deserialize{{tname}}(vb)
 	if err != nil {
 		t.Error(err)
 	}
 {% if is_empty_struct(decl) != "True" %}
-	vb = NewVariableBlob()
-	size, _, err := Deserialize{{tname}}(vb)
+	vb = koinos.NewVariableBlob()
+	size, _, err := koinos.Deserialize{{tname}}(vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -261,7 +261,7 @@ func Test{{tname}}(t *testing.T) {
 		t.Error(jerr)
 	}
 
-	jo := New{{tname}}()
+	jo := koinos.New{{tname}}()
 	jerr = json.Unmarshal(v, jo)
 	if jerr != nil {
 		t.Error(jerr)
@@ -283,25 +283,25 @@ func Test{{tname}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{ename}}(t *testing.T) {
-	vals := []{{ename}}{
+	vals := []koinos.{{ename}}{
 		{%- for entry in decl["entries"] %}
-		{{ename}}{{go_name(entry["name"])}},{%- endfor %}
+		koinos.{{ename}}{{go_name(entry["name"])}},{%- endfor %}
 	}
 
 	// Make sure all types properly serialize
 	for _, x := range vals {
-		vb := NewVariableBlob()
+		vb := koinos.NewVariableBlob()
 		vb = x.Serialize(vb)
 
-		nvb := NewVariableBlob()
-		ox := {{etype}}(x)
+		nvb := koinos.NewVariableBlob()
+		ox := koinos.{{etype}}(x)
 		nvb = ox.Serialize(nvb)
 
 		if !bytes.Equal(*vb, *nvb) {
 			t.Errorf("Serialized enum does match ideal serialization.")
 		}
 
-		_, y, err := Deserialize{{ename}}(vb)
+		_, y, err := koinos.Deserialize{{ename}}(vb)
 		if err != nil {
 			t.Error(err)
 		}
@@ -325,7 +325,7 @@ func Test{{ename}}(t *testing.T) {
 			t.Error(err)
 		}
 
-		r := New{{ename}}()
+		r := koinos.New{{ename}}()
 		if err = json.Unmarshal(jx, r); err != nil {
 			t.Error(err)
 		}
@@ -334,9 +334,9 @@ func Test{{ename}}(t *testing.T) {
 	// Find a value that is NOT an enum value
 	w := getInvalid{{ename}}()
 
-	tw := {{etype}}(w)
-	vb := NewVariableBlob()
-	n, _, err := Deserialize{{ename}}(vb)
+	tw := koinos.{{etype}}(w)
+	vb := koinos.NewVariableBlob()
+	n, _, err := koinos.Deserialize{{ename}}(vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -346,11 +346,11 @@ func Test{{ename}}(t *testing.T) {
 
 	vb = tw.Serialize(vb)
 
-	if _, _, err := Deserialize{{ename}}(vb); err == nil {
+	if _, _, err := koinos.Deserialize{{ename}}(vb); err == nil {
 		t.Errorf("Deserializing an invalid value did not return an error.")
 	}
 
-	je := New{{ename}}()
+	je := koinos.New{{ename}}()
 	if err := json.Unmarshal([]byte(fmt.Sprint(tw)), &je); err == nil {
 		t.Errorf("Deserializing an invalid JSON value did not return an error.")
 	}
@@ -371,7 +371,7 @@ func Test{{ename}}Panic(t *testing.T) {
 			}
 		}()
 
-		vb := NewVariableBlob()
+		vb := koinos.NewVariableBlob()
 		vb = w.Serialize(vb)
 	}()
 
@@ -386,9 +386,9 @@ func Test{{ename}}Panic(t *testing.T) {
 	}()
 }
 
-func getInvalid{{ename}}() {{ename}} {
-	w := {{ename}}{{go_name(decl["entries"][-1]["name"])}}
-	for IsValid{{ename}}(w) {
+func getInvalid{{ename}}() koinos.{{ename}} {
+	w := koinos.{{ename}}{{go_name(decl["entries"][-1]["name"])}}
+	for koinos.IsValid{{ename}}(w) {
 		w++
 	}
 
@@ -404,16 +404,16 @@ func getInvalid{{ename}}() {{ename}} {
 // ----------------------------------------
 
 func Test{{o_type}}(t *testing.T) {
-	v := New{{o_type}}()
+	v := koinos.New{{o_type}}()
 	for i := 0; i < 16; i++ {
-		no := New{{v_type}}()
+		no := koinos.New{{v_type}}()
 		*v = append(*v, *no)
 	}
 
-	vb := NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = v.Serialize(vb)
 
-	_, nv, err := Deserialize{{o_type}}(vb)
+	_, nv, err := koinos.Deserialize{{o_type}}(vb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -427,15 +427,15 @@ func Test{{o_type}}(t *testing.T) {
 		t.Error(err)
 	}
 
-	jv := New{{o_type}}()
+	jv := koinos.New{{o_type}}()
 	err = json.Unmarshal(j, &jv)
 	if err != nil {
 		t.Error(err)
 	}
 
 	// Test no data in the vector
-	vb = &VariableBlob{0x01}
-	n, _, err := Deserialize{{o_type}}(vb)
+	vb = &koinos.VariableBlob{0x01}
+	n, _, err := koinos.Deserialize{{o_type}}(vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -455,7 +455,7 @@ func Test{{o_type}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{o_type}}(t *testing.T) {
-	o := New{{o_type}}()
+	o := koinos.New{{o_type}}()
 
 	o.Box()
 	if o.IsUnboxed() {
@@ -543,7 +543,7 @@ func Test{{o_type}}(t *testing.T) {
 
 	// Test serialization
 
-	vb := NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = o.Serialize(vb)
 	b := o.GetBlob()
 
@@ -558,7 +558,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("GetBlob and Serialization do not match")
 	}
 
-	_, _, err2 := Deserialize{{o_type}}(vb)
+	_, _, err2 := koinos.Deserialize{{o_type}}(vb)
 	if err2 != nil {
 		t.Error(err2)
 	}
@@ -568,7 +568,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Error(jerr)
 	}
 
-	jo := New{{o_type}}()
+	jo := koinos.New{{o_type}}()
 	jerr = json.Unmarshal(v, jo)
 	if jerr != nil {
 		t.Error(jerr)
@@ -628,15 +628,15 @@ func Test{{o_type}}(t *testing.T) {
 // ----------------------------------------
 
 func Test{{fbname}}(t *testing.T) {
-	fb := New{{fbname}}()
+	fb := koinos.New{{fbname}}()
 	for i := 0; i < {{length}}; i++ {
 		fb[i] = byte(({{length}} + i) % 256)
 	}
 
-	vb := NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = fb.Serialize(vb)
 
-	size, nfb, err := Deserialize{{fbname}}(vb)
+	size, nfb, err := koinos.Deserialize{{fbname}}(vb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -649,8 +649,8 @@ func Test{{fbname}}(t *testing.T) {
 		t.Errorf("Binary deserialized fixed blob does not match source.")
 	}
 
-	vb = NewVariableBlob()
-	size, _, err = Deserialize{{fbname}}(vb)
+	vb = koinos.NewVariableBlob()
+	size, _, err = koinos.Deserialize{{fbname}}(vb)
 	if err == nil {
 		t.Errorf("err == nil")
 	}
@@ -663,7 +663,7 @@ func Test{{fbname}}(t *testing.T) {
 		t.Error(err)
 	}
 
-	jfb := New{{fbname}}()
+	jfb := koinos.New{{fbname}}()
 	err = json.Unmarshal(j, &jfb)
 	if err != nil {
 		t.Error(err)
@@ -688,7 +688,7 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}+1; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s := EncodeBytes(wfb)
+	s := koinos.EncodeBytes(wfb)
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
 		t.Errorf("deserialized JSON from a string which was not the proper size.")
@@ -699,7 +699,7 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s = EncodeBytes(wfb)
+	s = koinos.EncodeBytes(wfb)
 	s = "0" + s[1:]
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
@@ -717,13 +717,13 @@ func Test{{fbname}}(t *testing.T) {
 //  \____|\___|_| |_|\___|_|  \__,_|\__\___|\__,_|   |_|\___||___/\__|___/
 //                         Please do not modify
 
-package main
+package koinos_test
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	. "koinos"
+	"github.com/koinos/koinos-types-golang"
 	"testing"
 )
 
