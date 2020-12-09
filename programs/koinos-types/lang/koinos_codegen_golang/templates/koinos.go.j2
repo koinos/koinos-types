@@ -215,8 +215,8 @@ func Deserialize{{varname}}(vb *VariableBlob) (uint64,*{{varname}},error) {
 // UnmarshalJSON *{{varname}}
 func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 	variant := struct {
-		Type string `json:"type"`
-		Value interface{} `json:"value"`
+		Type  string          `json:"type"`
+		Value json.RawMessage `json:"value"`
 	}{}
 
 	err := json.Unmarshal(data, &variant)
@@ -224,15 +224,12 @@ func (n *{{varname}}) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var tmp []byte
-	tmp, _ = json.Marshal(&variant.Value)
-
 	switch variant.Type {
 {%- for arg in decl["tref"]["targs"] %}
 {%- set arg_type = typeref(arg) %}
 		case "{{namespaced_typeref(arg)}}":
 			v := New{{arg_type}}()
-			json.Unmarshal(tmp, &v)
+			json.Unmarshal(variant.Value, &v)
 			n.Value = v
 {%- endfor %}
 		default:
