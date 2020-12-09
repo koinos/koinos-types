@@ -3,7 +3,7 @@
 if [ "$RUN_TYPE" = "coverage" ]; then
    coveralls-lcov --repo-token "$COVERALLS_REPO_TOKEN" --service-name travis-pro ./build/merged.info
 
-   if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false"]; then
+   if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
       COMMIT_HASH=`git rev-parse --short HEAD`
 
       # Clone koinos-types-golang, add changes, commit, and push
