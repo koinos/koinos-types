@@ -634,7 +634,13 @@ void from_json( const json& j, T& v, uint32_t depth )
    detail::json::if_enum< typename reflector< T >::is_enum >::from_json( j, v, depth );
 }
 
-} // koinos::json
+template< typename = void, typename T = void > struct has_to_json_ : std::false_type {};
+template< typename T > struct has_to_json_< T, std::void_t< decltype( koinos::pack::to_json( std::declval< koinos::pack::json& >(), std::declval<T>() ) ) > > : std::true_type {};
+
+template< typename = void, typename T = void > struct jsonifiable : std::false_type {};
+template< typename T > struct jsonifiable< T, typename std::enable_if_t< reflector< T >::is_defined::value || ( !std::is_class< T >::value && has_to_json_< T >::value ) > > : std::true_type {};
+
+} // koinos::pack
 
 #undef JSON_MAX_SAFE_INTEGER
 #undef JSON_MIN_SAFE_INTEGER
