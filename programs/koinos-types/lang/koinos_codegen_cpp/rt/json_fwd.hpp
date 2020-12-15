@@ -90,10 +90,6 @@ inline void to_json( json& s, const T& v );
 template< typename T >
 inline void from_json( const json& s, T& v, uint32_t depth = 0 );
 
-template< typename = void, typename T = void > struct jsonifiable : std::false_type {};
-
-template< typename T > struct jsonifiable< T, std::void_t< decltype( koinos::pack::to_json( std::declval< koinos::pack::json& >(), std::declval<T>() ) ) > > : std::true_type {};
-
 template< typename T >
 std::ostream& json_to_stream( std::ostream& o, const T& t )
 {
@@ -109,8 +105,7 @@ std::ostream& json_to_stream( std::ostream& o, const T& t )
 namespace NS {                                                                                      \
                                                                                                     \
 template < typename T >                                                                             \
-typename std::enable_if_t< koinos::pack::jsonifiable< T >::value, std::ostream >&                   \
-operator<<( std::ostream& o, const T& t )                                                           \
+std::ostream& operator<<( std::ostream& o, const T& t )                                             \
 {                                                                                                   \
    return koinos::pack::json_to_stream( o, t );                                                     \
 }                                                                                                   \
