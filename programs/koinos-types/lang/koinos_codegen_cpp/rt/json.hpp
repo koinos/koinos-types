@@ -507,6 +507,11 @@ inline void from_json( const json& j, opaque< T >& v, uint32_t depth )
    }
 }
 
+inline void to_json( json& j1, const json& j2)
+{
+   j1 = j2;
+}
+
 namespace detail::json {
 
    template< typename T > std::true_type is_class_helper( void(T::*)() );
