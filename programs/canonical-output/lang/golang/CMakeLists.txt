@@ -1,5 +1,3 @@
-find_package( Boost 1.57 COMPONENTS program_options REQUIRED )
-
 set(KOINOS_REFLECT_PYTHONPATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../koinos-types")
 
 set(KOINOS_REFLECT_TEMPLATE_DIR "${KOINOS_REFLECT_PYTHONPATH}/lang")
