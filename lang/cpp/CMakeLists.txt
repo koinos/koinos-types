@@ -28,7 +28,7 @@ set(KOINOS_CPP_OUTPUT_FILES
 
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/util/base58.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/util/variant_helpers.hpp"
-   )
+)
 
 add_custom_target(cpp ALL)
 add_dependencies(cpp make_schema)
@@ -46,6 +46,7 @@ set_source_files_properties(${KOINOS_CPP_OUTPUT_FILES} PROPERTIES GENERATED TRUE
 
 add_library(koinos_types INTERFACE)
 add_dependencies(koinos_types cpp)
+add_library(Koinos::types ALIAS koinos_types)
 
 # We specifically do not want to link to boost, only include boost headers.
 # Any boost library that is not header only must be build against wasm.
@@ -56,3 +57,4 @@ target_include_directories(koinos_types INTERFACE ${KOINOS_CPP_OUTPUT_INCLUDE_DI
 if( INSTALL_KOINOS_TYPES_HEADERS )
    install( DIRECTORY ${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/ DESTINATION include )
 endif()
+
