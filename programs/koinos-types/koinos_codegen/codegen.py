@@ -6,6 +6,16 @@ import json
 import os
 import sys
 
+def write_if_different(dest_filename, content):
+    if os.path.exists(dest_filename):
+        with open(dest_filename, "r") as f:
+            current_content = f.read()
+        if current_content == content:
+            return
+
+    with open(dest_filename, "w") as f:
+        f.write(content)
+
 plugin_base = pluginbase.PluginBase(package="koinos_codegen.plugins")
 # TODO:  search path for builtin plugins?
 
@@ -66,8 +76,7 @@ def main(argv):
             target_filename = os.path.join(package_dir, filename)
             target_dir = os.path.dirname(target_filename)
             os.makedirs(target_dir, exist_ok=True)
-            with open(target_filename, "w") as f:
-                f.write(content)
+            write_if_different(target_filename, content)
     finally:
         pass
 
