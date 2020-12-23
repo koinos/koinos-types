@@ -174,3 +174,15 @@ class opaque
 };
 
 } // koinos::types
+
+namespace koinos::pack {
+template< typename T >
+struct get_typename< koinos::types::opaque<T> >
+{
+   static const char* name()
+   {
+      static const std::string n = std::string("opaque<") + get_typename<T>::name() + ">";
+      return n.c_str();
+   }
+};
+}
