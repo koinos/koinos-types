@@ -1,6 +1,7 @@
 
 import argparse
 import json
+import os
 import sys
 
 from . import lexer
@@ -19,6 +20,20 @@ def read_files(filenames):
                 result.append("\n")
     return "".join(result)
 
+def write_if_different(dest_filename, content):
+    if dest_filename == "-":
+        sys.stdout.write(content)
+        sys.stdout.flush()
+        return
+    if os.path.exists(dest_filename):
+        with open(dest_filename, "r") as f:
+            current_content = f.read()
+        if current_content == content:
+            return
+
+    with open(dest_filename, "w") as f:
+        f.write(content)
+
 def main(argv):
     argparser = argparse.ArgumentParser(description="Analyze files")
 
@@ -31,33 +46,25 @@ def main(argv):
 
     content = read_files(args.typefiles)
 
-    if args.output == "-":
-        out = sys.stdout
-        close_out = False
-    else:
-        out = open(args.output, "w")
-        close_out = True
-    try:
-        if args.lex:
-            for tok in lexer.lex(content):
-                out.write(tok.to_json(separators=(",", ":"))+"\n")
-        if args.parse:
-            out.write(parser.parse(content).to_json(separators=(",", ":")))
-            out.write("\n")
-        if args.schema:
-            parsed_content = parser.parse(content)
-            schemanator = schema.Schemanator(parsed_content)
-            schemanator.schemanate()
-            schema_json = schemanator.schema.to_json(separators=(",", ":"))
-            # Make sure the JSON we produce is loadable with from_json()
-            schema2 = schema.Schema.from_json(schema_json)
-            out.write(schema_json)
-            out.write("\n")
-    finally:
-        if close_out:
-            out.close()
-        else:
-            out.flush()
+    output = []
+    if args.lex:
+        for tok in lexer.lex(content):
+            output.append(tok.to_json(separators=(",", ":")))
+            output.append("\n")
+    if args.parse:
+        output.append(parser.parse(content).to_json(separators=(",", ":")))
+        output.append("\n")
+    if args.schema:
+        parsed_content = parser.parse(content)
+        schemanator = schema.Schemanator(parsed_content)
+        schemanator.schemanate()
+        schema_json = schemanator.schema.to_json(separators=(",", ":"))
+        # Make sure the JSON we produce is loadable with from_json()
+        schema2 = schema.Schema.from_json(schema_json)
+        output.append(schema_json)
+        output.append("\n")
+
+    write_if_different(args.output, "".join(output))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
