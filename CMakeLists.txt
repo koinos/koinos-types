@@ -75,6 +75,7 @@ if (NOT TARGET coverage)
 endif()
 
 hunter_add_package(Boost COMPONENTS system test program_options)
+hunter_add_package(nlohmann_json)
 
 add_subdirectory(lang)
 add_subdirectory(programs)
