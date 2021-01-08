@@ -10,6 +10,24 @@ if(CCACHE_PROGRAM)
    set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS   "${CMAKE_SOURCE_DIR}/ci/ccache_clang++")
 endif()
 
+option(HUNTER_RUN_UPLOAD "Upload Hunter packages to binary cache server" OFF)
+
+set(
+   HUNTER_CACHE_SERVERS
+   "https://github.com/koinos/hunter-cache"
+   CACHE
+   STRING
+   "Default cache server"
+)
+
+set(
+   HUNTER_PASSWORDS_PATH
+   "${CMAKE_CURRENT_LIST_DIR}/cmake/Hunter/passwords.cmake"
+   CACHE
+   FILEPATH
+   "Hunter passwords"
+)
+
 include("cmake/HunterGate.cmake")
 
 HunterGate(
