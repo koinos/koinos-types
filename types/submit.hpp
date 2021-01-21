@@ -4,9 +4,12 @@ struct reserved_query_params {};
 
 struct get_head_info_params {};
 
+struct get_chain_id_params {};
+
 typedef std::variant<
    reserved_query_params,
-   get_head_info_params > query_param_item;
+   get_head_info_params,
+   get_chain_id_params > query_param_item;
 
 typedef opaque< query_param_item > query_submission;
 
@@ -19,10 +22,16 @@ struct query_error
 
 typedef types::system::head_info get_head_info_result;
 
+struct get_chain_id_result
+{
+   types::multihash chain_id;
+};
+
 typedef std::variant<
    reserved_query_result,
    query_error,
-   get_head_info_result > query_item_result;
+   get_head_info_result,
+   get_chain_id_result > query_item_result;
 
 typedef opaque< query_item_result > query_submission_result;
 
