@@ -21,4 +21,4 @@ if [ "$RUN_TYPE" = "coverage" ]; then
    go get -u github.com/jandelgado/gcov2lcov
 fi
 
-pip3 install --user dataclasses-json Jinja2 importlib_resources pluginbase
+pip3 install --user dataclasses-json Jinja2 importlib_resources pluginbase gitpython
