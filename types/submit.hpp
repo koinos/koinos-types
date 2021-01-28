@@ -1,10 +1,10 @@
 namespace koinos { namespace types { namespace rpc {
 
-struct reserved_query_params {};
+typedef koinos::rpc::koinosd::reserved_query_params reserved_query_params;
 
-struct get_head_info_params {};
+typedef koinos::rpc::koinosd::get_head_info_params get_head_info_params;
 
-struct get_chain_id_params {};
+typedef koinos::rpc::koinosd::get_chain_id_params get_chain_id_params;
 
 typedef std::variant<
    reserved_query_params,
@@ -13,19 +13,13 @@ typedef std::variant<
 
 typedef opaque< query_param_item > query_submission;
 
-struct reserved_query_result {};
+typedef koinos::rpc::koinosd::reserved_query_result reserved_query_result;
 
-struct query_error
-{
-   variable_blob error_text;
-};
+typedef koinos::rpc::koinosd::rpc_error query_error
 
-typedef types::system::head_info get_head_info_result;
+typedef koinos::rpc::koinosd::get_head_info_result get_head_info_result;
 
-struct get_chain_id_result
-{
-   types::multihash chain_id;
-};
+typedef koinos::rpc::koinosd::get_chain_id_result get_chain_id_result;
 
 typedef std::variant<
    reserved_query_result,
@@ -38,40 +32,13 @@ typedef opaque< query_item_result > query_submission_result;
 // Every block has a cryptographic ID.
 // Check the claimed ID against the block content.
 
-struct block_topology
-{
-   types::multihash                      id;
-   types::block_height_type              height;
-   types::multihash                      previous;
-};
 
-struct reserved_submission {};
 
-struct block_submission
-{
-   block_topology                             topology;
+typedef koinos::rpc::koinosd::reserved_rpc_params reserved_submission;
 
-   /**
-    * block_parts[0].active_data     -> active_block_data
-    * block_parts[0].passive_data    -> passive_block_data
-    * block_parts[0].sig_data        -> sig_block_data
-    *
-    * block_parts[1..n].active_data  -> active_transaction_data (transaction_type)
-    * block_parts[1..n].passive_data -> passive_transaction_data
-    * block_parts[1..n].sig_data     -> sig_transaction_data
-    */
-   protocol::block                            block;
+typedef koinos::rpc::koinosd::submit_block_params block_submission;
 
-   boolean                                    verify_passive_data;
-   boolean                                    verify_block_signature;
-   boolean                                    verify_transaction_signatures;
-};
-
-struct transaction_submission
-{
-   types::variable_blob                       active_bytes;
-   types::variable_blob                       passive_bytes;
-};
+typedef koinos::rpc::koinosd::submit_transaction_params transaction_submission;
 
 typedef std::variant<
    reserved_submission,
@@ -79,16 +46,13 @@ typedef std::variant<
    transaction_submission,
    query_submission > submission_item;
 
-struct reserved_submission_result {};
+typedef koinos::rpc::koinosd::reserved_rpc_result reserved_submission_result;
 
-struct block_submission_result {};
+typedef koinos::rpc::koinosd::submit_block_result block_submission_result;
 
-struct transaction_submission_result {};
+typedef koinos::rpc::koinosd::submit_transaction_result transaction_submission_result;
 
-struct submission_error_result
-{
-   types::variable_blob error_text;
-};
+typedef koinos::rpc::koinosd::rpc_error submission_error_result;
 
 typedef std::variant<
    reserved_submission_result,
