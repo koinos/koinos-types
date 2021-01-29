@@ -22,11 +22,11 @@ struct submit_block_params
     * block_parts[1..n].passive_data -> passive_transaction_data
     * block_parts[1..n].sig_data     -> sig_transaction_data
     */
-   protocol::block                            block;
+   types::protocol::block                     block;
 
-   boolean                                    verify_passive_data;
-   boolean                                    verify_block_signature;
-   boolean                                    verify_transaction_signatures;
+   types::boolean                             verify_passive_data;
+   types::boolean                             verify_block_signature;
+   types::boolean                             verify_transaction_signatures;
 };
 
 struct submit_transaction_params
@@ -72,4 +72,4 @@ typedef std::variant<
    get_head_info_result,
    get_chain_id_result > koinosd_rpc_result;
 
-} } }
+} } } // koinos::rpc::koinosd
