@@ -49,6 +49,16 @@ def go_name(name):
         if m.group(2) is not None:
             u += m.group(2)
 
+    # Replace instances of Rpc with RPC
+    m = re.search("^([A-Za-z]*[a-z])?Rpc([A-Z][A-Za-z]*)?$", u)
+    if m is not None:
+        u = ""
+        if m.group(1) is not None:
+            u += m.group(1)
+        u += "RPC"
+        if m.group(2) is not None:
+            u += m.group(2)
+
     return u
 
 def decl_fixed_blob(length):
