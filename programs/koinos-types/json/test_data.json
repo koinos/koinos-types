@@ -195,7 +195,7 @@
       }
    },
    {
-      "type" : "rpc::block_topology",
+      "type" : "koinos::rpc::chain::block_topology",
       "json" : {
          "id" : {
             "hash" : 50,
