@@ -543,7 +543,7 @@ func Test{{o_type}}(t *testing.T) {
 
 	blob := native.Serialize(koinos.NewVariableBlob())
 	o.SetBlob(blob)
-	if o.IsUnboxed() {
+	if o.IsUnboxed() || bytes.Equal(blob, []byte(o.GetBlob)) {
 		t.Errorf("SetBlob failed.")
 	}
 
