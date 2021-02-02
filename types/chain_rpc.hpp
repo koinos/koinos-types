@@ -1,4 +1,4 @@
-namespace koinos { namespace rpc { namespace koinosd {
+namespace koinos { namespace rpc { namespace chain {
 
 struct reserved_rpc_params {};
 
@@ -50,7 +50,7 @@ struct reserved_rpc_result {};
 
 struct rpc_error
 {
-   types::variable_blob error_text;
+   std::string error_text;
 };
 
 struct submit_block_result {};
