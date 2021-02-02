@@ -484,7 +484,7 @@ func Test{{o_type}}(t *testing.T) {
 	}
 
 	// Test getting native on Unboxed
-	_, err = o.GetNative()
+	native, err = o.GetNative()
 	if err == nil {
 		t.Errorf("Getting native on Unboxed should fail.")
 	}
@@ -539,6 +539,12 @@ func Test{{o_type}}(t *testing.T) {
 	o.MakeMutable() // Call MakeMutable() on Boxed
 	if !o.IsMutable() {
 		t.Errorf("Boxed -> Mutable failed.")
+	}
+
+	blob := native.Serialize(koinos.NewVariableBlob())
+	o.SetBlob(blob)
+	if o.IsUnboxed() {
+		t.Errorf("SetBlob failed.")
 	}
 
 	// Test serialization

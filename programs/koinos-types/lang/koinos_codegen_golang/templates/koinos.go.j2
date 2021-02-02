@@ -485,6 +485,12 @@ func (n *{{o_type}}) GetBlob() *VariableBlob {
 	return n.blob
 }
 
+// SetBlob *{{o_type}}
+func (n *{{o_type}}) SetBlob( vb *VariableBlob ) {
+	n.native = nil
+	_ = copy(n.blob, vb)
+}
+
 // GetNative *{{o_type}}
 func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
 	if( n.native == nil ) {
