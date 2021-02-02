@@ -109,4 +109,6 @@ struct block
    std::vector< opaque_transaction >    transactions;
 };
 
+struct block_receipt {};
+
 } } } // koinos::types::protocol

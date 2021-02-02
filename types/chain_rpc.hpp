@@ -44,7 +44,7 @@ typedef std::variant<
    submit_block_params,
    submit_transaction_params,
    get_head_info_params,
-   get_chain_id_params > koinosd_rpc_params;
+   get_chain_id_params > chain_rpc_params;
 
 struct reserved_rpc_result {};
 
@@ -70,6 +70,6 @@ typedef std::variant<
    submit_block_result,
    submit_transaction_result,
    get_head_info_result,
-   get_chain_id_result > koinosd_rpc_result;
+   get_chain_id_result > chain_rpc_result;
 
-} } } // koinos::rpc::koinosd
+} } } // koinos::rpc::chain

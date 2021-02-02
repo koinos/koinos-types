@@ -38,12 +38,12 @@ struct block_item
    /**
     * The block data.  If return_block_blob is false, block_blob will be empty.
     */
-   types::variable_blob                  block_blob;
+   opaque< protocol::block >             block;
 
    /**
     * The block data.  If return_receipt_blob is false, block_receipt_blob will be empty.
     */
-   types::variable_blob                  block_receipt_blob;
+   opaque< protocol::block_receipt >     block_receipt;
 };
 
 struct get_blocks_by_id_resp
@@ -57,8 +57,8 @@ struct get_blocks_by_height_req
    types::block_height_type              ancestor_start_height;
    uint32                                num_blocks;
 
-   boolean                               return_block_blob;
-   boolean                               return_receipt_blob;
+   boolean                               return_block;
+   boolean                               return_receipt;
 };
 
 struct get_blocks_by_height_resp
@@ -82,14 +82,14 @@ struct block_record
    types::block_height_type              block_height;
    std::vector< types::multihash >       previous_block_ids;
 
-   types::variable_blob                  block_blob;
-   types::variable_blob                  block_receipt_blob;
+   opaque< protocol::block >             block;
+   opaque< protocol::block_receipt >     block_receipt;
 };
 
 struct add_transaction_req
 {
    types::multihash                      transaction_id;
-   types::variable_blob                  transaction_blob;
+   opaque< protocol::transaction >       transaction;
 };
 
 struct add_transaction_resp
@@ -98,7 +98,7 @@ struct add_transaction_resp
 
 struct transaction_record
 {
-   types::variable_blob                 transaction_blob;
+   opaque< protocol::transaction >      transaction;
 };
 
 struct get_transactions_by_id_req
@@ -108,7 +108,7 @@ struct get_transactions_by_id_req
 
 struct transaction_item
 {
-   types::variable_blob                 transaction_blob;
+   opaque< protocol::transaction >      transaction;
 };
 
 struct get_transactions_by_id_resp
