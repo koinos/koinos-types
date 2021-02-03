@@ -516,7 +516,6 @@ func Test{{o_type}}(t *testing.T) {
 	if err != nil {
 		t.Errorf("Getting native on boxed should not fail.")
 	}
-	//native := *nativePtr
 
 	o.Unbox() // Call Unbox() on Mutable
 	if !o.IsMutable() {
