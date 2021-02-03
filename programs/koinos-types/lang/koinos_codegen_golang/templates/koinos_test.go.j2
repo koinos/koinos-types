@@ -543,18 +543,11 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Boxed -> Mutable failed.")
 	}
 
-	vb := koinos.NewVariableBlob()
-	vb = native.Serialize(vb)
-	o.SetBlob(vb)
-	if o.IsUnboxed() || !bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
-		t.Errorf("SetBlob failed.")
-	}
-
 	o.MakeMutable()
 
 	// Test serialization
 
-	vb = koinos.NewVariableBlob()
+	vb := koinos.NewVariableBlob()
 	vb = o.Serialize(vb)
 	b := o.GetBlob()
 
@@ -626,6 +619,13 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("jerr == nil")
 	}
 {%- endif %}
+
+	vb = koinos.NewVariableBlob()
+	vb = native.Serialize(vb)
+	o.SetBlob(vb)
+	if o.IsUnboxed() || !bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
+		t.Errorf("SetBlob failed.")
+	}
 }
 
 {% endfor -%}
