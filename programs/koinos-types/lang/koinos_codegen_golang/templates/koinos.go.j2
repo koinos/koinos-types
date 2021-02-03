@@ -476,12 +476,14 @@ func New{{o_type}}() *{{o_type}} {
 	return &o
 }
 
+// New{{o_type}}FromBlob factory
 func New{{o_type}}FromBlob(vb *VariableBlob) *{{o_type}} {
 	o := {{o_type}}{}
 	o.blob = vb
 	return &o
 }
 
+// New{{o_type}}FromNative factory
 func New{{o_type}}FromNative(n {{v_type[0]}}) *{{o_type}} {
 	o := {{o_type}}{}
 	o.native = &n
