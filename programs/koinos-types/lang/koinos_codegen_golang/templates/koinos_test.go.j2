@@ -510,9 +510,7 @@ func Test{{o_type}}(t *testing.T) {
 	}
 
 	// Test getting native on Mutable
-	var native *koinos.{{v_type[0]}}
-
-	native, err = o.GetNative()
+	_, err = o.GetNative()
 	if err != nil {
 		t.Errorf("Getting native on boxed should not fail.")
 	}
@@ -542,8 +540,6 @@ func Test{{o_type}}(t *testing.T) {
 	if !o.IsMutable() {
 		t.Errorf("Boxed -> Mutable failed.")
 	}
-
-	o.MakeMutable()
 
 	// Test serialization
 
@@ -620,11 +616,20 @@ func Test{{o_type}}(t *testing.T) {
 	}
 {%- endif %}
 
+	o.MakeMutable()
+	native, _ := o.GetNative()
+
 	vb = koinos.NewVariableBlob()
 	vb = native.Serialize(vb)
 	o.SetBlob(vb)
 	if o.IsUnboxed() || !bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
 		t.Errorf("SetBlob failed.")
+	}
+
+	slice := append([]byte(*vb), 0)
+	vb = (*koinos.VariableBlob)(&slice)
+	if bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
+		t.Errorf("Opaque blob pointer leaked")
 	}
 }
 
