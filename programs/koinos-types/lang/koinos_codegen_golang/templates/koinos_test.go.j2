@@ -615,6 +615,22 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("jerr == nil")
 	}
 {%- endif %}
+
+	o.MakeMutable()
+	native, _ := o.GetNative()
+
+	vb = koinos.NewVariableBlob()
+	vb = native.Serialize(vb)
+	o.SetBlob(vb)
+	if o.IsUnboxed() || !bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
+		t.Errorf("SetBlob failed.")
+	}
+
+	slice := append([]byte(*vb), 0)
+	vb = (*koinos.VariableBlob)(&slice)
+	if bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
+		t.Errorf("Opaque blob pointer leaked")
+	}
 }
 
 {% endfor -%}
