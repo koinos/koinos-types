@@ -484,7 +484,7 @@ func Test{{o_type}}(t *testing.T) {
 	}
 
 	// Test getting native on Unboxed
-	native, err = o.GetNative()
+	_, err = o.GetNative()
 	if err == nil {
 		t.Errorf("Getting native on Unboxed should fail.")
 	}
@@ -510,10 +510,13 @@ func Test{{o_type}}(t *testing.T) {
 	}
 
 	// Test getting native on Mutable
-	_, err = o.GetNative()
+	var native *koinos.{{v_type[0]}}
+
+	native, err = o.GetNative()
 	if err != nil {
 		t.Errorf("Getting native on boxed should not fail.")
 	}
+	//native := *nativePtr
 
 	o.Unbox() // Call Unbox() on Mutable
 	if !o.IsMutable() {
@@ -541,15 +544,16 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Boxed -> Mutable failed.")
 	}
 
-	blob := native.Serialize(koinos.NewVariableBlob())
-	o.SetBlob(blob)
-	if o.IsUnboxed() || bytes.Equal(blob, []byte(o.GetBlob)) {
+	vb := koinos.NewVariableBlob()
+	vb = native.Serialize(vb)
+	o.SetBlob(vb)
+	if o.IsUnboxed() || !bytes.Equal([]byte(*vb), []byte(*o.GetBlob())) {
 		t.Errorf("SetBlob failed.")
 	}
 
 	// Test serialization
 
-	vb := koinos.NewVariableBlob()
+	vb = koinos.NewVariableBlob()
 	vb = o.Serialize(vb)
 	b := o.GetBlob()
 

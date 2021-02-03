@@ -488,7 +488,7 @@ func (n *{{o_type}}) GetBlob() *VariableBlob {
 // SetBlob *{{o_type}}
 func (n *{{o_type}}) SetBlob( vb *VariableBlob ) {
 	n.native = nil
-	_ = copy([]byte(*n.blob), []byte(*vb))
+	n.blob = vb
 }
 
 // GetNative *{{o_type}}
