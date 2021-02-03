@@ -550,6 +550,8 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("SetBlob failed.")
 	}
 
+	o.MakeMutable()
+
 	// Test serialization
 
 	vb = koinos.NewVariableBlob()
