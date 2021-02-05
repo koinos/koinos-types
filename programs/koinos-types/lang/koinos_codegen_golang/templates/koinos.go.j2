@@ -476,28 +476,33 @@ func New{{o_type}}() *{{o_type}} {
 	return &o
 }
 
+// New{{o_type}}FromBlob factory
+func New{{o_type}}FromBlob(vb *VariableBlob) *{{o_type}} {
+	o := {{o_type}}{}
+	o.blob = vb
+	return &o
+}
+
+// New{{o_type}}FromNative factory
+func New{{o_type}}FromNative(n {{v_type[0]}}) *{{o_type}} {
+	o := {{o_type}}{}
+	o.native = &n
+	return &o
+}
+
 // GetBlob *{{o_type}}
 func (n *{{o_type}}) GetBlob() *VariableBlob {
-	if (n.native != nil && n.blob == nil) {
-		n.serializeNative()
+	if !n.IsBoxed() {
+		n.Box()
 	}
 
 	return n.blob
-}
-
-// SetBlob *{{o_type}}
-func (n *{{o_type}}) SetBlob( vb *VariableBlob ) {
-	n.native = nil
-	n.blob = vb
 }
 
 // GetNative *{{o_type}}
 func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
 	if( n.native == nil ) {
 		return nil,errors.New("opaque type not unboxed")
-	}
-	if( n.blob != nil ) {
-		return nil,errors.New("opaque type is not mutable")
 	}
 
 	return n.native,nil;
@@ -506,12 +511,7 @@ func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
 // Box *{{o_type}}
 func (n *{{o_type}}) Box() {
 	if (n.native != nil) {
-		// Mutable -> Unboxed
-		if (n.blob == nil) {
-			n.serializeNative()
-		}
-
-		// Unboxed -> Boxed
+		n.serializeNative()
 		n.native = nil
 	}
 }
@@ -529,33 +529,9 @@ func (n *{{o_type}}) Unbox() {
 	}
 }
 
-// MakeMutable *{{o_type}}
-func (n *{{o_type}}) MakeMutable() {
-	if (n.native == nil) {
-		n.Unbox()
-	}
-
-	// Unboxed -> Mutable
-	if (n.native != nil && n.blob != nil) {
-		n.blob = nil
-	}
-}
-
-// MakeImmutable *{{o_type}}
-func (n *{{o_type}}) MakeImmutable() {
-	if (n.native != nil && n.blob == nil) {
-		n.serializeNative()
-	}
-}
-
-// IsUnboxed *{{o_type}}
-func (n *{{o_type}}) IsUnboxed() bool {
-	return n.native != nil;
-}
-
-// IsMutable *{{o_type}}
-func (n *{{o_type}}) IsMutable() bool {
-	return n.native != nil && n.blob == nil;
+// IsBoxed *{{o_type}}
+func (n *{{o_type}}) IsBoxed() bool {
+	return n.native == nil;
 }
 
 func (n *{{o_type}}) serializeNative() {
@@ -584,7 +560,7 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 func (n {{o_type}}) MarshalJSON() ([]byte, error) {
 	n.Unbox()
 
-	if n.IsUnboxed() {
+	if !n.IsBoxed() {
 		return json.Marshal(&n.native)
 	}
 
