@@ -2,6 +2,8 @@
 
 # Koinos Types
 
+Koinos Types provides the canonical serialization of Koinos data structures. Using an IDL (Interface Definition Language) the Koinos Types program generates the corresponding API in each of the supported languages.
+
 ## Base Types
 
 #### Integer Types:
