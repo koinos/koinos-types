@@ -57,7 +57,11 @@ struct submit_block_result {};
 
 struct submit_transaction_result {};
 
-typedef types::system::head_info get_head_info_result;
+struct get_head_info_result
+{
+   koinos::types::multihash              id;
+   koinos::types::block_height_type      height;
+};
 
 struct get_chain_id_result
 {
