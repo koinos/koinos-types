@@ -116,6 +116,11 @@ struct get_transactions_by_id_resp
    std::vector< transaction_item >      transaction_items;
 };
 
+struct block_store_error
+{
+   std::string error_text;
+};
+
 typedef std::variant<
    reserved_req,
    get_blocks_by_id_req,
@@ -127,6 +132,7 @@ typedef std::variant<
 
 typedef std::variant<
    reserved_resp,
+   block_store_error,
    get_blocks_by_id_resp,
    get_blocks_by_height_resp,
    add_block_resp,
