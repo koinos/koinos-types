@@ -1,15 +1,15 @@
 namespace koinos { namespace rpc { namespace chain {
 
-struct reserved_rpc_params {};
+struct chain_reserved_request {};
 
 struct block_topology
 {
-   types::multihash                      id;
-   types::block_height_type              height;
-   types::multihash                      previous;
+   multihash                      id;
+   block_height_type              height;
+   multihash                      previous;
 };
 
-struct submit_block_params
+struct submit_block_request
 {
    block_topology                             topology;
 
@@ -22,58 +22,58 @@ struct submit_block_params
     * block_parts[1..n].passive_data -> passive_transaction_data
     * block_parts[1..n].sig_data     -> sig_transaction_data
     */
-   types::protocol::block                     block;
+   protocol::block                     block;
 
-   types::boolean                             verify_passive_data;
-   types::boolean                             verify_block_signature;
-   types::boolean                             verify_transaction_signatures;
+   boolean                             verify_passive_data;
+   boolean                             verify_block_signature;
+   boolean                             verify_transaction_signatures;
 };
 
-struct submit_transaction_params
+struct submit_transaction_request
 {
-   types::variable_blob                       active_bytes;
-   types::variable_blob                       passive_bytes;
+   variable_blob                       active_bytes;
+   variable_blob                       passive_bytes;
 };
 
-struct get_head_info_params {};
+struct get_head_info_request {};
 
-struct get_chain_id_params {};
+struct get_chain_id_request {};
 
 typedef std::variant<
-   reserved_rpc_params,
-   submit_block_params,
-   submit_transaction_params,
-   get_head_info_params,
-   get_chain_id_params > chain_rpc_params;
+   chain_reserved_request,
+   submit_block_request,
+   submit_transaction_request,
+   get_head_info_request,
+   get_chain_id_request > chain_rpc_request;
 
-struct reserved_rpc_result {};
+struct chain_reserved_response {};
 
-struct rpc_error
+struct chain_error_response
 {
    std::string error_text;
 };
 
-struct submit_block_result {};
+struct submit_block_response {};
 
-struct submit_transaction_result {};
+struct submit_transaction_response {};
 
-struct get_head_info_result
+struct get_head_info_response
 {
-   koinos::types::multihash              id;
-   koinos::types::block_height_type      height;
+   multihash              id;
+   block_height_type      height;
 };
 
-struct get_chain_id_result
+struct get_chain_id_response
 {
-   types::multihash chain_id;
+   multihash chain_id;
 };
 
 typedef std::variant<
-   reserved_rpc_result,
-   rpc_error,
-   submit_block_result,
-   submit_transaction_result,
-   get_head_info_result,
-   get_chain_id_result > chain_rpc_result;
+   chain_reserved_response,
+   chain_error_response,
+   submit_block_response,
+   submit_transaction_response,
+   get_head_info_response,
+   get_chain_id_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain

@@ -1,5 +1,5 @@
 
-namespace koinos { namespace types { namespace system {
+namespace koinos { namespace system {
 
 struct system_call_target_reserved {};
 
@@ -11,8 +11,8 @@ struct contract_call_bundle
 
 typedef std::variant<
    system_call_target_reserved,
-   thunks::thunk_id,
+   thunk::thunk_id,
    contract_call_bundle
    > system_call_target;
 
-} } } // koinos::types::system
+} } // koinos::system

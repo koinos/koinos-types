@@ -1,5 +1,5 @@
 
-namespace koinos { namespace types { namespace system {
+namespace koinos { namespace system {
 
 // Use generate_ids.py to generate the system call id
 enum class system_call_id : uint32
@@ -27,4 +27,4 @@ enum class system_call_id : uint32
    verify_merkle_root = 0x996e24b9
 };
 
-} } } // koinos::types::system
+} } // koinos::system

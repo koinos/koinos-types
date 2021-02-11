@@ -1,4 +1,4 @@
-namespace koinos { namespace types { namespace protocol {
+namespace koinos { namespace protocol {
 
 struct reserved_operation
 {
@@ -111,4 +111,4 @@ struct block
 
 struct block_receipt {};
 
-} } } // koinos::types::protocol
+} } // koinos::protocol

@@ -5,11 +5,11 @@
 
 #include <cstdint>
 
-namespace koinos { namespace types { namespace system {
+namespace koinos { namespace system {
 
-enum class system_call_id : {{ mac.typeref( decls_by_name["koinos::types::system::system_call_id"]["tref"] ) }}
+enum class system_call_id : {{ mac.typeref( decls_by_name["koinos::system::system_call_id"]["tref"] ) }}
 {
-{%- for system_call in decls_by_name["koinos::types::system::system_call_id"]["entries"] %}
+{%- for system_call in decls_by_name["koinos::system::system_call_id"]["entries"] %}
    {{ system_call.name }} = 0x{{ "{:08x}".format(system_call.value) }}
 {%- if not loop.last -%}
 ,
@@ -17,4 +17,4 @@ enum class system_call_id : {{ mac.typeref( decls_by_name["koinos::types::system
 {%- endfor %}
 };
 
-} } } // koinos::types::system
+} } // koinos::system

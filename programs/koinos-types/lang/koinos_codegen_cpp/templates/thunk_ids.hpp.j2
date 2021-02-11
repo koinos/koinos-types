@@ -6,11 +6,11 @@
 #include <cstdint>
 #include <koinos/pack/rt/reflect.hpp>
 
-namespace koinos { namespace types { namespace thunks {
+namespace koinos { namespace thunk {
 
-enum class thunk_id : {{ mac.typeref( decls_by_name["koinos::types::thunks::thunk_id"]["tref"] ) }}
+enum class thunk_id : {{ mac.typeref( decls_by_name["koinos::thunk::thunk_id"]["tref"] ) }}
 {
-{%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
+{%- for thunk in decls_by_name["koinos::thunk::thunk_id"]["entries"] %}
    {{ thunk.name }} = 0x{{ "{:08x}".format(thunk.value) }}
 {%- if not loop.last -%}
 ,
@@ -18,10 +18,10 @@ enum class thunk_id : {{ mac.typeref( decls_by_name["koinos::types::thunks::thun
 {%- endfor %}
 };
 
-} } } // koinos::types::thunks
+} } // koinos::thunk
 
-KOINOS_REFLECT_ENUM( koinos::types::thunks::thunk_id, {{ mac.typeref( decls_by_name["koinos::types::thunks::thunk_id"]["tref"] ) }},
-{%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
+KOINOS_REFLECT_ENUM( koinos::thunk::thunk_id, {{ mac.typeref( decls_by_name["koinos::thunk::thunk_id"]["tref"] ) }},
+{%- for thunk in decls_by_name["koinos::thunk::thunk_id"]["entries"] %}
    ({{ thunk.name}})
 {%- endfor -%}
 )

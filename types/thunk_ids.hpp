@@ -1,5 +1,5 @@
 
-namespace koinos { namespace types { namespace thunks {
+namespace koinos { namespace thunk {
 
 // Use generate_ids.py to generate the thunk id
 enum class thunk_id : uint32
@@ -27,4 +27,4 @@ enum class thunk_id : uint32
    verify_merkle_root = 0x8ed9ddcb
 };
 
-} } } // koinos::types::thunks
+} } // koinos::thunk

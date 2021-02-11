@@ -1,16 +1,16 @@
-namespace koinos { namespace types { namespace system {
+namespace koinos { namespace system {
 
 struct head_info
 {
-   koinos::types::multihash              id;
-   koinos::types::block_height_type      height;
+   koinos::multihash              id;
+   koinos::block_height_type      height;
 };
 
 struct block_part
 {
-   types::variable_blob                  active_data;
-   types::variable_blob                  passive_data;
-   types::variable_blob                  sig_data;
+   variable_blob                  active_data;
+   variable_blob                  passive_data;
+   variable_blob                  sig_data;
 };
 
-} } } // koinos::types::system
+} } // koinos::system

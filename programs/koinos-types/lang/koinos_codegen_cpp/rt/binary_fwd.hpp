@@ -15,15 +15,13 @@ inline void to_binary( Stream& s, const type& t );                \
 template< typename Stream >                                       \
 inline void from_binary( Stream& s, type& t, uint32_t depth = 0 );\
 
-namespace koinos::types
+namespace koinos
 {
    // Forward declaration
    template< typename T > class opaque;
-} // koinos::types
+} // koinos
 
 namespace koinos::pack {
-
-using namespace koinos::types;
 
 KOINOS_DECLARE_PRIMITIVE_SERIALIZER( int8_t )
 KOINOS_DECLARE_PRIMITIVE_SERIALIZER( uint8_t )

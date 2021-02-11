@@ -14,7 +14,7 @@
 #include <variant>
 #include <vector>
 
-namespace koinos::types {
+namespace koinos {
 
    using std::array;
    using std::optional;
@@ -125,4 +125,4 @@ namespace koinos::types {
       std::vector< variable_blob > digests;
    };
 
-} // koinos::types
+} // koinos

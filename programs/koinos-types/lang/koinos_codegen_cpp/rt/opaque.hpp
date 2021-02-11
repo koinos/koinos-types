@@ -4,7 +4,7 @@
 #include <koinos/pack/rt/reflect.hpp>
 
 
-namespace koinos::types {
+namespace koinos {
 
 /////////////////////////////////////////////////////////////////////////////////////
 // opaque<T> state transition diagram                                              //
@@ -173,11 +173,11 @@ class opaque
       }
 };
 
-} // koinos::types
+} // koinos
 
 namespace koinos::pack {
 template< typename T >
-struct get_typename< koinos::types::opaque<T> >
+struct get_typename< koinos::opaque<T> >
 {
    static const char* name()
    {

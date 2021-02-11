@@ -1,5 +1,5 @@
 
-namespace koinos { namespace types {
+namespace koinos {
 
 struct unused_extensions_type { };
 
@@ -8,4 +8,4 @@ typedef fixed_blob<65> signature_type;
 // CONTRACT_ID_LENGTH = 20 from ripemd160 = 160 bits
 typedef fixed_blob<20> contract_id_type;
 
-} }
+}
