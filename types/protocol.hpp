@@ -20,7 +20,7 @@ struct create_system_contract_operation
 struct set_system_call_operation
 {
    uint32                         call_id;
-   system::system_call_target     target;
+   chain::system_call_target      target;
    unused_extensions_type         extensions;
 };
 

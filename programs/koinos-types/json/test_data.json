@@ -24,11 +24,11 @@
       }
    },
    {
-      "type" : "system::system_call_target_reserved",
+      "type" : "chain::system_call_target_reserved",
       "json" : {}
    },
    {
-      "type" : "system::contract_call_bundle",
+      "type" : "chain::contract_call_bundle",
       "json" : {
          "contract_id" : "zhQJuVPvm22Ke7S9mFQJxo3HKMU3",
          "entry_point" : 400
@@ -39,7 +39,7 @@
       "json" : {
          "call_id" : 300,
          "target" : {
-            "type" : "koinos::system::system_call_target_reserved",
+            "type" : "koinos::chain::system_call_target_reserved",
             "value" : {}
          }
       }
@@ -191,17 +191,17 @@
       }
    },
    {
-      "type" : "thunk::void_type",
+      "type" : "chain::void_type",
       "json" : {}
    },
    {
-      "type" : "thunk::prints_args",
+      "type" : "chain::prints_args",
       "json" : {
          "message" : "prints arguments"
       }
    },
    {
-      "type" : "thunk::verify_block_sig_args",
+      "type" : "chain::verify_block_sig_args",
       "json" : {
          "sig_data" : "zQT2iJXiFShP1KGPeeeet",
          "digest" : {
@@ -211,7 +211,7 @@
       }
    },
    {
-      "type" : "thunk::verify_merkle_root_args",
+      "type" : "chain::verify_merkle_root_args",
       "json" : {
          "root" : {
             "hash" : 900,
@@ -230,7 +230,7 @@
       }
    },
    {
-      "type" : "thunk::apply_block_args",
+      "type" : "chain::apply_block_args",
       "json" : {
          "block" : {
             "active_data" : {
@@ -289,7 +289,7 @@
       }
    },
    {
-      "type" : "thunk::apply_transaction_args",
+      "type" : "chain::apply_transaction_args",
       "json" : {
          "trx" : {
             "active_data": {},
@@ -321,7 +321,7 @@
       }
    },
    {
-      "type" : "thunk::apply_upload_contract_operation_args",
+      "type" : "chain::apply_upload_contract_operation_args",
       "json" : {
          "op" : {
             "contract_id" : "zgkdgumXXYheR7YQSPQDLHBkcvxo",
@@ -330,13 +330,13 @@
       }
    },
    {
-      "type" : "thunk::apply_reserved_operation_args",
+      "type" : "chain::apply_reserved_operation_args",
       "json" : {
          "extensions" : {}
       }
    },
    {
-      "type" : "thunk::apply_execute_contract_operation_args",
+      "type" : "chain::apply_execute_contract_operation_args",
       "json" : {
          "op" : {
             "contract_id" : "zjBnP7JQZuRLLEMCnHyoxqfierGX",
@@ -347,12 +347,12 @@
       }
    },
    {
-      "type" : "thunk::apply_set_system_call_operation_args",
+      "type" : "chain::apply_set_system_call_operation_args",
       "json" : {
          "op" : {
             "call_id" : 8,
             "target" : {
-               "type" : "koinos::thunk::thunk_id",
+               "type" : "koinos::chain::thunk_id",
                "value" : 2406348109
             },
             "extensions" : {}
@@ -360,7 +360,7 @@
       }
    },
    {
-      "type" : "thunk::db_put_object_args",
+      "type" : "chain::db_put_object_args",
       "json" : {
          "space" : 100,
          "key" : 200,
@@ -368,7 +368,7 @@
       }
    },
    {
-      "type" : "thunk::db_get_object_args",
+      "type" : "chain::db_get_object_args",
       "json" : {
          "space": 100,
          "key" : 200,
@@ -376,7 +376,7 @@
       }
    },
    {
-      "type" : "thunk::execute_contract_args",
+      "type" : "chain::execute_contract_args",
       "json" : {
          "contract_id" : "zmcw5JqHcG92FMA18CZQbQ9ggmaF",
          "entry_point" : 10,
@@ -384,19 +384,19 @@
       }
    },
    {
-      "type" : "thunk::set_contract_return_args",
+      "type" : "chain::set_contract_return_args",
       "json" : {
          "ret" : "zFArFa8RG1"
       }
    },
    {
-      "type" : "thunk::exit_contract_args",
+      "type" : "chain::exit_contract_args",
       "json" : {
          "exit_code" : 0
       }
    },
    {
-      "type" : "thunk::hash_args",
+      "type" : "chain::hash_args",
       "json" : {
          "code" : 120,
          "obj" : "zF9MGAPBas",

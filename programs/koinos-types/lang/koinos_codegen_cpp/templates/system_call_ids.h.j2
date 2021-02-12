@@ -1,5 +1,5 @@
 #pragma once
 
-{%- for system_call in decls_by_name["koinos::system::system_call_id"]["entries"] %}
+{%- for system_call in decls_by_name["koinos::chain::system_call_id"]["entries"] %}
 #define KOINOS_SYSTEM_CALL_ID_{{ system_call.name }} 0x{{ "{:08x}".format(system_call.value) }}
 {% endfor %}

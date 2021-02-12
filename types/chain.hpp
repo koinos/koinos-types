@@ -201,7 +201,7 @@ typedef void_type exit_contract_ret;
 
 typedef void_type get_head_info_args;
 
-typedef chain::head_info get_head_info_ret;
+typedef head_info get_head_info_ret;
 
 struct hash_args
 {
