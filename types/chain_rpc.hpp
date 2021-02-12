@@ -2,13 +2,6 @@ namespace koinos { namespace rpc { namespace chain {
 
 struct chain_reserved_request {};
 
-struct block_topology
-{
-   multihash                      id;
-   block_height_type              height;
-   multihash                      previous;
-};
-
 struct submit_block_request
 {
    block_topology                             topology;
@@ -31,8 +24,8 @@ struct submit_block_request
 
 struct submit_transaction_request
 {
-   variable_blob                       active_bytes;
-   variable_blob                       passive_bytes;
+   opaque< protocol::active_transaction_data >   active_data;
+   opaque< protocol::passive_transaction_data >  passive_data;
 };
 
 struct get_head_info_request {};

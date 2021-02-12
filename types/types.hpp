@@ -1,6 +1,13 @@
 
 namespace koinos {
 
+struct block_topology
+{
+   multihash                      id;
+   block_height_type              height;
+   multihash                      previous;
+};
+
 struct unused_extensions_type { };
 
 // KOINOS_SIGNATURE_LENGTH = 65 from fc::ecc::compact_signature

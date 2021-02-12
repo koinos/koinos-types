@@ -1,8 +1,8 @@
 namespace koinos { namespace rpc { namespace block_store {
 
-struct reserved_request {};
+struct block_store_reserved_request {};
 
-struct reserved_response {};
+struct block_store_reserved_response {};
 
 struct get_blocks_by_id_request
 {
@@ -44,8 +44,8 @@ struct get_blocks_by_height_response
 
 struct add_block_request
 {
-   block_store::block_item                            block_to_add;
-   multihash                             previous_block_id;
+   block_store::block_item block_to_add;
+   multihash               previous_block_id;
 };
 
 struct add_block_response
@@ -78,7 +78,7 @@ struct block_store_error_response
 };
 
 typedef std::variant<
-   reserved_request,
+   block_store_reserved_request,
    get_blocks_by_id_request,
    get_blocks_by_height_request,
    add_block_request,
@@ -87,7 +87,7 @@ typedef std::variant<
    > block_store_request;
 
 typedef std::variant<
-   reserved_response,
+   block_store_reserved_response,
    block_store_error_response,
    get_blocks_by_id_response,
    get_blocks_by_height_response,
