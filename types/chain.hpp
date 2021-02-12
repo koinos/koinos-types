@@ -1,4 +1,4 @@
-namespace koinos { namespace system {
+namespace koinos { namespace chain {
 
 struct head_info
 {
@@ -6,11 +6,4 @@ struct head_info
    koinos::block_height_type      height;
 };
 
-struct block_part
-{
-   variable_blob                  active_data;
-   variable_blob                  passive_data;
-   variable_blob                  sig_data;
-};
-
-} } // koinos::system
+} } // koinos::chain

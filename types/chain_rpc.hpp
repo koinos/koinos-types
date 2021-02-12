@@ -4,17 +4,8 @@ struct chain_reserved_request {};
 
 struct submit_block_request
 {
-   block_topology                             topology;
+   block_topology                      topology;
 
-   /**
-    * block_parts[0].active_data     -> active_block_data
-    * block_parts[0].passive_data    -> passive_block_data
-    * block_parts[0].sig_data        -> sig_block_data
-    *
-    * block_parts[1..n].active_data  -> active_transaction_data (transaction_type)
-    * block_parts[1..n].passive_data -> passive_transaction_data
-    * block_parts[1..n].sig_data     -> sig_transaction_data
-    */
    protocol::block                     block;
 
    boolean                             verify_passive_data;

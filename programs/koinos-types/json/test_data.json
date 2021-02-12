@@ -167,7 +167,7 @@
       }
    },
    {
-      "type" : "system::head_info",
+      "type" : "chain::head_info",
       "json" : {
          "id" : {
             "hash" : 50,
@@ -401,14 +401,6 @@
          "code" : 120,
          "obj" : "zF9MGAPBas",
          "size" : 7
-      }
-   },
-   {
-      "type" : "system::block_part",
-      "json" : {
-         "active_data" : "zF2P2XgNXE",
-         "passive_data" : "z2FAiSjnj4ex",
-         "sig_data" : "zXoAa5DbgvuAbW"
       }
    }
 ]
