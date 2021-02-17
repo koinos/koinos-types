@@ -79,7 +79,7 @@ struct prints_args
    std::string message;
 };
 
-typedef void_type prints_ret;
+typedef void_type prints_return;
 
 struct verify_block_sig_args
 {
@@ -87,7 +87,7 @@ struct verify_block_sig_args
    multihash                                  digest;
 };
 
-typedef boolean verify_block_sig_ret;
+typedef boolean verify_block_sig_return;
 
 struct verify_merkle_root_args
 {
@@ -95,7 +95,7 @@ struct verify_merkle_root_args
    std::vector< multihash >                   hashes;
 };
 
-typedef boolean verify_merkle_root_ret;
+typedef boolean verify_merkle_root_return;
 
 struct apply_block_args
 {
@@ -105,42 +105,42 @@ struct apply_block_args
    boolean                                     enable_check_transaction_signatures;
 };
 
-typedef void_type apply_block_ret;
+typedef void_type apply_block_return;
 
 struct apply_transaction_args
 {
    opaque< protocol::transaction >      trx;
 };
 
-typedef void_type apply_transaction_ret;
+typedef void_type apply_transaction_return;
 
 struct apply_upload_contract_operation_args
 {
    protocol::create_system_contract_operation op;
 };
 
-typedef void_type apply_upload_contract_operation_ret;
+typedef void_type apply_upload_contract_operation_return;
 
 struct apply_reserved_operation_args
 {
    protocol::reserved_operation op;
 };
 
-typedef void_type apply_reserved_operation_ret;
+typedef void_type apply_reserved_operation_return;
 
 struct apply_execute_contract_operation_args
 {
    protocol::contract_call_operation op;
 };
 
-typedef void_type apply_execute_contract_operation_ret;
+typedef void_type apply_execute_contract_operation_return;
 
 struct apply_set_system_call_operation_args
 {
    protocol::set_system_call_operation op;
 };
 
-typedef void_type apply_set_system_call_operation_ret;
+typedef void_type apply_set_system_call_operation_return;
 
 struct db_put_object_args
 {
@@ -149,7 +149,7 @@ struct db_put_object_args
    variable_blob obj;
 };
 
-typedef boolean db_put_object_ret;
+typedef boolean db_put_object_return;
 
 struct db_get_object_args
 {
@@ -158,15 +158,15 @@ struct db_get_object_args
    int32   object_size_hint;
 };
 
-typedef variable_blob db_get_object_ret;
+typedef variable_blob db_get_object_return;
 
 typedef db_get_object_args db_get_next_object_args;
 
-typedef db_get_object_ret db_get_next_object_ret;
+typedef db_get_object_return db_get_next_object_return;
 
 typedef db_get_object_args db_get_prev_object_args;
 
-typedef db_get_object_ret db_get_prev_object_ret;
+typedef db_get_object_return db_get_prev_object_return;
 
 struct execute_contract_args
 {
@@ -175,33 +175,33 @@ struct execute_contract_args
    variable_blob    args;
 };
 
-typedef variable_blob execute_contract_ret;
+typedef variable_blob execute_contract_return;
 
 typedef void_type get_contract_args_size_args;
 
-typedef uint32 get_contract_args_size_ret;
+typedef uint32 get_contract_args_size_return;
 
 typedef void_type get_contract_args_args;
 
-typedef variable_blob get_contract_args_ret;
+typedef variable_blob get_contract_args_return;
 
-struct set_contract_return_args
+struct set_contract_result_args
 {
-   variable_blob ret;
+   variable_blob result;
 };
 
-typedef void_type set_contract_return_ret;
+typedef void_type set_contract_result_return;
 
 struct exit_contract_args
 {
    uint8   exit_code;
 };
 
-typedef void_type exit_contract_ret;
+typedef void_type exit_contract_return;
 
 typedef void_type get_head_info_args;
 
-typedef head_info get_head_info_ret;
+typedef head_info get_head_info_return;
 
 struct hash_args
 {
@@ -210,6 +210,6 @@ struct hash_args
    uint64        size;
 };
 
-typedef multihash hash_ret;
+typedef multihash hash_return;
 
 } } // koinos::chain
