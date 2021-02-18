@@ -15,15 +15,15 @@ inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 inline void to_json( json& j, const type& t );                      \
 inline void from_json( const json& j, type& t, uint32_t depth = 0 );\
 
-namespace koinos::types
+namespace koinos
 {
    // Forward declaration
    template< typename T > class opaque;
-} // koinos::types
+} // koinos
 
 namespace koinos::pack {
 
-using namespace koinos::types;
+using namespace koinos;
 
 using json = nlohmann::json;
 

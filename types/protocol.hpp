@@ -1,4 +1,4 @@
-namespace koinos { namespace types { namespace protocol {
+namespace koinos { namespace protocol {
 
 struct reserved_operation
 {
@@ -20,7 +20,7 @@ struct create_system_contract_operation
 struct set_system_call_operation
 {
    uint32                         call_id;
-   system::system_call_target     target;
+   chain::system_call_target      target;
    unused_extensions_type         extensions;
 };
 
@@ -53,46 +53,12 @@ struct transaction
    std::vector< operation >            operations;
 };
 
-enum class header_hash_index : uint32
-{
-   /**
-    * Hash of the previous block.
-    */
-   previous_block_hash_index = 0,
-
-   /**
-    * Hash of Merkle root of transactions.
-    */
-   transaction_merkle_root_hash_index = 1,
-
-   /**
-    * Hash of Merkle root of passive data.
-    * Includes transaction passives, transaction signatures and block passives.
-    */
-   passive_data_merkle_root_hash_index = 2,
-
-   /**
-    * Number of header hashes.
-    */
-   NUM_HEADER_HASHES = 3
-};
-
 struct active_block_data
 {
-   /**
-    * Hashes included in the header.
-    * All hashes must use the same algorithm.
-    */
-   multihash_vector               header_hashes;
-
-   /**
-    * Block height.  The genesis block has height=1.
-    */
+   multihash                      previous_block;
+   multihash                      transaction_merkle_root;
+   multihash                      passive_data_merkle_root;
    block_height_type              height;
-
-   /**
-    * The timestamp.  Must be zero.
-    */
    timestamp_type                 timestamp;
 };
 
@@ -111,4 +77,4 @@ struct block
 
 struct block_receipt {};
 
-} } } // koinos::types::protocol
+} } // koinos::protocol

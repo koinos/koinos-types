@@ -1,5 +1,5 @@
 #pragma once
 
-{%- for thunk in decls_by_name["koinos::types::thunks::thunk_id"]["entries"] %}
+{%- for thunk in decls_by_name["koinos::chain::thunk_id"]["entries"] %}
 #define KOINOS_THUNK_ID_{{ thunk.name }} 0x{{ "{:08x}".format(thunk.value) }}
 {% endfor %}
