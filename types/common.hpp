@@ -3,9 +3,14 @@ namespace koinos {
 
 struct block_topology
 {
-   multihash                      id;
-   block_height_type              height;
-   multihash                      previous;
+   multihash id;
+   block_height_type height;
+   multihash previous;
+};
+
+struct transaction_topology
+{
+   multihash id;
 };
 
 struct unused_extensions_type { };

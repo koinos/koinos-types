@@ -384,12 +384,6 @@
       }
    },
    {
-      "type" : "chain::set_contract_result_args",
-      "json" : {
-         "ret" : "zFArFa8RG1"
-      }
-   },
-   {
       "type" : "chain::exit_contract_args",
       "json" : {
          "exit_code" : 0
@@ -401,6 +395,12 @@
          "code" : 120,
          "obj" : "zF9MGAPBas",
          "size" : 7
+      }
+   },
+   {
+      "type" : "chain::set_contract_result_args",
+      "json" : {
+         "result" : "zFArFa8RG1"
       }
    },
    {
@@ -419,13 +419,17 @@
          },
          "block" : {
             "active_data" : {
-               "header_hashes" : {
+               "previous_block" : {
                   "hash" : 70,
-                  "digests" : [
-                     "z2EiQdzYMa2c",
-                     "z2EiQdzYMa2d",
-                     "z2EiQdzYMa2e"
-                  ]
+                  "digest" : "zX2hqfMCMBn3dV"
+               },
+               "transaction_merkle_root" : {
+                  "hash" : 70,
+                  "digest" : "zX2hqfMCMBn3dV"
+               },
+               "passive_data_merkle_root" : {
+                  "hash" : 70,
+                  "digest" : "zX2hqfMCMBn3dV"
                },
                "height" : 30,
                "timestamp" : 40
@@ -476,8 +480,41 @@
    {
       "type" : "rpc::chain::submit_transaction_request",
       "json" : {
-         "active_bytes" : "z",
-         "passive_bytes" : "z"
+         "topology" : {
+            "id" : {
+               "hash" : 70,
+               "digest" : "zX2hqfMCMBn3dV"
+            }
+         },
+         "transaction" : {
+            "active_data": {},
+            "passive_data" : {},
+            "signature_data" : "zXoAa5DbgvuAbW",
+            "operations" :[
+               {
+                  "type" : "koinos::protocol::reserved_operation",
+                  "value" : {
+                     "extensions" : {}
+                  }
+               },
+               {
+                  "type" : "koinos::protocol::nop_operation",
+                  "value" : {
+                     "extensions" : {}
+                  }
+               },
+               {
+                  "type" : "koinos::protocol::create_system_contract_operation",
+                  "value" : {
+                     "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                     "bytecode" : "z7C2VTyPuYsLx",
+                     "extensions" : {}
+                  }
+               }
+            ]
+         },
+         "verify_passive_data" : true,
+         "verify_transaction_signatures" : true
       }
    },
    {

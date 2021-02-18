@@ -2,14 +2,14 @@ namespace koinos { namespace broadcast {
 
 struct transaction_accepted
 {
-   multihash                    id;
-   protocol::transaction        transaction;
+   transaction_topology topology;
+   protocol::transaction transaction;
 };
 
 struct block_accepted
 {
-   block_topology               topology;
-   protocol::block              block;
+   block_topology topology;
+   protocol::block block;
 };
 
 } } // koinos::broadcast
