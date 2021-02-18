@@ -221,11 +221,11 @@ struct get_transaction_payer_args
    protocol::transaction transaction;
 };
 
-typedef std::string get_transaction_payer_return;
+typedef variable_blob get_transaction_payer_return;
 
 struct get_max_account_resources_args
 {
-   std::string account;
+   variable_blob account;
 };
 
 typedef uint128 get_max_account_resources_return;
