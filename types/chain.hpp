@@ -1,11 +1,5 @@
 namespace koinos { namespace chain {
 
-struct head_info
-{
-   multihash         id;
-   block_height_type height;
-};
-
 // Use generate_ids.py to generate the system call id
 enum class system_call_id : uint32
 {
@@ -61,6 +55,14 @@ enum class thunk_id : uint32
    get_transaction_payer = 0x9db35086,
    get_max_account_resources = 0x90f14f8d
 };
+
+struct head_info
+{
+   multihash         id;
+   block_height_type height;
+};
+
+typedef variable_blob account_type;
 
 struct system_call_target_reserved {};
 
@@ -221,11 +223,11 @@ struct get_transaction_payer_args
    protocol::transaction transaction;
 };
 
-typedef variable_blob get_transaction_payer_return;
+typedef account_type get_transaction_payer_return;
 
 struct get_max_account_resources_args
 {
-   variable_blob account;
+   account_type account;
 };
 
 typedef uint128 get_max_account_resources_return;
