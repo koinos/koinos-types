@@ -4,19 +4,19 @@ struct chain_reserved_request {};
 
 struct submit_block_request
 {
-   block_topology topology;
+   block_topology  topology;
    protocol::block block;
-   boolean verify_passive_data;
-   boolean verify_block_signature;
-   boolean verify_transaction_signatures;
+   boolean         verify_passive_data;
+   boolean         verify_block_signature;
+   boolean         verify_transaction_signatures;
 };
 
 struct submit_transaction_request
 {
-   transaction_topology topology;
+   transaction_topology  topology;
    protocol::transaction transaction;
-   boolean verify_passive_data;
-   boolean verify_transaction_signatures;
+   boolean               verify_passive_data;
+   boolean               verify_transaction_signatures;
 };
 
 struct get_head_info_request {};
@@ -43,8 +43,8 @@ struct submit_transaction_response {};
 
 struct get_head_info_response
 {
-   multihash              id;
-   block_height_type      height;
+   multihash         id;
+   block_height_type height;
 };
 
 struct get_chain_id_response

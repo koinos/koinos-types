@@ -2,8 +2,8 @@ namespace koinos { namespace chain {
 
 struct head_info
 {
-   multihash              id;
-   block_height_type      height;
+   multihash         id;
+   block_height_type height;
 };
 
 // Use generate_ids.py to generate the system call id
@@ -28,7 +28,7 @@ enum class system_call_id : uint32
    exit_contract = 0x98df75b0,
    get_head_info = 0x956fb22d,
    hash = 0x99770e04,
-   verify_block_sig = 0x95836910,
+   verify_block_signature = 0x8fb9a59b,
    verify_merkle_root = 0x996e24b9
 };
 
@@ -54,7 +54,7 @@ enum class thunk_id : uint32
    exit_contract = 0x81f61f9f,
    get_head_info = 0x89df34c4,
    hash = 0x8aaaf547,
-   verify_block_sig = 0x89254037,
+   verify_block_signature = 0x9d1c3c89,
    verify_merkle_root = 0x8ed9ddcb
 };
 
@@ -81,13 +81,13 @@ struct prints_args
 
 typedef void_type prints_return;
 
-struct verify_block_sig_args
+struct verify_block_signature_args
 {
-   variable_blob                              sig_data;
-   multihash                                  digest;
+   variable_blob signature_data;
+   multihash     digest;
 };
 
-typedef boolean verify_block_sig_return;
+typedef boolean verify_block_signature_return;
 
 struct verify_merkle_root_args
 {

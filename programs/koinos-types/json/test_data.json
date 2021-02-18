@@ -201,9 +201,9 @@
       }
    },
    {
-      "type" : "chain::verify_block_sig_args",
+      "type" : "chain::verify_block_signature_args",
       "json" : {
-         "sig_data" : "zQT2iJXiFShP1KGPeeeet",
+         "signature_data" : "zQT2iJXiFShP1KGPeeeet",
          "digest" : {
             "hash" : 800,
             "digest" : "zF3tLyoe9Z"
