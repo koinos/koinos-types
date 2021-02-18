@@ -398,9 +398,9 @@
       }
    },
    {
-      "type" : "chain::set_contract_result_args",
+      "type" : "chain::set_contract_return_args",
       "json" : {
-         "result" : "zFArFa8RG1"
+         "value" : "zFArFa8RG1"
       }
    },
    {

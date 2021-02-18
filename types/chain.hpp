@@ -185,12 +185,12 @@ typedef void_type get_contract_args_args;
 
 typedef variable_blob get_contract_args_return;
 
-struct set_contract_result_args
+struct set_contract_return_args
 {
-   variable_blob result;
+   variable_blob value;
 };
 
-typedef void_type set_contract_result_return;
+typedef void_type set_contract_return_return;
 
 struct exit_contract_args
 {
