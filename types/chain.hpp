@@ -220,7 +220,7 @@ typedef multihash hash_return;
 
 struct get_transaction_payer_args
 {
-   protocol::transaction transaction;
+   opaque< protocol::transaction > transaction;
 };
 
 typedef account_type get_transaction_payer_return;
