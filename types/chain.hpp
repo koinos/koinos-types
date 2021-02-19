@@ -1,11 +1,5 @@
 namespace koinos { namespace chain {
 
-struct head_info
-{
-   multihash         id;
-   block_height_type height;
-};
-
 // Use generate_ids.py to generate the system call id
 enum class system_call_id : uint32
 {
@@ -29,7 +23,9 @@ enum class system_call_id : uint32
    get_head_info = 0x956fb22d,
    hash = 0x99770e04,
    verify_block_signature = 0x8fb9a59b,
-   verify_merkle_root = 0x996e24b9
+   verify_merkle_root = 0x996e24b9,
+   get_transaction_payer = 0x86a87bf5,
+   get_max_account_resources = 0x842c6c81
 };
 
 // Use generate_ids.py to generate the thunk id
@@ -55,8 +51,18 @@ enum class thunk_id : uint32
    get_head_info = 0x89df34c4,
    hash = 0x8aaaf547,
    verify_block_signature = 0x9d1c3c89,
-   verify_merkle_root = 0x8ed9ddcb
+   verify_merkle_root = 0x8ed9ddcb,
+   get_transaction_payer = 0x9db35086,
+   get_max_account_resources = 0x90f14f8d
 };
+
+struct head_info
+{
+   multihash         id;
+   block_height_type height;
+};
+
+typedef variable_blob account_type;
 
 struct system_call_target_reserved {};
 
@@ -211,5 +217,19 @@ struct hash_args
 };
 
 typedef multihash hash_return;
+
+struct get_transaction_payer_args
+{
+   opaque< protocol::transaction > transaction;
+};
+
+typedef account_type get_transaction_payer_return;
+
+struct get_max_account_resources_args
+{
+   account_type account;
+};
+
+typedef uint128 get_max_account_resources_return;
 
 } } // koinos::chain
