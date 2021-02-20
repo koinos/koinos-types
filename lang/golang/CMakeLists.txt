@@ -21,9 +21,12 @@ add_custom_command(TARGET golang
    -o "${KOINOS_GOLANG_OUTPUT_DIR}"
    ${KOINOS_SCHEMA_FILES}
 )
-add_custom_command(TARGET golang POST_BUILD
-   COMMAND go mod tidy
-   WORKING_DIRECTORY ${GOLANG_MODULE_SOURCE_DIR}
-   COMMENT "Generating go.sum"
-)
+find_program(GO_EXECUTABLE go)
+if (GO_EXECUTABLE)
+   add_custom_command(TARGET golang POST_BUILD
+      COMMAND ${GO_EXECUTABLE} mod tidy
+      WORKING_DIRECTORY ${GOLANG_MODULE_SOURCE_DIR}
+      COMMENT "Generating go.sum"
+   )
+endif()
 
