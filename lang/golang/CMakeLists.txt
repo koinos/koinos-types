@@ -3,7 +3,8 @@ set(KOINOS_GOLANG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/golang")
 
 set(GOLANG_MODULE_NAME github.com/koinos/koinos-types-golang)
 set(GOLANG_MODULE_VERSION 1.15)
-configure_file(${PROJECT_SOURCE_DIR}/cmake/go.mod.in ${KOINOS_GOLANG_OUTPUT_DIR}/src/${GOLANG_MODULE_NAME}/go.mod)
+set(GOLANG_MODULE_SOURCE_DIR ${KOINOS_GOLANG_OUTPUT_DIR}/src/${GOLANG_MODULE_NAME})
+configure_file(${PROJECT_SOURCE_DIR}/cmake/go.mod.in ${GOLANG_MODULE_SOURCE_DIR}/go.mod)
 
 set(KOINOS_REFLECT_PYTHONPATH "${PROJECT_SOURCE_DIR}/programs/koinos-types")
 set(KOINOS_REFLECT_TEMPLATE_DIR "${PROJECT_SOURCE_DIR}/programs/koinos-types/lang")
@@ -20,3 +21,9 @@ add_custom_command(TARGET golang
    -o "${KOINOS_GOLANG_OUTPUT_DIR}"
    ${KOINOS_SCHEMA_FILES}
 )
+add_custom_command(TARGET golang POST_BUILD
+   COMMAND go mod tidy
+   WORKING_DIRECTORY ${GOLANG_MODULE_SOURCE_DIR}
+   COMMENT "Generating go.sum"
+)
+
