@@ -75,6 +75,7 @@ struct get_transactions_by_id_response
 struct block_store_error_response
 {
    std::string error_text;
+   std::string error_data;
 };
 
 typedef std::variant<
