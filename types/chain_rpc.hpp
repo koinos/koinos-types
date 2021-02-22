@@ -42,6 +42,7 @@ struct chain_reserved_response {};
 struct chain_error_response
 {
    std::string error_text;
+   std::string error_data;
 };
 
 struct submit_block_response {};

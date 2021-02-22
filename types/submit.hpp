@@ -6,10 +6,13 @@ typedef koinos::rpc::chain::get_head_info_request get_head_info_params;
 
 typedef koinos::rpc::chain::get_chain_id_request get_chain_id_params;
 
+typedef koinos::rpc::chain::get_pending_transactions_request get_pending_transactions_params;
+
 typedef std::variant<
    reserved_query_params,
    get_head_info_params,
-   get_chain_id_params > query_param_item;
+   get_chain_id_params,
+   get_pending_transactions_params > query_param_item;
 
 typedef opaque< query_param_item > query_submission;
 
@@ -21,11 +24,14 @@ typedef koinos::rpc::chain::get_head_info_response get_head_info_result;
 
 typedef koinos::rpc::chain::get_chain_id_response get_chain_id_result;
 
+typedef koinos::rpc::chain::get_pending_transactions_response get_pending_transactions_result;
+
 typedef std::variant<
    reserved_query_result,
    query_error,
    get_head_info_result,
-   get_chain_id_result > query_item_result;
+   get_chain_id_result,
+   get_pending_transactions_result > query_item_result;
 
 typedef opaque< query_item_result > query_submission_result;
 
