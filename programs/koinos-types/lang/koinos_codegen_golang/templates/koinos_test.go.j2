@@ -570,7 +570,7 @@ func Test{{o_type}}(t *testing.T) {
 	}
 {% if is_empty_struct(decls_by_name[v_type[1]]) != "True" %}
 	jerr = json.Unmarshal([]byte("{
-{%- for field in decls_by_name[v_type[1]]["fields"] -%}\"{{field["name"]}}\":0{{"," if not loop.last}}{%- endfor -%}
+{%- for field in decls_by_name[v_type[1]]["fields"] -%}\"{{field["name"]}}\":{\"bougsagdg\":\"adgagf\"}{{"," if not loop.last}}{%- endfor -%}
 }"), jo)
 	if jerr == nil {
 		t.Errorf("jerr == nil")

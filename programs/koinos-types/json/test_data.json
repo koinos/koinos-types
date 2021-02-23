@@ -69,7 +69,9 @@
       "type" : "protocol::transaction",
       "json" :
       {
-         "active_data": {},
+         "active_data": {
+            "resource_limit" : "3480523478260483267"
+         },
          "passive_data" : {},
          "signature_data" : "zXoAa5DbgvuAbW",
          "operations" :[
@@ -134,7 +136,9 @@
          "signature_data" : "zXoAa5DbgvuAbW",
          "transactions" : [
             {
-               "active_data": {},
+               "active_data": {
+                  "resource_limit" : "3480523478260483267"
+               },
                "passive_data" : {},
                "signature_data" : "z",
                "operations" : [
@@ -252,7 +256,9 @@
             "signature_data" : "zXoAa5DbgvuAbW",
             "transactions" : [
                {
-                  "active_data": {},
+                  "active_data": {
+                     "resource_limit" : "3480523478260483267"
+                  },
                   "passive_data" : {},
                   "signature_data" : "z23Ap51zkyD67RAyeyr",
                   "operations" : [
@@ -295,7 +301,9 @@
       "type" : "chain::apply_transaction_args",
       "json" : {
          "trx" : {
-            "active_data": {},
+            "active_data": {
+               "resource_limit" : "3480523478260483267"
+            },
             "passive_data" : {},
             "signature_data" : "z23Ap51zkyD67RAyeyr",
             "operations" : [
@@ -441,7 +449,9 @@
             "signature_data" : "zXoAa5DbgvuAbW",
             "transactions" : [
                {
-                  "active_data": {},
+                  "active_data": {
+                     "resource_limit" : "3480523478260483267"
+                  },
                   "passive_data" : {},
                   "signature_data" : "z23Ap51zkyD67RAyeyr",
                   "operations" : [
@@ -490,7 +500,9 @@
             }
          },
          "transaction" : {
-            "active_data": {},
+            "active_data": {
+               "resource_limit": "3480523478260483267"
+            },
             "passive_data" : {},
             "signature_data" : "zXoAa5DbgvuAbW",
             "operations" :[
