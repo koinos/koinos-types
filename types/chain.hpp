@@ -25,7 +25,8 @@ enum class system_call_id : uint32
    verify_block_signature = 0x8fb9a59b,
    verify_merkle_root = 0x996e24b9,
    get_transaction_payer = 0x86a87bf5,
-   get_max_account_resources = 0x842c6c81
+   get_max_account_resources = 0x842c6c81,
+   get_transaction_resource_limit = 0x9940f685
 };
 
 // Use generate_ids.py to generate the thunk id
@@ -53,7 +54,8 @@ enum class thunk_id : uint32
    verify_block_signature = 0x9d1c3c89,
    verify_merkle_root = 0x8ed9ddcb,
    get_transaction_payer = 0x9db35086,
-   get_max_account_resources = 0x90f14f8d
+   get_max_account_resources = 0x90f14f8d,
+   get_transaction_resource_limit = 0x8bdf81a1
 };
 
 struct head_info
@@ -231,5 +233,12 @@ struct get_max_account_resources_args
 };
 
 typedef uint128 get_max_account_resources_return;
+
+struct get_transaction_resource_limit_args
+{
+   opaque< protocol::transaction > transaction;
+};
+
+typedef uint128 get_transaction_resource_limit_return;
 
 } } // koinos::chain
