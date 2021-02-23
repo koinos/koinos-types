@@ -40,7 +40,9 @@ typedef std::variant<
    set_system_call_operation
    > operation;
 
-struct active_transaction_data {};
+struct active_transaction_data {
+   uint128 resource_limit;
+};
 
 struct passive_transaction_data {};
 
