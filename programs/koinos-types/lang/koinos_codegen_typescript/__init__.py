@@ -1,0 +1,2 @@
+
+from .gentypescript import setup
