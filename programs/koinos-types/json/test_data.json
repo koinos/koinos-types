@@ -56,7 +56,10 @@
    },
    {
       "type" : "protocol::active_transaction_data",
-      "json" : {}
+      "json" :
+      {
+         "resource_limit": "3480523478260483267"
+      }
    },
    {
       "type" : "protocol::passive_transaction_data",
