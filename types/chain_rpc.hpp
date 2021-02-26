@@ -29,13 +29,16 @@ struct get_pending_transactions_request
    uint64    limit;
 };
 
+struct get_fork_heads_request {};
+
 typedef std::variant<
    chain_reserved_request,
    submit_block_request,
    submit_transaction_request,
    get_head_info_request,
    get_chain_id_request,
-   get_pending_transactions_request > chain_rpc_request;
+   get_pending_transactions_request,
+   get_fork_heads_request > chain_rpc_request;
 
 struct chain_reserved_response {};
 
@@ -65,6 +68,12 @@ struct get_pending_transactions_response
    std::vector< protocol::transaction > transactions;
 };
 
+struct get_fork_heads_response
+{
+   std::vector< block_topology > fork_heads;
+   block_topology                last_irr;
+};
+
 typedef std::variant<
    chain_reserved_response,
    chain_error_response,
@@ -72,6 +81,7 @@ typedef std::variant<
    submit_transaction_response,
    get_head_info_response,
    get_chain_id_response,
-   get_pending_transactions_response > chain_rpc_response;
+   get_pending_transactions_response,
+   get_fork_heads_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain

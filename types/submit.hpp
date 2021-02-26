@@ -41,17 +41,22 @@ typedef koinos::rpc::chain::submit_block_request block_submission;
 
 typedef koinos::rpc::chain::submit_transaction_request transaction_submission;
 
+typedef koinos::rpc::chain::get_fork_heads_request get_fork_heads_submission;
+
 typedef std::variant<
    reserved_submission,
    block_submission,
    transaction_submission,
-   query_submission > submission_item;
+   query_submission,
+   get_fork_heads_submission > submission_item;
 
 typedef koinos::rpc::chain::chain_reserved_response reserved_submission_result;
 
 typedef koinos::rpc::chain::submit_block_response block_submission_result;
 
 typedef koinos::rpc::chain::submit_transaction_response transaction_submission_result;
+
+typedef koinos::rpc::chain::get_fork_heads_response get_fork_heads_submission_result;
 
 typedef koinos::rpc::chain::chain_error_response submission_error_result;
 
@@ -60,6 +65,7 @@ typedef std::variant<
    block_submission_result,
    transaction_submission_result,
    query_submission_result,
+   get_fork_heads_submission_result,
    submission_error_result > submission_result;
 
 } } } // koinos::types::rpc
