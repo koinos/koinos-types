@@ -36,7 +36,24 @@ HunterGate(
    LOCAL
 )
 
-project( koinos-types )
+project(koinos_types VERSION 0.1.0 LANGUAGES CXX)
+
+#
+# CONFIGURATION
+#
+include(GNUInstallDirs)
+
+set(KOINOS_LIB_TARGET_NAME                ${PROJECT_NAME})
+set(KOINOS_LIB_TARGET_SHORT_NAME          "types")
+set(KOINOS_LIB_CONFIG_INSTALL_DIR         "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE INTERNAL "")
+set(KOINOS_LIB_INCLUDE_INSTALL_DIR        "${CMAKE_INSTALL_INCLUDEDIR}")
+set(KOINOS_LIB_TARGETS_EXPORT_NAME        "${PROJECT_NAME}Targets")
+set(KOINOS_LIB_CMAKE_CONFIG_TEMPLATE      "cmake/config.cmake.in")
+set(KOINOS_LIB_CMAKE_CONFIG_DIR           "${CMAKE_CURRENT_BINARY_DIR}")
+set(KOINOS_LIB_CMAKE_VERSION_CONFIG_FILE  "${KOINOS_LIB_CMAKE_CONFIG_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
+set(KOINOS_LIB_CMAKE_PROJECT_CONFIG_FILE  "${KOINOS_LIB_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
+set(KOINOS_LIB_CMAKE_PROJECT_TARGETS_FILE "${KOINOS_LIB_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Targets.cmake")
+set(KOINOS_LIB_PKGCONFIG_INSTALL_DIR      "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
 
@@ -54,31 +71,10 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror" )
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" )
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas" )
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas" )
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(Boost_NO_BOOST_CMAKE ON)
 
 set(PYTHON_BINARY "python3" CACHE STRING "The default python to invoke")
-
-option( BUILD_KOINOS_TYPES_TESTS "Build Koinos-Types unit tests" ON )
-option( INSTALL_KOINOS_TYPES_HEADERS "Install Koinos-Types headers" OFF )
-
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_NO_BOOST_CMAKE ON)
-if( NOT( Boost_VERSION_MACRO LESS 106900 ) )
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-endif()
-
-if(${CMAKE_GENERATOR} MATCHES "Xcode")
-  set(CMAKE_XCODE_GENERATE_SCHEME YES)
-endif()
 
 if (NOT TARGET coverage)
   if (COVERAGE)
@@ -98,6 +94,40 @@ hunter_add_package(nlohmann_json)
 add_subdirectory(lang)
 add_subdirectory(programs)
 
-if( BUILD_KOINOS_TYPES_TESTS )
+if(BUILD_TESTS)
    add_subdirectory(tests)
 endif()
+
+# Install a pkg-config file, so other tools can find this.
+configure_file(
+   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pkg-config.pc.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+)
+
+#
+# INSTALL
+# install header files, generate and install cmake config files for find_package()
+#
+include(CMakePackageConfigHelpers)
+
+configure_file(
+   "cmake/${PROJECT_NAME}ConfigVersion.cmake.in"
+   ${KOINOS_LIB_CMAKE_VERSION_CONFIG_FILE}
+   @ONLY
+)
+configure_file(
+   ${KOINOS_LIB_CMAKE_CONFIG_TEMPLATE}
+   ${KOINOS_LIB_CMAKE_PROJECT_CONFIG_FILE}
+   @ONLY
+)
+
+install(
+   FILES ${KOINOS_LIB_CMAKE_PROJECT_CONFIG_FILE} ${KOINOS_LIB_CMAKE_VERSION_CONFIG_FILE}
+   DESTINATION ${KOINOS_LIB_CONFIG_INSTALL_DIR}
+)
+
+install(
+   FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+   DESTINATION ${KOINOS_LIB_PKGCONFIG_INSTALL_DIR}
+)
+

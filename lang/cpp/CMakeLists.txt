@@ -50,10 +50,32 @@ add_library(Koinos::types ALIAS koinos_types)
 # We specifically do not want to link to boost, only include boost headers.
 # Any boost library that is not header only must be build against wasm.
 # It is easier to simply to utilize those libraries. Most boost libraries are header only.
-target_link_libraries(koinos_types INTERFACE nlohmann_json::nlohmann_json)
-target_include_directories(koinos_types INTERFACE ${KOINOS_CPP_OUTPUT_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
+target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
+target_include_directories(koinos_types INTERFACE
+   $<BUILD_INTERFACE:${KOINOS_CPP_OUTPUT_INCLUDE_DIR}>
+   $<INSTALL_INTERFACE:include>
+)
 
-if( INSTALL_KOINOS_TYPES_HEADERS )
-   install( DIRECTORY ${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/ DESTINATION include )
-endif()
+install(DIRECTORY ${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/ DESTINATION include)
+
+export(
+   TARGETS ${KOINOS_LIB_TARGET_NAME}
+   NAMESPACE Koinos::
+   FILE ${KOINOS_LIB_CMAKE_PROJECT_TARGETS_FILE}
+)
+
+install(
+   TARGETS ${KOINOS_LIB_TARGET_NAME}
+   EXPORT ${KOINOS_LIB_TARGETS_EXPORT_NAME}
+   INCLUDES DESTINATION ${KOINOS_LIB_INCLUDE_INSTALL_DIR}
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib
+)
+
+install(
+   EXPORT ${KOINOS_LIB_TARGETS_EXPORT_NAME}
+   NAMESPACE Koinos::
+   DESTINATION ${KOINOS_LIB_CONFIG_INSTALL_DIR}
+)
 
