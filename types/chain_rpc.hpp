@@ -71,7 +71,7 @@ struct get_pending_transactions_response
 struct get_fork_heads_response
 {
    std::vector< block_topology > fork_heads;
-   block_topology                last_irr;
+   block_topology                last_irreversible_block;
 };
 
 typedef std::variant<
