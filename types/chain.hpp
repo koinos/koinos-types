@@ -257,17 +257,17 @@ typedef block_height_type get_last_irreversible_block_return;
 
 struct get_caller_args {};
 
-typedef variable_blob get_caller_return;
+typedef account_type get_caller_return;
 
 struct require_authority_args
 {
-   variable_blob account;
+   account_type account;
 };
 
 typedef void_type require_authority_return;
 
 struct get_transaction_signature {};
 
-typedef variable_blob get_transaction_signature_return;
+typedef account_type get_transaction_signature_return;
 
 } } // koinos::chain
