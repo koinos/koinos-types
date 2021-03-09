@@ -27,7 +27,10 @@ enum class system_call_id : uint32
    get_transaction_payer = 0x86a87bf5,
    get_max_account_resources = 0x842c6c81,
    get_transaction_resource_limit = 0x9940f685,
-   get_last_irreversible_block = 0x953d2e37
+   get_last_irreversible_block = 0x953d2e37,
+   get_caller = 0x94176c5f,
+   require_authority = 0x9491e528,
+   get_transaction_signature = 0x9dc3ec34
 };
 
 // Use generate_ids.py to generate the thunk id
@@ -57,7 +60,10 @@ enum class thunk_id : uint32
    get_transaction_payer = 0x9db35086,
    get_max_account_resources = 0x90f14f8d,
    get_transaction_resource_limit = 0x8bdf81a1,
-   get_last_irreversible_block = 0x80c3b893
+   get_last_irreversible_block = 0x80c3b893,
+   get_caller = 0x82312501,
+   require_authority = 0x8a06717d,
+   get_transaction_signature = 0x83441b23
 };
 
 struct head_info
@@ -248,5 +254,20 @@ typedef uint128 get_transaction_resource_limit_return;
 struct get_last_irreversible_block_args {};
 
 typedef block_height_type get_last_irreversible_block_return;
+
+struct get_caller_args {};
+
+typedef account_type get_caller_return;
+
+struct require_authority_args
+{
+   account_type account;
+};
+
+typedef void_type require_authority_return;
+
+struct get_transaction_signature {};
+
+typedef account_type get_transaction_signature_return;
 
 } } // koinos::chain
