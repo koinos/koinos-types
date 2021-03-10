@@ -72,6 +72,13 @@ struct get_transactions_by_id_response
    std::vector< block_store::transaction_item >      transaction_items;
 };
 
+struct get_last_irreversible_block_request {};
+
+struct get_last_irreversible_block_response
+{
+   multihash block_id;
+};
+
 struct block_store_error_response
 {
    std::string error_text;
@@ -84,7 +91,8 @@ typedef std::variant<
    get_blocks_by_height_request,
    add_block_request,
    add_transaction_request,
-   get_transactions_by_id_request
+   get_transactions_by_id_request,
+   get_last_irreversible_block_request
    > block_store_request;
 
 typedef std::variant<
@@ -94,7 +102,8 @@ typedef std::variant<
    get_blocks_by_height_response,
    add_block_response,
    add_transaction_response,
-   get_transactions_by_id_response
+   get_transactions_by_id_response,
+   get_last_irreversible_block_response
    > block_store_response;
 
 } } }
