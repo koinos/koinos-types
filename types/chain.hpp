@@ -266,8 +266,8 @@ struct require_authority_args
 
 typedef void_type require_authority_return;
 
-struct get_transaction_signature {};
+struct get_transaction_signature_args {};
 
-typedef account_type get_transaction_signature_return;
+typedef variable_blob get_transaction_signature_return;
 
 } } // koinos::chain
