@@ -30,7 +30,8 @@ enum class system_call_id : uint32
    get_last_irreversible_block = 0x953d2e37,
    get_caller = 0x94176c5f,
    require_authority = 0x9491e528,
-   get_transaction_signature = 0x9dc3ec34
+   get_transaction_signature = 0x9dc3ec34,
+   set_user_mode = 0x9dd0a15a
 };
 
 // Use generate_ids.py to generate the thunk id
@@ -63,7 +64,8 @@ enum class thunk_id : uint32
    get_last_irreversible_block = 0x80c3b893,
    get_caller = 0x82312501,
    require_authority = 0x8a06717d,
-   get_transaction_signature = 0x83441b23
+   get_transaction_signature = 0x83441b23,
+   set_user_mode = 0x8e887829
 };
 
 struct head_info
@@ -269,5 +271,9 @@ typedef void_type require_authority_return;
 struct get_transaction_signature_args {};
 
 typedef variable_blob get_transaction_signature_return;
+
+struct set_user_mode_args{};
+
+typedef void_type set_user_mode_return;
 
 } } // koinos::chain
