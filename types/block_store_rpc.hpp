@@ -76,7 +76,7 @@ struct get_highest_block_request {};
 
 struct get_highest_block_response
 {
-   multihash block_id;
+   block_topology topology;
 };
 
 struct block_store_error_response
