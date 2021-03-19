@@ -4,7 +4,6 @@ struct chain_reserved_request {};
 
 struct submit_block_request
 {
-   block_topology  topology;
    protocol::block block;
    boolean         verify_passive_data;
    boolean         verify_block_signature;
@@ -13,7 +12,6 @@ struct submit_block_request
 
 struct submit_transaction_request
 {
-   transaction_topology  topology;
    protocol::transaction transaction;
    boolean               verify_passive_data;
    boolean               verify_transaction_signatures;

@@ -118,16 +118,16 @@ typedef boolean verify_merkle_root_return;
 struct apply_block_args
 {
    protocol::block                             block;
-   boolean                                     enable_check_passive_data;
-   boolean                                     enable_check_block_signature;
-   boolean                                     enable_check_transaction_signatures;
+   boolean                                     check_passive_data;
+   boolean                                     check_block_signature;
+   boolean                                     check_transaction_signatures;
 };
 
 typedef void_type apply_block_return;
 
 struct apply_transaction_args
 {
-   opaque< protocol::transaction >      trx;
+   protocol::transaction transaction;
 };
 
 typedef void_type apply_transaction_return;
@@ -232,7 +232,7 @@ typedef multihash hash_return;
 
 struct get_transaction_payer_args
 {
-   opaque< protocol::transaction > transaction;
+   protocol::transaction transaction;
 };
 
 typedef account_type get_transaction_payer_return;
@@ -246,7 +246,7 @@ typedef uint128 get_max_account_resources_return;
 
 struct get_transaction_resource_limit_args
 {
-   opaque< protocol::transaction > transaction;
+   protocol::transaction transaction;
 };
 
 typedef uint128 get_transaction_resource_limit_return;

@@ -51,7 +51,7 @@ struct passive_transaction_data {};
 
 struct transaction
 {
-   multihash                           transaction_id;
+   multihash                           id;
    opaque< active_transaction_data >   active_data;
    opaque< passive_transaction_data >  passive_data;
    variable_blob                       signature_data;
@@ -66,11 +66,9 @@ struct active_block_data
 
 struct passive_block_data {};
 
-typedef opaque< transaction > opaque_transaction;
-
 struct block_header
 {
-   multihash                     previous_block;
+   multihash                     previous;
    block_height_type             height;
    timestamp_type                timestamp;
 };
@@ -92,13 +90,13 @@ struct block_header
 
 struct block
 {
-   multihash                     block_id;
+   multihash                     id;
    block_header                  header;
    opaque< active_block_data >   active_data;
    opaque< passive_block_data >  passive_data;
    variable_blob                 signature_data;
 
-   std::vector< opaque_transaction >    transactions;
+   std::vector< transaction >    transactions;
 };
 
 struct block_receipt {};

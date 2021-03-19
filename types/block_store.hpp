@@ -16,7 +16,7 @@ struct block_item
    /**
     * The block data.  If return_block_blob is false, block_blob will be empty.
     */
-   opaque< protocol::block >             block;
+   protocol::block                       block;
 
    /**
     * The block data.  If return_receipt_blob is false, block_receipt_blob will be empty.
@@ -30,18 +30,18 @@ struct block_record
    block_height_type              block_height;
    std::vector< multihash >       previous_block_ids;
 
-   opaque< protocol::block >             block;
+   protocol::block                       block;
    opaque< protocol::block_receipt >     block_receipt;
 };
 
 struct transaction_item
 {
-   opaque< protocol::transaction >      transaction;
+   protocol::transaction transaction;
 };
 
 struct transaction_record
 {
-   opaque< protocol::transaction >      transaction;
+   protocol::transaction transaction;
 };
 
 } } // koinos::block_store
