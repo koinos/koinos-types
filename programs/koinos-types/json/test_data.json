@@ -175,11 +175,18 @@
    {
       "type" : "chain::head_info",
       "json" : {
-         "id" : {
-            "hash" : 50,
-            "digest" : "zX1ECcx53wEief"
+         "head_topology": {
+            "id" : {
+               "hash" : 50,
+               "digest" : "zX1ECcx53wEief"
+            },
+            "height" : 100,
+            "previous" : {
+               "hash" : 40,
+               "digest" : "zX1ECcx53wEief"
+            }
          },
-         "height" : 100
+         "last_irreversible_height": 100
       }
    },
    {

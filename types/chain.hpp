@@ -68,9 +68,7 @@ enum class thunk_id : uint32
 
 struct head_info
 {
-   multihash         id;
-   multihash         previous_id;
-   block_height_type height;
+   block_topology    head_topology;
    block_height_type last_irreversible_height;
 };
 

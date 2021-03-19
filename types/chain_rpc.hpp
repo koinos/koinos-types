@@ -52,9 +52,7 @@ struct submit_transaction_response {};
 
 struct get_head_info_response
 {
-   multihash         id;
-   multihash         previous_id;
-   block_height_type height;
+   block_topology    head_topology;
    block_height_type last_irreversible_height;
 };
 
