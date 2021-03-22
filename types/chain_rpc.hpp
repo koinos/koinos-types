@@ -21,12 +21,6 @@ struct get_head_info_request {};
 
 struct get_chain_id_request {};
 
-struct get_pending_transactions_request
-{
-   multihash start;
-   uint64    limit;
-};
-
 struct get_fork_heads_request {};
 
 typedef std::variant<
@@ -35,7 +29,6 @@ typedef std::variant<
    submit_transaction_request,
    get_head_info_request,
    get_chain_id_request,
-   get_pending_transactions_request,
    get_fork_heads_request > chain_rpc_request;
 
 struct chain_reserved_response {};
@@ -61,11 +54,6 @@ struct get_chain_id_response
    multihash chain_id;
 };
 
-struct get_pending_transactions_response
-{
-   std::vector< protocol::transaction > transactions;
-};
-
 struct get_fork_heads_response
 {
    std::vector< block_topology > fork_heads;
@@ -79,7 +67,6 @@ typedef std::variant<
    submit_transaction_response,
    get_head_info_response,
    get_chain_id_response,
-   get_pending_transactions_response,
    get_fork_heads_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain
