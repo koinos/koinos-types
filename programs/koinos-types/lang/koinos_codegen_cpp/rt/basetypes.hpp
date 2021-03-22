@@ -119,10 +119,4 @@ namespace koinos {
       }
    };
 
-   struct multihash_vector
-   {
-      uint64_t                     id = 0;
-      std::vector< variable_blob > digests;
-   };
-
 } // koinos

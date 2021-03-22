@@ -6,7 +6,6 @@ Variant = typing.Union
 Uint32 = int
 Uint64 = int
 MultihashType = bytes
-MultihashVector = bytes
 VlBlob = bytes
 FlBlob = bytes
 

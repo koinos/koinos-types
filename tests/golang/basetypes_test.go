@@ -3,8 +3,9 @@ package koinos_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/koinos/koinos-types-golang"
 	"testing"
+
+	"github.com/koinos/koinos-types-golang"
 )
 
 func TestBoolean(t *testing.T) {
@@ -703,96 +704,6 @@ func TestMultihash(t *testing.T) {
 	if err.Error() != "Could not deserialize multihash id" {
 		t.Errorf("Expected a failure to deserialize multihash Id")
 	}
-}
-
-func TestMultihashVector(t *testing.T) {
-	variableBlob := koinos.NewVariableBlob()
-	*variableBlob = append(*variableBlob, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
-	variableBlob2 := koinos.NewVariableBlob()
-	*variableBlob2 = append(*variableBlob2, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
-	multihashVector := koinos.NewMultihashVector()
-	multihashVector.ID = 1
-	multihashVector.Digests = append(multihashVector.Digests, *variableBlob)
-	multihashVector.Digests = append(multihashVector.Digests, *variableBlob2)
-
-	result := koinos.NewVariableBlob()
-	result = multihashVector.Serialize(result)
-
-	expected := []byte{
-		0x01,                               // hash_id
-		0x06,                               // hash length
-		0x02,                               // num hashes
-		0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A, // digest_a
-		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // digest_b
-	}
-
-	if !bytes.Equal(*result, expected) {
-		t.Errorf("*result != expected")
-	}
-
-	_, resultMh, e := koinos.DeserializeMultihashVector(result)
-	if e != nil {
-		t.Errorf("Failed to deserialize multihash vector")
-	}
-	if resultMh.ID != multihashVector.ID {
-		t.Errorf("Multihash vector Id mismatch")
-	}
-	for i, s := range multihashVector.Digests {
-		if !bytes.Equal(s, resultMh.Digests[i]) {
-			t.Errorf("Multihash vector digest mismatch")
-		}
-	}
-
-	failBytes := []byte{
-		0x01,                               // hash_id
-		0x06,                               // hash length
-		0x02,                               // num hashes
-		0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A, // digest_a
-		0x01, 0x02, 0x03, 0x04, 0x05, // digest_b
-	}
-	failBlob := koinos.NewVariableBlob()
-	*failBlob = append(*failBlob, failBytes...)
-
-	_, _, err := koinos.DeserializeMultihashVector(failBlob)
-	if err.Error() != "Unexpected EOF" {
-		t.Errorf("Expected an EOF error")
-	}
-
-	_, _, err = koinos.DeserializeMultihashVector(&koinos.VariableBlob{})
-	if err.Error() != "Could not deserialize multihash vector id" {
-		t.Errorf("Expected an failure deserializing multihash vector Id")
-	}
-
-	_, _, err = koinos.DeserializeMultihashVector(&koinos.VariableBlob{0x01})
-	if err.Error() != "Could not deserialize multihash vector hash size" {
-		t.Errorf("Expected an failure deserializing multihash hash size")
-	}
-
-	_, _, err = koinos.DeserializeMultihashVector(&koinos.VariableBlob{0x01, 0x02})
-	if err.Error() != "Could not deserialize multihash vector size" {
-		t.Errorf("Expected an failure deserializing multihash vector size")
-	}
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Expected panic on mismatching multihash vector size")
-		} else {
-			if r != "Multihash vector size mismatch" {
-				t.Errorf("Expected panic on mismatching multihash vector size, rather than: %s", r)
-			}
-		}
-	}()
-	vblobFail := koinos.NewVariableBlob()
-	*vblobFail = append(*vblobFail, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
-	vblobFail2 := koinos.NewVariableBlob()
-	*vblobFail2 = append(*vblobFail2, 0x01, 0x02, 0x03, 0x04, 0x05)
-	var mhvFail koinos.MultihashVector
-	mhvFail.ID = 1
-	mhvFail.Digests = append(mhvFail.Digests, *vblobFail)
-	mhvFail.Digests = append(mhvFail.Digests, *vblobFail2)
-
-	failSerialize := koinos.NewVariableBlob()
-	mhvFail.Serialize(failSerialize)
 }
 
 func TestFixedBlob(t *testing.T) {
@@ -2211,75 +2122,6 @@ func TestMultihashJson(t *testing.T) {
 	expected := []byte{0x01, 0x02, 0x03, 0x04}
 	if !value.Equals(&result) || result.ID != 1 || !bytes.Equal(result.Digest, expected) {
 		t.Errorf("The resulting values are unequal")
-	}
-}
-
-func TestMultihashVectorJson(t *testing.T) {
-	variableBlob := koinos.NewVariableBlob()
-	*variableBlob = append(*variableBlob, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
-	variableBlob2 := koinos.NewVariableBlob()
-	*variableBlob2 = append(*variableBlob2, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
-	var value koinos.MultihashVector
-	value.ID = 1
-	value.Digests = append(value.Digests, *variableBlob)
-	value.Digests = append(value.Digests, *variableBlob2)
-	b, err := json.Marshal(&value)
-	if err != nil {
-		t.Errorf("An error occurred while encoding to JSON")
-	}
-	if string(b) != "{\"hash\":1,\"digests\":[\"z31SRtpx1\",\"zW7LcTy7\"]}" {
-		t.Errorf("Unexpected JSON output")
-	}
-	var result koinos.MultihashVector
-	err = json.Unmarshal(b, &result)
-	if err != nil {
-		t.Errorf("An error occurred while decoding from JSON")
-	}
-
-	if result.ID != value.ID || !bytes.Equal(result.Digests[0], value.Digests[0]) || !bytes.Equal(result.Digests[1], value.Digests[1]) {
-		t.Errorf("The resulting values are unequal")
-	}
-
-	var mhv koinos.MultihashVector
-	by := []byte(`{"hash":"1","digests":["z31SRtpx1","zW7yj"]}`)
-	err = json.Unmarshal(by, &mhv)
-	if err.Error() != "json: cannot unmarshal string into Go struct field .hash of type uint64" {
-		t.Errorf("Expected failure parsing hash id")
-	}
-
-	by = []byte(`{"hash":1,"digests":["31SRtpx1"]}`)
-	err = json.Unmarshal(by, &mhv)
-	if err.Error() != "Unknown encoding: 3" {
-		t.Errorf("Expected unknown encoding")
-	}
-
-	by = []byte(`{"hash":1,"digests":["z31SRtpx1","zW7yj"]}`)
-
-	err = json.Unmarshal(by, &mhv)
-	if err == nil {
-		t.Errorf("Expected multihash vector size mismatch")
-	}
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Expected panic on mismatching multihash vector size")
-		} else {
-			if r != "Multihash vector size mismatch" {
-				t.Errorf("Expected panic on mismatching multihash vector size, rather than: %s", r)
-			}
-		}
-	}()
-	vblobFail := koinos.NewVariableBlob()
-	*vblobFail = append(*vblobFail, 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A)
-	vblobFail2 := koinos.NewVariableBlob()
-	*vblobFail2 = append(*vblobFail2, 0x01, 0x02, 0x03, 0x04, 0x05)
-	var mhvFail koinos.MultihashVector
-	mhvFail.ID = 1
-	mhvFail.Digests = append(mhvFail.Digests, *vblobFail)
-	mhvFail.Digests = append(mhvFail.Digests, *vblobFail2)
-	_, e := json.Marshal(&mhvFail)
-	if e == nil {
-		t.Errorf("Unexpected success with mismatching multihash vector sizes")
 	}
 }
 
