@@ -4,7 +4,6 @@ struct chain_reserved_request {};
 
 struct submit_block_request
 {
-   block_topology  topology;
    protocol::block block;
    boolean         verify_passive_data;
    boolean         verify_block_signature;
@@ -13,7 +12,6 @@ struct submit_block_request
 
 struct submit_transaction_request
 {
-   transaction_topology  topology;
    protocol::transaction transaction;
    boolean               verify_passive_data;
    boolean               verify_transaction_signatures;
@@ -54,9 +52,7 @@ struct submit_transaction_response {};
 
 struct get_head_info_response
 {
-   multihash         id;
-   multihash         previous_id;
-   block_height_type height;
+   block_topology    head_topology;
    block_height_type last_irreversible_height;
 };
 

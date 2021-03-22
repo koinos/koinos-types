@@ -42,40 +42,60 @@ typedef std::variant<
 
 struct active_transaction_data
 {
-   uint128 resource_limit;
+   uint128                  resource_limit;
+   std::vector< operation > operations;
 };
 
 struct passive_transaction_data {};
 
 struct transaction
 {
+   multihash                           id;
    opaque< active_transaction_data >   active_data;
    opaque< passive_transaction_data >  passive_data;
    variable_blob                       signature_data;
-
-   std::vector< operation >            operations;
 };
 
 struct active_block_data
 {
-   multihash                      previous_block;
    multihash                      transaction_merkle_root;
    multihash                      passive_data_merkle_root;
-   block_height_type              height;
-   timestamp_type                 timestamp;
+   multihash                      signer_address;
 };
 
 struct passive_block_data {};
 
-typedef opaque< transaction > opaque_transaction;
+struct block_header
+{
+   multihash                     previous;
+   block_height_type             height;
+   timestamp_type                timestamp;
+};
+
+/**
+ * Topological constraints:  Constraints for a new block b that builds on a given block a
+ *
+ * b.header.previous_block == a.block_id
+ * b.header.height         == a.header.height+1
+ * b.header.timestamp      >  a.header.timestamp
+ *
+ * Cryptographic constraints:  Internal constraints for block b.
+ *
+ * b.block_id                             == H(b.header, b.active_data)
+ * b.active_data.transaction_merkle_root  == Hm(b.transactions)
+ * b.active_data.passive_data_merkle_root == Hm(b.passive_data)
+ * b.active_data.signer_address           == H(recover(b.signature_data, b.block_id))
+ */
 
 struct block
 {
+   multihash                     id;
+   block_header                  header;
    opaque< active_block_data >   active_data;
    opaque< passive_block_data >  passive_data;
    variable_blob                 signature_data;
 
-   std::vector< opaque_transaction >    transactions;
+   std::vector< transaction >    transactions;
 };
 
 struct block_receipt {};

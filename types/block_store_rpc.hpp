@@ -45,7 +45,6 @@ struct get_blocks_by_height_response
 struct add_block_request
 {
    block_store::block_item block_to_add;
-   multihash               previous_block_id;
 };
 
 struct add_block_response
@@ -54,8 +53,7 @@ struct add_block_response
 
 struct add_transaction_request
 {
-   multihash                             transaction_id;
-   opaque< protocol::transaction >       transaction;
+   protocol::transaction transaction;
 };
 
 struct add_transaction_response
