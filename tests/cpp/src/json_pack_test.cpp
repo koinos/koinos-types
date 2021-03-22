@@ -323,6 +323,18 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    multihash from_j;
    from_json( j, from_j );
    BOOST_REQUIRE_EQUAL( to_j.digest.size(), from_j.digest.size() );
+
+   j = std::string("zkpt6ajQywrZ");
+   try
+   {
+      from_json( j, from_j );
+      BOOST_REQUIRE( false );
+   }
+   catch( json_type_mismatch& e )
+   {
+      BOOST_REQUIRE_EQUAL( e.what(), "Multihash JSON had extra bytes" );
+   }
+
    for( size_t i = 0; i < to_j.digest.size(); ++i )
    {
       BOOST_REQUIRE_EQUAL( to_j.digest[i], from_j.digest[i] );

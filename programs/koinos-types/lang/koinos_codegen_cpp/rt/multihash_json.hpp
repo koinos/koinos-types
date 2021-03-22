@@ -38,6 +38,10 @@ inline void from_json( const json& j, multihash& v, uint32_t depth )
    std::stringstream ss(serialized_bytes_str);
 
    from_binary( ss, v );
+   if( ss.tellg() != serialized_bytes_str.size() )
+   {
+      throw json_type_mismatch( "Multihash JSON had extra bytes" );
+   }
 }
 
 }
