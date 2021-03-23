@@ -117,9 +117,9 @@
    {
       "type": "protocol::block",
       "json": {
-         "id": "zggYfqMKC3KaECod",
+         "id": "z3396kz2ywyU8s",
          "header": {
-            "previous": "zggYfqMKC3KaECod",
+            "previous": "z3396kz2ywyU8s",
             "height": 30,
             "timestamp": 40
          },
@@ -128,7 +128,7 @@
          "signature_data": "zXoAa5DbgvuAbW",
          "transactions": [
             {
-               "id": "zggYfqMKC3KaECod",
+               "id": "z3396kz2ywyU8s",
                "active_data": {
                   "resource_limit": "3480523478260483267",
                   "operations": [
@@ -164,9 +164,9 @@
       "type": "chain::head_info",
       "json": {
          "head_topology": {
-            "id": "z5AknUi3r5PazoPSLgj",
+            "id": "zDQePGgMRmMPgwyu",
             "height": 100,
-            "previous": "z4LSqe7u29G8jZwrMCX"
+            "previous": "zAvpWTnQXpthbhiT"
          },
          "last_irreversible_height": 100
       }
@@ -174,9 +174,9 @@
    {
       "type": "koinos::block_topology",
       "json": {
-         "id": "z5AknUi3r5PazoPSLgj",
+         "id": "zDQePGgMRmMPgwyu",
          "height": 100,
-         "previous": "z614jKJDQq3EpgTHzfM"
+         "previous": "zFtUGpPpXGTi3rjm"
       }
    },
    {
@@ -193,16 +193,16 @@
       "type": "chain::verify_block_signature_args",
       "json": {
          "signature_data": "zQT2iJXiFShP1KGPeeeet",
-         "digest": "zggYfqMKC3KaECod"
+         "digest": "z3396kz2ywyU8s"
       }
    },
    {
       "type": "chain::verify_merkle_root_args",
       "json": {
-         "root": "z2gUKsEH1Fqh6K",
+         "root": "z61BvZeNkaP",
          "hashes": [
-            "zE35B6ga1jZ2u9i",
-            "zCTr31ykeQhVk65"
+            "zfoxVHZEMqGU",
+            "zb8MrNpnNivu"
          ]
       }
    },
@@ -210,9 +210,9 @@
       "type": "chain::apply_block_args",
       "json": {
          "block": {
-            "id": "zggYfqMKC3KaECod",
+            "id": "z3396kz2ywyU8s",
             "header": {
-               "previous": "zggYfqMKC3KaECod",
+               "previous": "z3396kz2ywyU8s",
                "height": 30,
                "timestamp": 40
             },
@@ -221,7 +221,7 @@
             "signature_data": "zXoAa5DbgvuAbW",
             "transactions": [
                {
-                  "id": "zggYfqMKC3KaECod",
+                  "id": "z3396kz2ywyU8s",
                   "active_data": {
                      "resource_limit": "3480523478260483267",
                      "operations": [
@@ -260,7 +260,7 @@
       "type": "chain::apply_transaction_args",
       "json": {
          "transaction": {
-            "id": "zggYfqMKC3KaECod",
+            "id": "z3396kz2ywyU8s",
             "active_data": {
                "resource_limit": "3480523478260483267",
                "operations": [
@@ -378,9 +378,9 @@
       "type": "rpc::chain::submit_block_request",
       "json": {
          "block": {
-            "id": "zggYfqMKC3KaECod",
+            "id": "z3396kz2ywyU8s",
             "header": {
-               "previous": "zggYfqMKC3KaECod",
+               "previous": "z3396kz2ywyU8s",
                "height": 30,
                "timestamp": 40
             },
@@ -389,7 +389,7 @@
             "signature_data": "zXoAa5DbgvuAbW",
             "transactions": [
                {
-                  "id": "zggYfqMKC3KaECod",
+                  "id": "z3396kz2ywyU8s",
                   "active_data": {
                      "resource_limit": "3480523478260483267",
                      "operations": [
@@ -428,7 +428,7 @@
       "type": "rpc::chain::submit_transaction_request",
       "json": {
          "transaction": {
-            "id": "zggYfqMKC3KaECod",
+            "id": "z3396kz2ywyU8s",
             "active_data": {
                "resource_limit": "3480523478260483267",
                "operations": [
