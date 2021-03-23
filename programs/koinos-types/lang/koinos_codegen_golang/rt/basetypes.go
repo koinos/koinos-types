@@ -1232,7 +1232,7 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 }
 
 // MarshalJSON Multihash
-func (m0 *Multihash) MarshalJSON() ([]byte, error) {
+func (m0 Multihash) MarshalJSON() ([]byte, error) {
 	vb := NewVariableBlob()
 	s := m0.Serialize(vb)
 	b58str := "z" + base58.Encode(*s)
