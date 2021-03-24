@@ -210,30 +210,19 @@ inline void from_json( const json& j, vector< T >& v, uint32_t depth )
 // variable length blob
 inline void to_json( json& j, const variable_blob& v )
 {
-   string base58;
-   util::encode_base58( base58, v );
-   j = std::move( 'z' + base58 );
+   std::vector<char> dest;
+   util::encode_multibase( v.data(), v.size(), dest );
+   j = std::string( dest.begin(), dest.end() );
 }
 
 inline void from_json( const json& j, variable_blob& v, uint32_t depth )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
-   v.clear();
    string encoded_str = j.template get< string >();
-   switch( encoded_str.c_str()[0] )
-   {
-      case 'm':
-         // Base64
-         break;
-      case 'z':
-         // Base58
-         if( !(util::decode_base58( encoded_str.c_str() + 1, v )) ) throw json_decode_error( "Error decoding base58 string" );
-         break;
-      default:
-         if( !(false) ) throw json_type_mismatch( "Unknown encoding prefix" );
-   }
+   util::decode_multibase( encoded_str.c_str(), encoded_str.size(), v );
 }
 
+// string
 inline void to_json( json& j, const std::string& s )
 {
    j = s;
@@ -304,29 +293,20 @@ inline void from_json( const json& j, array< T, N >& v, uint32_t depth )
 template< size_t N >
 inline void to_json( json& j, const fixed_blob< N >& v )
 {
-   string base58;
-   util::encode_base58( base58, v );
-   j = std::move( 'z' + base58 );
+   std::vector<char> dest;
+   util::encode_multibase( v.data(), v.size(), dest );
+   j = std::string( dest.begin(), dest.end() );
 }
 
 template< size_t N >
 inline void from_json( const json& j, fixed_blob< N >& v, uint32_t depth )
 {
    if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: String Expected" );
-
    string encoded_str = j.template get< string >();
-   switch( encoded_str.c_str()[0] )
-   {
-      case 'm':
-         // Base64
-         break;
-      case 'z':
-         // Base58
-         if( !(util::decode_base58( encoded_str.c_str() + 1, v )) ) throw json_decode_error( "Error decoding base58 string" );
-         break;
-      default:
-         if( !(false) ) throw json_type_mismatch( "Unknown encoding prefix" );
-   }
+   std::vector< char > temp;
+   util::decode_multibase( encoded_str.c_str(), encoded_str.size(), temp );
+   if( temp.size() != N ) throw json_type_mismatch( "String length does not match" );
+   std::copy( temp.begin(), temp.end(), v.begin() );
 }
 
 // variant

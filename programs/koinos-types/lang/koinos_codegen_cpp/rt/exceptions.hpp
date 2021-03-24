@@ -70,6 +70,11 @@ KOINOS_PACK_DECLARE_EXCEPTION( opaque_not_unboxed );
  */
 KOINOS_PACK_DECLARE_EXCEPTION( opaque_locked );
 
+/*
+ * Serialization error encoding/decoding multibase, base64, base58, etc.
+ */
+KOINOS_PACK_DECLARE_EXCEPTION( base_decode_error );
+
 } // koinos::pack
 
 #undef KOINOS_PACK_DECLARE_EXCEPTION
