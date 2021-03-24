@@ -1175,8 +1175,8 @@ func DeserializeBlockHeightType(vb *VariableBlob) (uint64, *BlockHeightType, err
 
 // Multihash type
 type Multihash struct {
-	ID     UInt64       `json:"hash"`
-	Digest VariableBlob `json:"digest"`
+	ID     UInt64
+	Digest VariableBlob
 }
 
 // NewMultihash factory
@@ -1229,6 +1229,38 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 	omh.ID = UInt64(id)
 	omh.Digest = *d
 	return uint64(isize) + dsize, &omh, nil
+}
+
+// MarshalJSON Multihash
+func (m0 Multihash) MarshalJSON() ([]byte, error) {
+	vb := NewVariableBlob()
+	s := m0.Serialize(vb)
+	b58str := "z" + base58.Encode(*s)
+	return json.Marshal(b58str)
+}
+
+// UnmarshalJSON Multihash
+func (m0 *Multihash) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+
+	db, err := DecodeBytes(s)
+	if err != nil {
+		return err
+	}
+	vdb := VariableBlob(db)
+	size, m1, err := DeserializeMultihash(&vdb)
+	if err != nil {
+		return err
+	}
+	if size != uint64(len(db)) {
+		return errors.New("Multihash JSON had extra bytes")
+	}
+
+	*m0 = *m1
+	return nil
 }
 
 // --------------------------------

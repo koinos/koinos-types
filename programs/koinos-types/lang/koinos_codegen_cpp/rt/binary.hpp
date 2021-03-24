@@ -1,6 +1,7 @@
 #pragma once
 #include <koinos/pack/rt/binary_fwd.hpp>
 #include <koinos/pack/rt/exceptions.hpp>
+#include <koinos/pack/rt/multihash_binary.hpp>
 #include <koinos/pack/rt/opaque.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 #include <koinos/pack/rt/typename.hpp>
@@ -430,38 +431,6 @@ inline void from_binary( Stream& s, std::optional< T >& v, uint32_t depth )
       v = T();
       from_binary( s, *v, depth );
    }
-}
-
-/* Multihash:
- *
- * A varint hash function (key), followed by a varint digest size in bytes,
- * followed by Network Byte Order hash for the specified length.
- */
-
-template< typename Stream >
-inline void to_binary( Stream& s, const multihash& v )
-{
-   to_binary( s, unsigned_int( v.id ) );
-   to_binary( s, v.digest );
-}
-
-template< typename Stream >
-inline void from_binary( Stream& s, multihash& v, uint32_t depth )
-{
-   unsigned_int id, size;
-   from_binary( s, id );
-   from_binary( s, size );
-
-   if( !(size.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Array allocation exceeded" );
-
-   v.digest.resize( size.value );
-   if( size.value )
-   {
-      s.read( v.digest.data(), size.value );
-      if( !(s.good()) ) throw stream_error( "Error reading from stream" );
-   }
-
-   v.id = id.value;
 }
 
 template< typename Stream, typename T >

@@ -20,6 +20,8 @@ set(KOINOS_CPP_OUTPUT_FILES
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/exceptions.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/json_fwd.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/json.hpp"
+   "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/multihash_binary.hpp"
+   "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/multihash_json.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/pack_fwd.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/reflect.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/typename.hpp"
