@@ -2109,9 +2109,11 @@ func TestMultihashJson(t *testing.T) {
 	value := koinos.Multihash{ID: 1, Digest: koinos.VariableBlob{0x01, 0x02, 0x03, 0x04}}
 	b, err := json.Marshal(&value)
 	if err != nil {
-		t.Errorf("An error occurred while encoding to JSON")
+		t.Errorf("An error occurred while encoding to JSON: %s\n", err.Error())
 	}
-	if string(b) != "{\"hash\":1,\"digest\":\"z2VfUX\"}" {
+	// Expected string generated using Python base58 (pip install base58) as follows:
+	// echo -n z; echo -ne '\x01\x04\x01\x02\x03\x04' | base58; echo
+	if string(b) != "\"zWLNhUaF\"" {
 		t.Errorf("Unexpected JSON output")
 	}
 	var result koinos.Multihash
@@ -2122,6 +2124,17 @@ func TestMultihashJson(t *testing.T) {
 	expected := []byte{0x01, 0x02, 0x03, 0x04}
 	if !value.Equals(&result) || result.ID != 1 || !bytes.Equal(result.Digest, expected) {
 		t.Errorf("The resulting values are unequal")
+	}
+	// Expected string generated using Python base58 (pip install base58) as follows:
+	// echo -n z; echo -ne '\x01\x04\x01\x02\x03\x04\x02' | base58; echo
+	b = []byte("\"z3EUWmehiq\"")
+	err = json.Unmarshal(b, &result)
+	if err == nil {
+		t.Errorf("Expected error, got success decoding JSON multihash with too many bytes")
+	} else {
+		if err.Error() != "Multihash JSON had extra bytes" {
+			t.Errorf("Got unexpected error decoding JSON multihash with too many bytes: %s\n", err.Error())
+		}
 	}
 }
 
