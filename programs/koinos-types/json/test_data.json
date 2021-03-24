@@ -56,7 +56,8 @@
    {
       "type": "protocol::active_transaction_data",
       "json": {
-         "resource_limit": "3480523478260483267"
+         "resource_limit": "3480523478260483267",
+         "nonce": 1
       }
    },
    {
