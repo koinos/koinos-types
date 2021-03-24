@@ -56,7 +56,8 @@
    {
       "type": "protocol::active_transaction_data",
       "json": {
-         "resource_limit": "3480523478260483267"
+         "resource_limit": "3480523478260483267",
+         "nonce": 1
       }
    },
    {
@@ -67,7 +68,8 @@
       "type": "protocol::transaction",
       "json": {
          "active_data": {
-            "resource_limit": "3480523478260483267"
+            "resource_limit": "3480523478260483267",
+            "nonce": 1
          },
          "passive_data": {},
          "signature_data": "zXoAa5DbgvuAbW",
@@ -131,6 +133,7 @@
                "id": "z3396kz2ywyU8s",
                "active_data": {
                   "resource_limit": "3480523478260483267",
+                  "nonce": 1,
                   "operations": [
                      {
                         "type": "koinos::protocol::reserved_operation",
@@ -224,6 +227,7 @@
                   "id": "z3396kz2ywyU8s",
                   "active_data": {
                      "resource_limit": "3480523478260483267",
+                     "nonce": 1,
                      "operations": [
                         {
                            "type": "koinos::protocol::reserved_operation",
@@ -263,6 +267,7 @@
             "id": "z3396kz2ywyU8s",
             "active_data": {
                "resource_limit": "3480523478260483267",
+               "nonce": 1,
                "operations": [
                   {
                      "type": "koinos::protocol::reserved_operation",
@@ -392,6 +397,7 @@
                   "id": "z3396kz2ywyU8s",
                   "active_data": {
                      "resource_limit": "3480523478260483267",
+                     "nonce": 1,
                      "operations": [
                         {
                            "type": "koinos::protocol::reserved_operation",
@@ -431,6 +437,7 @@
             "id": "z3396kz2ywyU8s",
             "active_data": {
                "resource_limit": "3480523478260483267",
+               "nonce": 1,
                "operations": [
                   {
                      "type": "koinos::protocol::reserved_operation",
