@@ -4,6 +4,16 @@ namespace koinos { namespace block_store {
 struct block_item
 {
    /**
+    * The hash of the block.
+    */
+   multihash                      block_id;
+
+   /**
+    * The height of the block.
+    */
+   block_height_type              block_height;
+
+   /**
     * The block data.  If return_block_blob is false, block_blob will be empty.
     */
    opaque< protocol::block >             block;
