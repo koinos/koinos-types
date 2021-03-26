@@ -8,11 +8,6 @@ struct block_topology
    multihash         previous;
 };
 
-struct transaction_topology
-{
-   multihash id;
-};
-
 struct unused_extensions_type { };
 
 // KOINOS_SIGNATURE_LENGTH = 65 from fc::ecc::compact_signature
