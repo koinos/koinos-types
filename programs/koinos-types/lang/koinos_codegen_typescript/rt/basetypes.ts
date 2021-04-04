@@ -42,6 +42,14 @@ export class Int8 {
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeByte(this._number);
   }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
+  }
 }
 
 export const MAX_UINT8 = 0xFF;
@@ -57,6 +65,14 @@ export class UInt8 {
 
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeByte(this._number);
+  }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
   }
 }
 
@@ -75,6 +91,14 @@ export class Int16 {
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeInt16(this._number);
   }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
+  }
 }
 
 export const MAX_UINT16 = 0xFFFF;
@@ -90,6 +114,14 @@ export class UInt16 {
 
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeUint16(this._number);
+  }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
   }
 }
 
@@ -108,6 +140,14 @@ export class Int32 {
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeInt32(this._number);
   }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
+  }
 }
 
 export const MAX_UINT32 = 0xFFFFFFFF;
@@ -123,6 +163,14 @@ export class UInt32 {
 
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeUint32(this._number);
+  }
+
+  toNumber(): number {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
   }
 }
 
@@ -148,6 +196,14 @@ export class Int64 {
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeInt64(this._number);
   }
+
+  toNumber(): Long.Long {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
+  }
 }
 
 export const MAX_UINT64 = Long.MAX_UNSIGNED_VALUE;
@@ -170,6 +226,14 @@ export class UInt64 {
 
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeUint64(this._number);
+  }
+
+  toNumber(): Long.Long {
+    return this._number;
+  }
+
+  toString(): string { 
+    return this._number.toString();
   }
 }
 

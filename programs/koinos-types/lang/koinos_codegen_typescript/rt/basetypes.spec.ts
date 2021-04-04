@@ -10,7 +10,7 @@ describe("Koinos Types - Typescript", () => {
     const str = new Koinos.KString("test");
     str.serialize(vb);
     vb.buffer.flip();    
-    expect(vb.deserializeInt32()._number).toBe(12345);
-    expect(vb.deserializeString()._string).toBe("test");
+    expect(vb.deserializeInt32().toNumber()).toBe(12345);
+    expect(vb.deserializeString().toString()).toBe("test");
   });
 });
