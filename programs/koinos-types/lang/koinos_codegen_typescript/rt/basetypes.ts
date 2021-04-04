@@ -9,8 +9,8 @@ export class KString {
     this._string = str;
   }
   
-  serialize(): VariableBlob {
-    return new VariableBlob(ByteBuffer.fromUTF8(this._string));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.append(ByteBuffer.fromUTF8(this._string));
   }
 }
 
@@ -22,109 +22,154 @@ export class KBoolean {
     this._bool = bool;
   }
 
-  serialize(): VariableBlob {
-    const buffer = new ByteBuffer(1);
-    buffer.writeByte(this._bool ? 1: 0)
-    return new VariableBlob(buffer);
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeByte(this._bool ? 1: 0);
   }
 }
 
+export const MAX_INT8 = 0x7F;
+export const MIN_INT8 = -0x80;
 export class Int8 {
 
   public _number: number;
 
   constructor(n: number = 0) {
+    if(n < MIN_INT8 || n > MAX_INT8)
+      throw new Error("Int8 is out of bounds");
     this._number = n;
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(1).writeByte(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeByte(this._number);
   }
 }
 
-export class UInt8 extends Int8 {}
+export const MAX_UINT8 = 0xFF;
+export class UInt8 {
 
+  public _number: number;
+
+  constructor(n: number = 0) {
+    if(n < 0 || n > MAX_UINT8)
+      throw new Error("UInt8 is out of bounds");
+    this._number = n;
+  }
+
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeByte(this._number);
+  }
+}
+
+export const MAX_INT16 = 0x7FFF;
+export const MIN_INT16 = -0x8000;
 export class Int16 {
 
   public _number: number;
 
   constructor(n: number = 0) {
+    if(n < MIN_INT16 || n > MAX_INT16)
+      throw new Error("Int16 is out of bounds");
     this._number = n;
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(2).writeInt16(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeInt16(this._number);
   }
 }
 
+export const MAX_UINT16 = 0xFFFF;
 export class UInt16 {
-
+  
   public _number: number;
 
   constructor(n: number = 0) {
+    if(n < 0 || n > MAX_UINT16)
+      throw new Error("UInt16 is out of bounds");  
     this._number = n;
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(2).writeUint16(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeUint16(this._number);
   }
 }
 
+export const MAX_INT32 = 0x7FFFFFFF;
+export const MIN_INT32 = -0x80000000;
 export class Int32 {
 
   public _number: number;
 
   constructor(n: number = 0) {
+    if(n < MIN_INT32 || n > MAX_INT32)
+      throw new Error("Int32 is out of bounds");
     this._number = n;
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(4).writeInt32(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeInt32(this._number);
   }
 }
 
+export const MAX_UINT32 = 0xFFFFFFFF;
 export class UInt32 {
 
   public _number: number;
 
   constructor(n: number = 0) {
+    if(n < 0 || n > MAX_UINT32)
+      throw new Error("UInt32 is out of bounds");
     this._number = n;
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(4).writeUint32(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeUint32(this._number);
   }
 }
 
+export const MAX_INT64 = Long.MAX_VALUE;
+export const MIN_INT64 = Long.MIN_VALUE;
 export class Int64 {
 
   public _number: Long.Long;
 
-  constructor(n?: number | Long.Long) {
-    if(n instanceof Long)
+  constructor(n: number | string | Long.Long) {
+    if (n instanceof Long)
       this._number = n;
-    else
-      this._number = new Long(n);
+    else if(typeof n === "string")
+      this._number = Long.fromString(n);
+    else {
+      const number = n as unknown as number;
+      if (number < MIN_INT32 || number > MAX_INT32)
+        throw new Error("Int64 low number out of bounds");
+      this._number = Long.fromNumber(number);
+    }
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(8).writeInt64(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeInt64(this._number);
   }
 }
 
+export const MAX_UINT64 = Long.MAX_UNSIGNED_VALUE;
 export class UInt64 {
 
   public _number: Long.Long;
 
-  constructor(n?: number | Long.Long) {
-    if(n instanceof Long)
+  constructor(n: number | string | Long.Long) {
+    if (n instanceof Long)
       this._number = n;
-    else
-      this._number = new Long(n);
+    else if(typeof n === "string")
+      this._number = Long.fromString(n);
+    else {
+      const number = n as unknown as number;
+      if (number < 0 || number > MAX_UINT32)
+        throw new Error("UInt64 low number out of bounds");
+      this._number = Long.fromNumber(number);
+    }
   }
 
-  serialize(): VariableBlob {
-    return new VariableBlob(new ByteBuffer(8).writeUint64(this._number));
+  serialize(vb: VariableBlob): VariableBlob {
+    return vb.buffer.writeUint64(this._number);
   }
 }
 
@@ -139,17 +184,14 @@ export class VariableBlob {
       this.buffer = ByteBuffer.allocate(b);
   }
 
-  serialize(): VariableBlob {
-    if(this.buffer.offset !== 0) this.buffer.flip();
-    const ser = new VariableBlob();
-    ser.buffer
+  serialize(vb: VariableBlob): VariableBlob {
+    vb.buffer
       .writeVarint64(this.buffer.limit)
       .append(this.buffer);
-    return ser;
+    return vb;
   }
 
   deserializeVariableBlob(): VariableBlob {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     const size = this.buffer.readVarint64().toNumber();
     if(size < 0)
       throw new Error("Could not deserialize variable blob");
@@ -163,12 +205,10 @@ export class VariableBlob {
   }
 
   deserializeString(): KString {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     return new KString(this.buffer.toUTF8())
   }
 
   deserializeBoolean(): KBoolean {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit === 0)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readByte(0);
@@ -178,7 +218,6 @@ export class VariableBlob {
   }
 
   deserializeInt8(): Int8 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit === 0)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readByte(0);
@@ -190,7 +229,6 @@ export class VariableBlob {
   }
 
   deserializeInt16(): Int16 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 2)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readInt16();
@@ -198,7 +236,6 @@ export class VariableBlob {
   }
 
   deserializeUInt16(): UInt16 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 2)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readUint16();
@@ -206,7 +243,6 @@ export class VariableBlob {
   }
 
   deserializeInt32(): Int32 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 4)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readInt32();
@@ -214,7 +250,6 @@ export class VariableBlob {
   }
 
   deserializeUInt32(): UInt32 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 4)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readUint32();
@@ -222,7 +257,6 @@ export class VariableBlob {
   }
 
   deserializeInt64(): Int64 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 8)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readInt64();
@@ -230,7 +264,6 @@ export class VariableBlob {
   }
 
   deserializeUInt64(): UInt64 {
-    if(this.buffer.offset !== 0) this.buffer.flip();
     if(this.buffer.limit < 4)
       throw new Error("Unexpected EOF");
     const value = this.buffer.readUint64();
