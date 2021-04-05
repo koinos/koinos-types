@@ -2,7 +2,7 @@ import * as Koinos from "./basetypes";
 
 describe("Koinos Types - Typescript", () => {
   it("Serialize and desearialize", () => {
-    expect.assertions(8);
+    expect.assertions(20);
     const vb = new Koinos.VariableBlob();
     new Koinos.KBoolean(true).serialize(vb);
     new Koinos.KString("test").serialize(vb);
@@ -12,8 +12,18 @@ describe("Koinos Types - Typescript", () => {
     new Koinos.UInt16(1000).serialize(vb);
     new Koinos.Int32(10000).serialize(vb);
     new Koinos.UInt32(10000).serialize(vb);
-    //new Koinos.Int64("100000").serialize(vb);
-    //new Koinos.UInt64("100000").serialize(vb);
+    new Koinos.Int64("100000").serialize(vb);
+    new Koinos.Int64("-100000").serialize(vb);
+    new Koinos.UInt64("100000").serialize(vb);
+    new Koinos.Int128("100000").serialize(vb);
+    new Koinos.Int128("-100000").serialize(vb);
+    new Koinos.UInt128("100000").serialize(vb);
+    new Koinos.Int160("100000").serialize(vb);
+    new Koinos.Int160("-100000").serialize(vb);
+    new Koinos.UInt160("100000").serialize(vb);
+    new Koinos.Int256("100000").serialize(vb);
+    new Koinos.Int256("-100000").serialize(vb);
+    new Koinos.UInt256("100000").serialize(vb);
     vb.buffer.flip();
     expect(vb.deserializeBoolean().toBoolean()).toBe(true);
     expect(vb.deserializeString().toString()).toBe("test");
@@ -23,7 +33,17 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserializeUInt16().toNumber()).toBe(1000);
     expect(vb.deserializeInt32().toNumber()).toBe(10000);
     expect(vb.deserializeUInt32().toNumber()).toBe(10000);
-    //expect(vb.deserializeInt64().toString()).toBe("100000");
-    //expect(vb.deserializeUInt64().toString()).toBe("100000");
+    expect(vb.deserializeInt64().toString()).toBe("100000");
+    expect(vb.deserializeInt64().toString()).toBe("-100000");
+    expect(vb.deserializeUInt64().toString()).toBe("100000");
+    expect(vb.deserializeInt128().toString()).toBe("100000");
+    expect(vb.deserializeInt128().toString()).toBe("-100000");
+    expect(vb.deserializeUInt128().toString()).toBe("100000");
+    expect(vb.deserializeInt160().toString()).toBe("100000");
+    expect(vb.deserializeInt160().toString()).toBe("-100000");
+    expect(vb.deserializeUInt160().toString()).toBe("100000");
+    expect(vb.deserializeInt256().toString()).toBe("100000");
+    expect(vb.deserializeInt256().toString()).toBe("-100000");
+    expect(vb.deserializeUInt256().toString()).toBe("100000");
   });
 });

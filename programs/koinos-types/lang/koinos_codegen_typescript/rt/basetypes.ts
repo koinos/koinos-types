@@ -1,5 +1,4 @@
 import * as ByteBuffer from 'bytebuffer'
-import * as Long from 'long'
 
 export class KString {
   
@@ -16,7 +15,7 @@ export class KString {
       .append(buffer);
   }
 
-  toString() {
+  toString(): string {
     return this._string;
   }
 }
@@ -33,8 +32,12 @@ export class KBoolean {
     return vb.buffer.writeByte(this._bool ? 1: 0);
   }
 
-  toBoolean() {
+  toBoolean(): boolean {
     return this._bool;
+  }
+
+  toString(): string {
+    return this._bool.toString();
   }
 }
 
@@ -58,8 +61,8 @@ export class Int8 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
@@ -82,8 +85,8 @@ export class UInt8 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
@@ -107,8 +110,8 @@ export class Int16 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
@@ -131,8 +134,8 @@ export class UInt16 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
@@ -156,8 +159,8 @@ export class Int32 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
@@ -180,71 +183,110 @@ export class UInt32 {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
-export const MAX_INT64 = Long.MAX_VALUE;
-export const MIN_INT64 = Long.MIN_VALUE;
-export class Int64 {
+export class KBigInt {
 
-  public _number: Long.Long;
+  public _number: bigint;
 
-  constructor(n: number | string | Long.Long) {
-    if (n instanceof Long)
-      this._number = n;
-    else if(typeof n === "string")
-      this._number = Long.fromString(n);
-    else {
-      const number = n as unknown as number;
-      if (number < MIN_INT32 || number > MAX_INT32)
-        throw new Error("Int64 low number out of bounds");
-      this._number = Long.fromNumber(number);
-    }
+  private bytes: number;
+
+  constructor(number: bigint | string | number, bits: number, max: bigint, min: bigint = BigInt(0)) {
+    const n = BigInt(number);
+    const unsigned = min === BigInt(0);
+    this.bytes = bits / 8;
+    this._number = n;
+    if(n < min || n > max )
+      throw new Error(`${unsigned ? "U" : ""}Int${bits} is out of bounds`);
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeInt64(this._number);
+    let numString: string;
+    if(this._number >= BigInt(0)) {
+      numString = this._number.toString(16);
+      numString = "0".repeat(2*this.bytes - numString.length) + numString;
+    } else {
+      numString = (BigInt("0x1" + "0".repeat(2*this.bytes)) + this._number).toString(16);
+    }
+    for(let i=0; i<2*this.bytes; i+=8) {
+      const int32 = Number("0x" + numString.substring(i, i+8));
+      vb.buffer.writeUint32(int32);
+    }
+    return vb;
   }
 
-  toNumber(): Long.Long {
+  toBigInt(): bigint {
     return this._number;
   }
 
-  toString(): string { 
-    return this._number.toString();
+  toString(radix?: number): string {
+    return this._number.toString(radix);
   }
 }
 
-export const MAX_UINT64 = Long.MAX_UNSIGNED_VALUE;
-export class UInt64 {
+export const MAX_INT64  = BigInt("0x7" + "F".repeat(15));
+export const MAX_INT128 = BigInt("0x7" + "F".repeat(31));
+export const MAX_INT160 = BigInt("0x7" + "F".repeat(39));
+export const MAX_INT256 = BigInt("0x7" + "F".repeat(63));
 
-  public _number: Long.Long;
+export const MIN_INT64  = -BigInt("0x8" + "0".repeat(15));
+export const MIN_INT128 = -BigInt("0x8" + "0".repeat(31));
+export const MIN_INT160 = -BigInt("0x8" + "0".repeat(39));
+export const MIN_INT256 = -BigInt("0x8" + "0".repeat(63));
 
-  constructor(n: number | string | Long.Long) {
-    if (n instanceof Long)
-      this._number = n;
-    else if(typeof n === "string")
-      this._number = Long.fromString(n);
-    else {
-      const number = n as unknown as number;
-      if (number < 0 || number > MAX_UINT32)
-        throw new Error("UInt64 low number out of bounds");
-      this._number = Long.fromNumber(number);
-    }
+export const MAX_UINT64  = BigInt("0x" + "F".repeat(16));
+export const MAX_UINT128 = BigInt("0x" + "F".repeat(32));
+export const MAX_UINT160 = BigInt("0x" + "F".repeat(40));
+export const MAX_UINT256 = BigInt("0x" + "F".repeat(64));
+
+export class Int64 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 64, MAX_INT64, MIN_INT64);
   }
+}
 
-  serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeUint64(this._number);
+export class UInt64 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 64, MAX_UINT64);
   }
+}
 
-  toNumber(): Long.Long {
-    return this._number;
+export class Int128 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 128, MAX_INT128, MIN_INT128);
   }
+}
 
-  toString(): string { 
-    return this._number.toString();
+export class UInt128 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 128, MAX_UINT128);
+  }
+}
+
+export class Int160 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 160, MAX_INT160, MIN_INT160);
+  }
+}
+
+export class UInt160 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 160, MAX_UINT160);
+  }
+}
+
+export class Int256 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 256, MAX_INT256, MIN_INT256);
+  }
+}
+
+export class UInt256 extends KBigInt {
+  constructor(number: bigint | string | number) {
+    super(number, 256, MAX_UINT256);
   }
 }
 
@@ -333,19 +375,53 @@ export class VariableBlob {
     return new UInt32(value);
   }
 
-  deserializeInt64(): Int64 {
-    if(this.buffer.limit < 8)
+  deserializeBigInt(bits: number, unsigned: boolean): bigint {
+    const bytes = bits / 8;
+    if(this.buffer.limit < bytes)
       throw new Error("Unexpected EOF");
-    const value = this.buffer.readInt64();
-    return new Int64(value);
+    let numString = "0x";
+    for(let i=0; i<bytes/4; i+=1) {
+      const uint32Str = this.buffer.readUint32().toString(16);
+      numString += "0".repeat(8 - uint32Str.length) + uint32Str;
+    }
+    if(!unsigned && Number(numString.substring(0,3)) >= 8) {
+      // signed number and starts with bit 1 (negative number)
+      return BigInt(numString) - BigInt("0x1" + "0".repeat(2*bytes));
+    }
+    return BigInt(numString);
   }
 
-  deserializeUInt64(): UInt64 {
-    if(this.buffer.limit < 4)
-      throw new Error("Unexpected EOF");
-    const value = this.buffer.readUint64();
-    return new UInt64(value);
+  deserializeInt64(): Int64 {
+    return new Int64(this.deserializeBigInt(64, false));
   }
+  
+  deserializeUInt64(): UInt64 {
+    return new UInt64(this.deserializeBigInt(64, true));
+  }
+
+  deserializeInt128(): Int128 {
+    return new Int128(this.deserializeBigInt(128, false));
+  }
+  
+  deserializeUInt128(): UInt128 {
+    return new UInt128(this.deserializeBigInt(128, true));
+  }
+
+  deserializeInt160(): Int160 {
+    return new Int160(this.deserializeBigInt(160, false));
+  }
+  
+  deserializeUInt160(): UInt160 {
+    return new UInt160(this.deserializeBigInt(160, true));
+  }
+
+  deserializeInt256(): Int256 {
+    return new Int256(this.deserializeBigInt(256, false));
+  }
+  
+  deserializeUInt256(): UInt256 {
+    return new UInt256(this.deserializeBigInt(256, true));
+  }  
 
   toHex() {
     if(this.buffer.offset !== 0) this.buffer.flip();
