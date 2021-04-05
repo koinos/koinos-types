@@ -10,7 +10,14 @@ export class KString {
   }
   
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.append(ByteBuffer.fromUTF8(this._string));
+    const buffer = ByteBuffer.fromUTF8(this._string);
+    return vb.buffer
+      .writeVarint64(buffer.limit)
+      .append(buffer);
+  }
+
+  toString() {
+    return this._string;
   }
 }
 
@@ -24,6 +31,10 @@ export class KBoolean {
 
   serialize(vb: VariableBlob): VariableBlob {
     return vb.buffer.writeByte(this._bool ? 1: 0);
+  }
+
+  toBoolean() {
+    return this._bool;
   }
 }
 
@@ -265,17 +276,19 @@ export class VariableBlob {
       throw new Error("Unexpected EOF");
     const vb = new VariableBlob(size);
     this.buffer.copyTo(vb.buffer, 0, offset, offset + size);
+    this.buffer.offset += size;
     return vb;
   }
 
   deserializeString(): KString {
-    return new KString(this.buffer.toUTF8())
+    const vb = this.deserializeVariableBlob();
+    return new KString(vb.buffer.toUTF8())
   }
 
   deserializeBoolean(): KBoolean {
     if(this.buffer.limit === 0)
       throw new Error("Unexpected EOF");
-    const value = this.buffer.readByte(0);
+    const value = this.buffer.readByte();
     if( value !== 0 && value !== 1)
       throw new Error("Boolean must be 0 or 1");
     return new KBoolean(!!value);
@@ -284,7 +297,7 @@ export class VariableBlob {
   deserializeInt8(): Int8 {
     if(this.buffer.limit === 0)
       throw new Error("Unexpected EOF");
-    const value = this.buffer.readByte(0);
+    const value = this.buffer.readByte();
     return new Int8(value);
   }
 
