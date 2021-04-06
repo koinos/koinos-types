@@ -1,9 +1,32 @@
 import * as Koinos from "./basetypes";
 
 describe("Koinos Types - Typescript", () => {
+  it("should compare VariableBlobs", () => {
+    expect.assertions(2);
+    const vb1 = new Koinos.VariableBlob(9);
+    const vb2 = new Koinos.VariableBlob(5);
+    const vb3 = new Koinos.VariableBlob(5);
+    
+    const num1 = new Koinos.Int16(1000);
+    const num2 = new Koinos.Int64(1000);
+    num1.serialize(vb1);
+    num1.serialize(vb2);
+    num2.serialize(vb3);
+    vb1.buffer.flip();
+    vb2.buffer.flip();
+    vb3.buffer.flip();
+    expect(vb1.equals(vb2)).toBe(true);
+    expect(vb1.equals(vb3)).toBe(false);
+  });
   it("Serialize and desearialize", () => {
-    expect.assertions(20);
+    expect.assertions(24);
     const vb = new Koinos.VariableBlob();
+    
+    const vb1 = new Koinos.VariableBlob();
+    new Koinos.KString("test variable blob").serialize(vb1);
+
+    vb1.buffer.flip();
+    vb1.serialize(vb);
     new Koinos.KBoolean(true).serialize(vb);
     new Koinos.KString("test").serialize(vb);
     new Koinos.Int8(100).serialize(vb);
@@ -24,7 +47,17 @@ describe("Koinos Types - Typescript", () => {
     new Koinos.Int256("100000").serialize(vb);
     new Koinos.Int256("-100000").serialize(vb);
     new Koinos.UInt256("100000").serialize(vb);
+    new Koinos.TimestampType("1234567890").serialize(vb);
+    new Koinos.BlockHeightType(123456).serialize(vb);
+    const m = new Koinos.Multihash();
+    m.id = new Koinos.UInt64(123);
+    m.digest = new Koinos.VariableBlob();
+    new Koinos.KString("digest").serialize(m.digest);
+    m.digest.buffer.flip();
+    m.serialize(vb);
+
     vb.buffer.flip();
+    expect(vb.deserializeVariableBlob().equals(vb1)).toBe(true);
     expect(vb.deserializeBoolean().toBoolean()).toBe(true);
     expect(vb.deserializeString().toString()).toBe("test");
     expect(vb.deserializeInt8().toNumber()).toBe(100);
@@ -45,5 +78,8 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserializeInt256().toString()).toBe("100000");
     expect(vb.deserializeInt256().toString()).toBe("-100000");
     expect(vb.deserializeUInt256().toString()).toBe("100000");
+    expect(vb.deserializeTimestampType().toString()).toBe("1234567890");
+    expect(vb.deserializeBlockHeightType().toString()).toBe("123456");
+    expect(vb.deserializeMultihash().equals(m)).toBe(true);
   });
 });

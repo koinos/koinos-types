@@ -2,42 +2,42 @@ import * as ByteBuffer from 'bytebuffer'
 
 export class KString {
   
-  public _string: string;
+  public str: string;
 
   constructor(str: string = "") {
-    this._string = str;
+    this.str = str;
   }
   
   serialize(vb: VariableBlob): VariableBlob {
-    const buffer = ByteBuffer.fromUTF8(this._string);
+    const buffer = ByteBuffer.fromUTF8(this.str);
     return vb.buffer
       .writeVarint64(buffer.limit)
       .append(buffer);
   }
 
   toString(): string {
-    return this._string;
+    return this.str;
   }
 }
 
 export class KBoolean {
   
-  public _bool: boolean;
+  public bool: boolean;
 
   constructor(bool: boolean = false) {
-    this._bool = bool;
+    this.bool = bool;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeByte(this._bool ? 1: 0);
+    return vb.buffer.writeByte(this.bool ? 1: 0);
   }
 
   toBoolean(): boolean {
-    return this._bool;
+    return this.bool;
   }
 
   toString(): string {
-    return this._bool.toString();
+    return this.bool.toString();
   }
 }
 
@@ -45,48 +45,48 @@ export const MAX_INT8 = 0x7F;
 export const MIN_INT8 = -0x80;
 export class Int8 {
 
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < MIN_INT8 || n > MAX_INT8)
       throw new Error("Int8 is out of bounds");
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeByte(this._number);
+    return vb.buffer.writeByte(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
 export const MAX_UINT8 = 0xFF;
 export class UInt8 {
 
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < 0 || n > MAX_UINT8)
       throw new Error("UInt8 is out of bounds");
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeByte(this._number);
+    return vb.buffer.writeByte(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
@@ -94,48 +94,48 @@ export const MAX_INT16 = 0x7FFF;
 export const MIN_INT16 = -0x8000;
 export class Int16 {
 
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < MIN_INT16 || n > MAX_INT16)
       throw new Error("Int16 is out of bounds");
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeInt16(this._number);
+    return vb.buffer.writeInt16(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
 export const MAX_UINT16 = 0xFFFF;
 export class UInt16 {
   
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < 0 || n > MAX_UINT16)
       throw new Error("UInt16 is out of bounds");  
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeUint16(this._number);
+    return vb.buffer.writeUint16(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
@@ -143,54 +143,54 @@ export const MAX_INT32 = 0x7FFFFFFF;
 export const MIN_INT32 = -0x80000000;
 export class Int32 {
 
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < MIN_INT32 || n > MAX_INT32)
       throw new Error("Int32 is out of bounds");
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeInt32(this._number);
+    return vb.buffer.writeInt32(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
 export const MAX_UINT32 = 0xFFFFFFFF;
 export class UInt32 {
 
-  public _number: number;
+  public num: number;
 
   constructor(n: number = 0) {
     if(n < 0 || n > MAX_UINT32)
       throw new Error("UInt32 is out of bounds");
-    this._number = n;
+    this.num = n;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
-    return vb.buffer.writeUint32(this._number);
+    return vb.buffer.writeUint32(this.num);
   }
 
   toNumber(): number {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
 export class KBigInt {
 
-  public _number: bigint;
+  public num: bigint;
 
   private bytes: number;
 
@@ -198,18 +198,18 @@ export class KBigInt {
     const n = BigInt(number);
     const unsigned = min === BigInt(0);
     this.bytes = bits / 8;
-    this._number = n;
+    this.num = n;
     if(n < min || n > max )
       throw new Error(`${unsigned ? "U" : ""}Int${bits} is out of bounds`);
   }
 
   serialize(vb: VariableBlob): VariableBlob {
     let numString: string;
-    if(this._number >= BigInt(0)) {
-      numString = this._number.toString(16);
+    if(this.num >= BigInt(0)) {
+      numString = this.num.toString(16);
       numString = "0".repeat(2*this.bytes - numString.length) + numString;
     } else {
-      numString = (BigInt("0x1" + "0".repeat(2*this.bytes)) + this._number).toString(16);
+      numString = (BigInt("0x1" + "0".repeat(2*this.bytes)) + this.num).toString(16);
     }
     for(let i=0; i<2*this.bytes; i+=8) {
       const int32 = Number("0x" + numString.substring(i, i+8));
@@ -219,11 +219,11 @@ export class KBigInt {
   }
 
   toBigInt(): bigint {
-    return this._number;
+    return this.num;
   }
 
   toString(radix?: number): string {
-    return this._number.toString(radix);
+    return this.num.toString(radix);
   }
 }
 
@@ -290,6 +290,42 @@ export class UInt256 extends KBigInt {
   }
 }
 
+export class TimestampType extends UInt64 {}
+
+export class BlockHeightType extends UInt64 {}
+
+export class Multihash {
+
+  public id: UInt64;
+
+  public digest: VariableBlob;
+
+  constructor() {
+    this.id = new UInt64(0);
+    this.digest = new VariableBlob();
+  }
+
+  equals(m: Multihash): boolean {
+    return this.id.num === m.id.num && this.digest.equals(m.digest);
+  }
+
+  lessThan(m: Multihash): boolean {
+    if (this.id.num !== m.id.num)
+      return this.id.num < m.id.num;
+    return this.digest.length() < m.digest.length();
+  }
+
+  greaterThan(m: Multihash): boolean {
+    return !this.equals(m) && !this.lessThan(m);
+  }
+
+  serialize(vb: VariableBlob): VariableBlob {
+    vb.buffer.writeVarint64(Number(this.id.num));
+    this.digest.serialize(vb);
+    return vb;
+  }
+}
+
 export class VariableBlob {
 
   public buffer: ByteBuffer;
@@ -299,6 +335,22 @@ export class VariableBlob {
       this.buffer = b;
     else
       this.buffer = ByteBuffer.allocate(b);
+  }
+
+  length(): number {
+    return Math.max(this.buffer.offset, this.buffer.limit);
+  }
+
+  equals(vb: VariableBlob): boolean {
+    const size1 = this.length();
+    const size2 = vb.length();
+
+    if(size1 !== size2) return false;
+
+    for(let i=0; i<size1; i+=1)
+      if(this.buffer.buffer[i] !== vb.buffer.buffer[i]) return false;
+
+    return true;
   }
 
   serialize(vb: VariableBlob): VariableBlob {
@@ -421,7 +473,24 @@ export class VariableBlob {
   
   deserializeUInt256(): UInt256 {
     return new UInt256(this.deserializeBigInt(256, true));
-  }  
+  }
+
+  deserializeTimestampType(): TimestampType {
+    return new TimestampType(this.deserializeBigInt(64, true));
+  }
+
+  deserializeBlockHeightType(): BlockHeightType {
+    return new BlockHeightType(this.deserializeBigInt(64, true));
+  }
+
+  deserializeMultihash(): Multihash {
+    const id = this.buffer.readVarint64().toNumber();
+    const digest = this.deserializeVariableBlob();
+    const multihash = new Multihash();
+    multihash.id = new UInt64(id);
+    multihash.digest = digest;
+    return multihash;
+  }
 
   toHex() {
     if(this.buffer.offset !== 0) this.buffer.flip();
