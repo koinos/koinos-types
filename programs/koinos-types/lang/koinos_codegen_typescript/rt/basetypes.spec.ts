@@ -57,8 +57,8 @@ describe("Koinos Types - Typescript", () => {
     m.serialize(vb);
 
     vb.buffer.flip();
-    expect(vb.deserializeVariableBlob().equals(vb1)).toBe(true);
-    expect(vb.deserializeBoolean().toBoolean()).toBe(true);
+    expect(vb.deserialize(Koinos.VariableBlob).equals(vb1)).toBe(true);
+    expect(vb.deserialize(Koinos.KBoolean).toBoolean()).toBe(true);
     expect(vb.deserializeString().toString()).toBe("test");
     expect(vb.deserializeInt8().toNumber()).toBe(100);
     expect(vb.deserializeUInt8().toNumber()).toBe(100);
@@ -81,5 +81,25 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserializeTimestampType().toString()).toBe("1234567890");
     expect(vb.deserializeBlockHeightType().toString()).toBe("123456");
     expect(vb.deserializeMultihash().equals(m)).toBe(true);
+  });
+
+  it("should create an opaque class", () => {
+    expect.assertions(10);
+    const num = new Koinos.Int32(123456);
+    const opaque = new Koinos.Opaque(Koinos.Int32, num);
+    expect(opaque.isUnboxed()).toBe(true);
+    expect(opaque.isMutable()).toBe(true);
+    opaque.box();
+    expect(opaque.isUnboxed()).toBe(false);
+    expect(opaque.isMutable()).toBe(false);    
+    opaque.unbox();
+    expect(opaque.isUnboxed()).toBe(true);
+    expect(opaque.isMutable()).toBe(false);
+    opaque.makeMutable();
+    expect(opaque.isUnboxed()).toBe(true);
+    expect(opaque.isMutable()).toBe(true);
+    opaque.makeImmutable();
+    expect(opaque.isUnboxed()).toBe(true);
+    expect(opaque.isMutable()).toBe(false);
   });
 });

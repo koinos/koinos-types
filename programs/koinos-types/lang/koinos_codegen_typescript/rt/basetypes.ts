@@ -326,6 +326,75 @@ export class Multihash {
   }
 }
 
+export interface KoinosClass {
+  serialize(vb: VariableBlob): VariableBlob;
+}
+
+export class Opaque<T extends KoinosClass> {
+  private native: T;
+
+  private blob: VariableBlob;
+
+  private TCtor: new () => T;
+
+  constructor(TCtor: new () => T, nativeOrBlob?: T | VariableBlob) {
+    this.TCtor = TCtor;
+    if (nativeOrBlob instanceof TCtor) {
+      this.native = nativeOrBlob;
+    } else if (nativeOrBlob instanceof VariableBlob) {
+      this.blob = nativeOrBlob;
+    } else {
+      this.native = new TCtor();
+    }
+  }
+
+  unbox(): void {
+    if( !this.native && this.blob )
+      this.native = this.blob.deserialize(this.TCtor);
+  }
+
+  box(): void {
+    if( this.native) {
+      if(!this.blob) this.serialize();
+      this.native = null;
+    }
+  }
+
+  isUnboxed(): boolean {
+    return !!this.native;
+  }
+
+  makeImmutable(): void {
+    if(this.native && !this.blob) this.serialize();
+  }
+
+  makeMutable(): void {
+    if(!this.native) this.unbox();
+    if(this.native && this.blob) this.blob = null;
+  }
+
+  isMutable(): boolean {
+    return !!this.native && !this.blob;
+  }
+
+  getBlob(): VariableBlob {
+    if(this.native && !this.blob) this.serialize();
+    return this.blob;
+  }
+
+  getNative(): T {
+    if(!this.native) throw new Error("Opaque type not unboxed");
+    if(this.blob) throw new Error("Opaque type is not mutable");
+    return this.native;
+  }
+
+  private serialize(): void {
+    this.blob = new VariableBlob();
+    this.native.serialize(this.blob);
+    this.blob.buffer.flip();
+  }
+}
+
 export class VariableBlob {
 
   public buffer: ByteBuffer;
@@ -358,6 +427,53 @@ export class VariableBlob {
       .writeVarint64(this.buffer.limit)
       .append(this.buffer);
     return vb;
+  }
+
+  deserialize<T>(TCtor: new () => T): T {
+    const t = new TCtor();
+    if( t instanceof VariableBlob ) {
+      return this.deserializeVariableBlob() as unknown as T;
+    } else if(t instanceof KBoolean) {
+      return this.deserializeBoolean() as unknown as T;
+    } else if(t instanceof KString) {
+      return this.deserializeString() as unknown as T;
+    } else if(t instanceof Int8) {
+      return this.deserializeInt8() as unknown as T;
+    } else if(t instanceof UInt8) {
+      return this.deserializeUInt8() as unknown as T;
+    } else if(t instanceof Int16) {
+      return this.deserializeInt16() as unknown as T;
+    } else if(t instanceof UInt16) {
+      return this.deserializeUInt16() as unknown as T;
+    } else if(t instanceof Int32) {
+      return this.deserializeInt32() as unknown as T;
+    } else if(t instanceof UInt32) {
+      return this.deserializeUInt32() as unknown as T;
+    } else if(t instanceof Int64) {
+      return this.deserializeInt64() as unknown as T;
+    } else if(t instanceof UInt64) {
+      return this.deserializeUInt64() as unknown as T;
+    } else if(t instanceof Int128) {
+      return this.deserializeInt128() as unknown as T;
+    } else if(t instanceof UInt128) {
+      return this.deserializeUInt128() as unknown as T;
+    } else if(t instanceof Int160) {
+      return this.deserializeInt160() as unknown as T;
+    } else if(t instanceof UInt160) {
+      return this.deserializeUInt160() as unknown as T;
+    } else if(t instanceof Int256) {
+      return this.deserializeInt256() as unknown as T;
+    } else if(t instanceof UInt256) {
+      return this.deserializeUInt256() as unknown as T;
+    } else if(t instanceof TimestampType) {
+      return this.deserializeTimestampType() as unknown as T;
+    } else if(t instanceof BlockHeightType) {
+      return this.deserializeBlockHeightType() as unknown as T;
+    } else if(t instanceof Multihash) {
+      return this.deserializeMultihash() as unknown as T;
+    } else {
+      throw new Error("Invalid class");
+    }
   }
 
   deserializeVariableBlob(): VariableBlob {
