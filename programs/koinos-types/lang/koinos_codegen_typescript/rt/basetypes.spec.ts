@@ -1,92 +1,114 @@
-import * as Koinos from "./basetypes";
+import {
+  VariableBlob,
+  KoinosBoolean,
+  KoinosString,
+  Int8,
+  Int16,
+  Int32,
+  Int64,
+  Int128,
+  Int160,
+  Int256,
+  UInt8,
+  UInt16,
+  UInt32,
+  UInt64,
+  UInt128,
+  UInt160,
+  UInt256,
+  TimestampType,
+  BlockHeightType,
+  Multihash,
+  Opaque,
+} from "./";
 
 describe("Koinos Types - Typescript", () => {
   it("should compare VariableBlobs", () => {
     expect.assertions(2);
-    const vb1 = new Koinos.VariableBlob(9);
-    const vb2 = new Koinos.VariableBlob(5);
-    const vb3 = new Koinos.VariableBlob(5);
+    const vb1 = new VariableBlob(9);
+    const vb2 = new VariableBlob(5);
+    const vb3 = new VariableBlob(5);
     
-    const num1 = new Koinos.Int16(1000);
-    const num2 = new Koinos.Int64(1000);
+    const num1 = new Int16(1000);
+    const num2 = new Int64(1000);
     num1.serialize(vb1);
     num1.serialize(vb2);
     num2.serialize(vb3);
-    vb1.buffer.flip();
-    vb2.buffer.flip();
-    vb3.buffer.flip();
+    vb1.flip();
+    vb2.flip();
+    vb3.flip();
     expect(vb1.equals(vb2)).toBe(true);
     expect(vb1.equals(vb3)).toBe(false);
   });
   it("Serialize and desearialize", () => {
     expect.assertions(24);
-    const vb = new Koinos.VariableBlob();
+    const vb = new VariableBlob();
     
-    const vb1 = new Koinos.VariableBlob();
-    new Koinos.KString("test variable blob").serialize(vb1);
+    const vb1 = new VariableBlob();
+    new KoinosString("test variable blob").serialize(vb1);
 
-    vb1.buffer.flip();
+    vb1.flip();
     vb1.serialize(vb);
-    new Koinos.KBoolean(true).serialize(vb);
-    new Koinos.KString("test").serialize(vb);
-    new Koinos.Int8(100).serialize(vb);
-    new Koinos.UInt8(100).serialize(vb);
-    new Koinos.Int16(1000).serialize(vb);
-    new Koinos.UInt16(1000).serialize(vb);
-    new Koinos.Int32(10000).serialize(vb);
-    new Koinos.UInt32(10000).serialize(vb);
-    new Koinos.Int64("100000").serialize(vb);
-    new Koinos.Int64("-100000").serialize(vb);
-    new Koinos.UInt64("100000").serialize(vb);
-    new Koinos.Int128("100000").serialize(vb);
-    new Koinos.Int128("-100000").serialize(vb);
-    new Koinos.UInt128("100000").serialize(vb);
-    new Koinos.Int160("100000").serialize(vb);
-    new Koinos.Int160("-100000").serialize(vb);
-    new Koinos.UInt160("100000").serialize(vb);
-    new Koinos.Int256("100000").serialize(vb);
-    new Koinos.Int256("-100000").serialize(vb);
-    new Koinos.UInt256("100000").serialize(vb);
-    new Koinos.TimestampType("1234567890").serialize(vb);
-    new Koinos.BlockHeightType(123456).serialize(vb);
-    const m = new Koinos.Multihash();
-    m.id = new Koinos.UInt64(123);
-    m.digest = new Koinos.VariableBlob();
-    new Koinos.KString("digest").serialize(m.digest);
-    m.digest.buffer.flip();
+    new KoinosBoolean(true).serialize(vb);
+    new KoinosString("test").serialize(vb);
+    new Int8(100).serialize(vb);
+    new UInt8(100).serialize(vb);
+    new Int16(1000).serialize(vb);
+    new UInt16(1000).serialize(vb);
+    new Int32(10000).serialize(vb);
+    new UInt32(10000).serialize(vb);
+    new Int64("100000").serialize(vb);
+    new Int64("-100000").serialize(vb);
+    new UInt64("100000").serialize(vb);
+    new Int128("100000").serialize(vb);
+    new Int128("-100000").serialize(vb);
+    new UInt128("100000").serialize(vb);
+    new Int160("100000").serialize(vb);
+    new Int160("-100000").serialize(vb);
+    new UInt160("100000").serialize(vb);
+    new Int256("100000").serialize(vb);
+    new Int256("-100000").serialize(vb);
+    new UInt256("100000").serialize(vb);
+    new TimestampType("1234567890").serialize(vb);
+    new BlockHeightType(123456).serialize(vb);
+    const m = new Multihash();
+    m.id = new UInt64(123);
+    m.digest = new VariableBlob();
+    new KoinosString("digest").serialize(m.digest);
+    m.digest.flip();
     m.serialize(vb);
 
-    vb.buffer.flip();
-    expect(vb.deserialize(Koinos.VariableBlob).equals(vb1)).toBe(true);
-    expect(vb.deserialize(Koinos.KBoolean).toBoolean()).toBe(true);
-    expect(vb.deserializeString().toString()).toBe("test");
-    expect(vb.deserializeInt8().toNumber()).toBe(100);
-    expect(vb.deserializeUInt8().toNumber()).toBe(100);
-    expect(vb.deserializeInt16().toNumber()).toBe(1000);
-    expect(vb.deserializeUInt16().toNumber()).toBe(1000);
-    expect(vb.deserializeInt32().toNumber()).toBe(10000);
-    expect(vb.deserializeUInt32().toNumber()).toBe(10000);
-    expect(vb.deserializeInt64().toString()).toBe("100000");
-    expect(vb.deserializeInt64().toString()).toBe("-100000");
-    expect(vb.deserializeUInt64().toString()).toBe("100000");
-    expect(vb.deserializeInt128().toString()).toBe("100000");
-    expect(vb.deserializeInt128().toString()).toBe("-100000");
-    expect(vb.deserializeUInt128().toString()).toBe("100000");
-    expect(vb.deserializeInt160().toString()).toBe("100000");
-    expect(vb.deserializeInt160().toString()).toBe("-100000");
-    expect(vb.deserializeUInt160().toString()).toBe("100000");
-    expect(vb.deserializeInt256().toString()).toBe("100000");
-    expect(vb.deserializeInt256().toString()).toBe("-100000");
-    expect(vb.deserializeUInt256().toString()).toBe("100000");
-    expect(vb.deserializeTimestampType().toString()).toBe("1234567890");
-    expect(vb.deserializeBlockHeightType().toString()).toBe("123456");
-    expect(vb.deserializeMultihash().equals(m)).toBe(true);
+    vb.flip();
+    expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
+    expect(vb.deserialize(KoinosBoolean).toBoolean()).toBe(true);
+    expect(vb.deserialize(KoinosString).toString()).toBe("test");
+    expect(vb.deserialize(Int8).toNumber()).toBe(100);
+    expect(vb.deserialize(UInt8).toNumber()).toBe(100);
+    expect(vb.deserialize(Int16).toNumber()).toBe(1000);
+    expect(vb.deserialize(UInt16).toNumber()).toBe(1000);
+    expect(vb.deserialize(Int32).toNumber()).toBe(10000);
+    expect(vb.deserialize(UInt32).toNumber()).toBe(10000);
+    expect(vb.deserialize(Int64).toString()).toBe("100000");
+    expect(vb.deserialize(Int64).toString()).toBe("-100000");
+    expect(vb.deserialize(UInt64).toString()).toBe("100000");
+    expect(vb.deserialize(Int128).toString()).toBe("100000");
+    expect(vb.deserialize(Int128).toString()).toBe("-100000");
+    expect(vb.deserialize(UInt128).toString()).toBe("100000");
+    expect(vb.deserialize(Int160).toString()).toBe("100000");
+    expect(vb.deserialize(Int160).toString()).toBe("-100000");
+    expect(vb.deserialize(UInt160).toString()).toBe("100000");
+    expect(vb.deserialize(Int256).toString()).toBe("100000");
+    expect(vb.deserialize(Int256).toString()).toBe("-100000");
+    expect(vb.deserialize(UInt256).toString()).toBe("100000");
+    expect(vb.deserialize(TimestampType).toString()).toBe("1234567890");
+    expect(vb.deserialize(BlockHeightType).toString()).toBe("123456");
+    expect(vb.deserialize(Multihash).equals(m)).toBe(true);
   });
 
   it("should create an opaque class", () => {
     expect.assertions(10);
-    const num = new Koinos.Int32(123456);
-    const opaque = new Koinos.Opaque(Koinos.Int32, num);
+    const num = new Int32(123456);
+    const opaque = new Opaque(Int32, num);
     expect(opaque.isUnboxed()).toBe(true);
     expect(opaque.isMutable()).toBe(true);
     opaque.box();
