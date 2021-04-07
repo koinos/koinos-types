@@ -20,7 +20,7 @@ import {
   BlockHeightType,
   Multihash,
   Opaque,
-} from "./";
+} from ".";
 
 describe("Koinos Types - Typescript", () => {
   it("should compare VariableBlobs", () => {
@@ -28,7 +28,7 @@ describe("Koinos Types - Typescript", () => {
     const vb1 = new VariableBlob(9);
     const vb2 = new VariableBlob(5);
     const vb3 = new VariableBlob(5);
-    
+
     const num1 = new Int16(1000);
     const num2 = new Int64(1000);
     num1.serialize(vb1);
@@ -43,7 +43,7 @@ describe("Koinos Types - Typescript", () => {
   it("Serialize and desearialize", () => {
     expect.assertions(24);
     const vb = new VariableBlob();
-    
+
     const vb1 = new VariableBlob();
     new KoinosString("test variable blob").serialize(vb1);
 
@@ -113,7 +113,7 @@ describe("Koinos Types - Typescript", () => {
     expect(opaque.isMutable()).toBe(true);
     opaque.box();
     expect(opaque.isUnboxed()).toBe(false);
-    expect(opaque.isMutable()).toBe(false);    
+    expect(opaque.isMutable()).toBe(false);
     opaque.unbox();
     expect(opaque.isUnboxed()).toBe(true);
     expect(opaque.isMutable()).toBe(false);
