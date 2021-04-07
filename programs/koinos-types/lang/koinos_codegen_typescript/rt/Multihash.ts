@@ -30,6 +30,15 @@ export class Multihash {
     this.digest.serialize(vb);
     return vb;
   }
+
+  static deserialize(vb: VariableBlob): Multihash {
+    const id = vb.buffer.readVarint64().toNumber();
+    const digest = VariableBlob.deserialize(vb);
+    const multihash = new Multihash();
+    multihash.id = new UInt64(id);
+    multihash.digest = digest;
+    return multihash;
+  }
 }
 
 export default Multihash;

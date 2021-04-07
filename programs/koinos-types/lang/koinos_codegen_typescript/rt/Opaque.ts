@@ -4,27 +4,32 @@ export interface KoinosClass {
   serialize(vb: VariableBlob): VariableBlob;
 }
 
+export interface KoinosClassBuilder<T extends KoinosClass> {
+  new (): T;
+  deserialize(vb: VariableBlob): T;
+}
+
 export class Opaque<T extends KoinosClass> {
   private native: T;
 
   private blob: VariableBlob;
 
-  private TCtor: new () => T;
+  private ClassT: KoinosClassBuilder<T>;
 
-  constructor(TCtor: new () => T, nativeOrBlob?: T | VariableBlob) {
-    this.TCtor = TCtor;
-    if (nativeOrBlob instanceof TCtor) {
+  constructor(ClassT: KoinosClassBuilder<T>, nativeOrBlob?: T | VariableBlob) {
+    this.ClassT = ClassT;
+    if (nativeOrBlob instanceof ClassT) {
       this.native = nativeOrBlob;
     } else if (nativeOrBlob instanceof VariableBlob) {
       this.blob = nativeOrBlob;
     } else {
-      this.native = new TCtor();
+      this.native = new ClassT();
     }
   }
 
   unbox(): void {
     if (!this.native && this.blob)
-      this.native = this.blob.deserialize(this.TCtor);
+      this.native = this.ClassT.deserialize(this.blob);
   }
 
   box(): void {

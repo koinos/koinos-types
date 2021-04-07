@@ -12,6 +12,12 @@ export class Int16 extends KoinosNumber {
     vb.buffer.writeInt16(this.num);
     return vb;
   }
+
+  static deserialize(vb: VariableBlob): Int16 {
+    if (vb.buffer.limit < 2) throw new Error("Unexpected EOF");
+    const value = vb.buffer.readInt16();
+    return new Int16(value);
+  }
 }
 
 export default Int16;

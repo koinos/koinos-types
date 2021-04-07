@@ -11,6 +11,12 @@ export class UInt32 extends KoinosNumber {
     vb.buffer.writeUint32(this.num);
     return vb;
   }
+
+  static deserialize(vb: VariableBlob): UInt32 {
+    if (vb.buffer.limit < 4) throw new Error("Unexpected EOF");
+    const value = vb.buffer.readUint32();
+    return new UInt32(value);
+  }
 }
 
 export default UInt32;

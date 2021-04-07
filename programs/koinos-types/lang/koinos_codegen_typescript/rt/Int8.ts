@@ -12,6 +12,12 @@ export class Int8 extends KoinosNumber {
     vb.buffer.writeByte(this.num);
     return vb;
   }
+
+  static deserialize(vb: VariableBlob): Int8 {
+    if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
+    const value = vb.buffer.readByte();
+    return new Int8(value);
+  }
 }
 
 export default Int8;

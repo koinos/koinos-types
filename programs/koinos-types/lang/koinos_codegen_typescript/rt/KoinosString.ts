@@ -14,6 +14,11 @@ export class KoinosString {
     return vb;
   }
 
+  static deserialize(vb: VariableBlob): KoinosString {
+    const subvb = VariableBlob.deserialize(vb);
+    return new KoinosString(subvb.buffer.toUTF8());
+  }
+
   toString(): string {
     return this.str;
   }
