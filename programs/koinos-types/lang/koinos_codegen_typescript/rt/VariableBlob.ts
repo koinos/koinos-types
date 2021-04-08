@@ -42,7 +42,7 @@ export class VariableBlob {
   }
 
   toHex(): string {
-    if (this.buffer.offset !== 0) this.buffer.flip();
+    if (this.buffer.offset !== 0) this.flip();
     return this.buffer.toHex();
   }
 

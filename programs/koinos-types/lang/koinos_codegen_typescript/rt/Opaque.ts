@@ -1,10 +1,10 @@
 import { VariableBlob } from "./VariableBlob";
 
-export interface KoinosClass {
+interface KoinosClass {
   serialize(vb: VariableBlob): VariableBlob;
 }
 
-export interface KoinosClassBuilder<T extends KoinosClass> {
+interface KoinosClassBuilder<T extends KoinosClass> {
   new (): T;
   deserialize(vb: VariableBlob): T;
 }
@@ -70,7 +70,7 @@ export class Opaque<T extends KoinosClass> {
   private serialize(): void {
     this.blob = new VariableBlob();
     this.native.serialize(this.blob);
-    this.blob.buffer.flip();
+    this.blob.flip();
   }
 }
 
