@@ -7,8 +7,10 @@ export class KoinosBoolean {
     this.bool = bool;
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serialize(blob?: VariableBlob): VariableBlob {
+    let vb = blob ? blob : new VariableBlob(1);
     vb.buffer.writeByte(this.bool ? 1 : 0);
+    if(!blob) vb.flip();
     return vb;
   }
 

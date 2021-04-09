@@ -1,4 +1,15 @@
 import * as ByteBuffer from "bytebuffer";
+import KoinosBoolean from "./KoinosBoolean";
+import KoinosString from "./KoinosString";
+
+export interface KoinosClass {
+  serialize(vb: VariableBlob): VariableBlob;
+}
+
+export interface KoinosClassBuilder<T extends KoinosClass> {
+  new (): T;
+  deserialize(vb: VariableBlob): T;
+}
 
 export class VariableBlob {
   public buffer: ByteBuffer;
@@ -24,21 +35,31 @@ export class VariableBlob {
     return true;
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serializeVariableBlob(): VariableBlob {
+    const vb = new VariableBlob();
     vb.buffer.writeVarint64(this.buffer.limit).append(this.buffer);
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): VariableBlob {
-    const size = vb.buffer.readVarint64().toNumber();
+  serialize(k?: KoinosClass): VariableBlob {
+    if (!k || k instanceof VariableBlob) return this.serializeVariableBlob()
+    return k.serialize(this);
+  }
+
+  deserializeVariableBlob(): VariableBlob {
+    const size = this.buffer.readVarint64().toNumber();
     if (size < 0) throw new Error("Could not deserialize variable blob");
 
-    const { limit, offset } = vb.buffer;
+    const { limit, offset } = this.buffer;
     if (limit < offset + size) throw new Error("Unexpected EOF");
     const subvb = new VariableBlob(size);
-    vb.buffer.copyTo(subvb.buffer, 0, offset, offset + size);
-    vb.buffer.offset += size;
+    this.buffer.copyTo(subvb.buffer, 0, offset, offset + size);
+    this.buffer.offset += size;
     return subvb;
+  }
+
+  deserialize<T extends KoinosClass>(ClassT: KoinosClassBuilder<T>):T {
+    return ClassT.deserialize(this);
   }
 
   toHex(): string {
