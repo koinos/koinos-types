@@ -44,14 +44,11 @@ describe("Koinos Types - Typescript", () => {
   it("Serialize and desearialize", () => {
     expect.assertions(24);
     const vb = new VariableBlob();
+    const vb1 = new KoinosString("test variable blob").serialize();
 
-    const vb1 = new VariableBlob()
-      .serialize(new KoinosString("test variable blob"))
-      .flip();
-
-    const m = new Multihash();
-    m.id = new UInt64(123);
-    m.digest = new VariableBlob().serialize(new KoinosString("digest")).flip();
+    const multihash = new Multihash();
+    multihash.id = new UInt64(123);
+    multihash.digest = new KoinosString("digest").serialize();
 
     vb.serialize(vb1)
       .serialize(new KoinosBoolean(true))
@@ -76,10 +73,9 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new UInt256("100000"))
       .serialize(new TimestampType("1234567890"))
       .serialize(new BlockHeightType(123456))
-      .serialize(m)
+      .serialize(multihash)
       .flip();
 
-    //expect(vb.deserializeVariableBlob().equals(vb1)).toBe(true);
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
     expect(vb.deserialize(KoinosBoolean).toBoolean()).toBe(true);
     expect(vb.deserialize(KoinosString).toString()).toBe("test");
@@ -103,7 +99,7 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserialize(UInt256).toString()).toBe("100000");
     expect(vb.deserialize(TimestampType).toString()).toBe("1234567890");
     expect(vb.deserialize(BlockHeightType).toString()).toBe("123456");
-    expect(vb.deserialize(Multihash).equals(m)).toBe(true);
+    expect(vb.deserialize(Multihash).equals(multihash)).toBe(true);
   });
 
   it("should create an opaque class", () => {

@@ -8,8 +8,8 @@ export class KoinosString {
     this.str = str;
   }
 
-  serialize(blob: VariableBlob): VariableBlob {
-    let vb = blob ? blob : new VariableBlob();
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob();
     const buffer = ByteBuffer.fromUTF8(this.str) as ByteBuffer;
     vb.buffer.writeVarint64(buffer.limit).append(buffer);
     if (!blob) vb.flip();
@@ -17,8 +17,7 @@ export class KoinosString {
   }
 
   static deserialize(vb: VariableBlob): KoinosString {
-    //const subvb = vb.deserializeVariableBlob();
-    const subvb = vb.deserializeVariableBlob();
+    const subvb = vb.deserialize(VariableBlob);
     return new KoinosString(subvb.buffer.toUTF8());
   }
 

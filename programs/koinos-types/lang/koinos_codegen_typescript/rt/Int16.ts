@@ -8,8 +8,10 @@ export class Int16 extends KoinosNumber {
     super(n, "Int16", MAX_INT16, MIN_INT16);
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob(2);
     vb.buffer.writeInt16(this.num);
+    if (!blob) vb.flip();
     return vb;
   }
 

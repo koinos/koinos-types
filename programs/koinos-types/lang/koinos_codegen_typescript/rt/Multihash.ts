@@ -24,10 +24,12 @@ export class Multihash {
     return !this.equals(m) && !this.lessThan(m);
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob();
     // TODO: Use Long instead of Number to construct the varint
     vb.buffer.writeVarint64(Number(this.id.num));
     vb.serialize(this.digest);
+    if (!blob) vb.flip();
     return vb;
   }
 

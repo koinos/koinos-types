@@ -8,8 +8,10 @@ export class Int32 extends KoinosNumber {
     super(n, "Int32", MAX_INT32, MIN_INT32);
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob(4);
     vb.buffer.writeInt32(this.num);
+    if (!blob) vb.flip();
     return vb;
   }
 

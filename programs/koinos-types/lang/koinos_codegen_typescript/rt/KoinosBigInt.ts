@@ -21,7 +21,8 @@ export class KoinosBigInt {
       throw new Error(`${this.unsigned ? "U" : ""}Int${bits} is out of bounds`);
   }
 
-  serialize(vb: VariableBlob): VariableBlob {
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob();
     let numString: string;
     if (this.num >= BigInt(0)) {
       numString = this.num.toString(16);
@@ -35,6 +36,7 @@ export class KoinosBigInt {
       const int32 = Number("0x" + numString.substring(i, i + 8));
       vb.buffer.writeUint32(int32);
     }
+    if (!blob) vb.flip();
     return vb;
   }
 

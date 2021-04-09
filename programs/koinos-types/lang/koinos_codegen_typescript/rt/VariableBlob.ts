@@ -1,6 +1,4 @@
 import * as ByteBuffer from "bytebuffer";
-import KoinosBoolean from "./KoinosBoolean";
-import KoinosString from "./KoinosString";
 
 export interface KoinosClass {
   serialize(vb: VariableBlob): VariableBlob;
