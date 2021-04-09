@@ -27,7 +27,7 @@ export class Multihash {
   serialize(vb: VariableBlob): VariableBlob {
     // TODO: Use Long instead of Number to construct the varint
     vb.buffer.writeVarint64(Number(this.id.num));
-    this.digest.serialize(vb);
+    vb.serialize(this.digest);
     return vb;
   }
 

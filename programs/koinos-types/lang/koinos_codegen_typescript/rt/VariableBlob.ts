@@ -35,14 +35,26 @@ export class VariableBlob {
     return true;
   }
 
-  serializeVariableBlob(): VariableBlob {
-    const vb = new VariableBlob();
-    vb.buffer.writeVarint64(this.buffer.limit).append(this.buffer);
-    return vb;
+  serializeVariableBlob(blob?: VariableBlob): VariableBlob {
+    let vbModified: VariableBlob;
+    let vbInput: VariableBlob;
+    if (blob) {
+      vbModified = this;
+      vbInput = blob;
+    } else {
+      vbModified = new VariableBlob();
+      vbInput = this;
+    }
+    vbModified.buffer
+      .writeVarint64(vbInput.buffer.limit)
+      .append(vbInput.buffer);
+    if (!blob) vbModified.flip();
+    return vbModified;
   }
 
-  serialize(k?: KoinosClass): VariableBlob {
-    if (!k || k instanceof VariableBlob) return this.serializeVariableBlob()
+  serialize<T extends KoinosClass>(k?: T): VariableBlob {
+    if (!k || k instanceof VariableBlob)
+      return this.serializeVariableBlob((k as unknown) as VariableBlob);
     return k.serialize(this);
   }
 
@@ -58,8 +70,12 @@ export class VariableBlob {
     return subvb;
   }
 
-  deserialize<T extends KoinosClass>(ClassT: KoinosClassBuilder<T>):T {
-    return ClassT.deserialize(this);
+  deserialize<T extends KoinosClass>(
+    ClassT: KoinosClassBuilder<T> | typeof VariableBlob
+  ): T {
+    if (new ClassT() instanceof VariableBlob)
+      return (this.deserializeVariableBlob() as unknown) as T;
+    return (ClassT as KoinosClassBuilder<T>).deserialize(this);
   }
 
   toHex(): string {
@@ -67,8 +83,9 @@ export class VariableBlob {
     return this.buffer.toHex();
   }
 
-  flip(): void {
+  flip(): VariableBlob {
     this.buffer.flip();
+    return this;
   }
 }
 

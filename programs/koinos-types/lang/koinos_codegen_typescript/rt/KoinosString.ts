@@ -12,7 +12,7 @@ export class KoinosString {
     let vb = blob ? blob : new VariableBlob();
     const buffer = ByteBuffer.fromUTF8(this.str) as ByteBuffer;
     vb.buffer.writeVarint64(buffer.limit).append(buffer);
-    if(!blob) vb.flip();
+    if (!blob) vb.flip();
     return vb;
   }
 
