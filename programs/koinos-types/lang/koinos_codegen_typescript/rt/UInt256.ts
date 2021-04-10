@@ -1,12 +1,10 @@
 import { VariableBlob } from "./VariableBlob";
-import { KoinosNumber } from "./KoinosNumber";
+import { NumberLike } from "./KoinosNumber";
 import { KoinosBigInt } from "./KoinosBigInt";
 
 export const MAX_UINT256 = BigInt("0x" + "F".repeat(64));
 export class UInt256 extends KoinosBigInt {
-  constructor(
-    number: bigint | string | KoinosNumber | KoinosBigInt | number = 0
-  ) {
+  constructor(number: NumberLike = 0) {
     super(number, 256, MAX_UINT256);
   }
 

@@ -1,5 +1,5 @@
 import { VariableBlob } from "./VariableBlob";
-import { KoinosNumber } from "./KoinosNumber";
+import { KoinosNumber, NumberLike } from "./KoinosNumber";
 
 export class KoinosBigInt {
   public num: bigint;
@@ -8,12 +8,7 @@ export class KoinosBigInt {
 
   private unsigned: boolean;
 
-  constructor(
-    number: bigint | string | KoinosNumber | KoinosBigInt | number,
-    bits: number,
-    max: bigint,
-    min = BigInt(0)
-  ) {
+  constructor(number: NumberLike, bits: number, max: bigint, min = BigInt(0)) {
     let n: bigint;
     if (number instanceof KoinosBigInt) n = number.num;
     else if (number instanceof KoinosNumber) n = BigInt(number.num);

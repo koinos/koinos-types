@@ -1,9 +1,11 @@
 import { VariableBlob } from "./VariableBlob";
 
+export type BooleanLike = boolean | KoinosBoolean;
+
 export class KoinosBoolean {
   public bool: boolean;
 
-  constructor(bool: boolean | KoinosBoolean = false) {
+  constructor(bool: BooleanLike = false) {
     this.bool = bool instanceof KoinosBoolean ? bool.bool : bool;
   }
 

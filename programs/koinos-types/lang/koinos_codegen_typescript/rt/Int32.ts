@@ -1,13 +1,10 @@
 import { VariableBlob } from "./VariableBlob";
-import { KoinosNumber } from "./KoinosNumber";
-import { KoinosBigInt } from "./KoinosBigInt";
+import { KoinosNumber, NumberLike } from "./KoinosNumber";
 
 export const MAX_INT32 = 0x7fffffff;
 export const MIN_INT32 = -0x80000000;
 export class Int32 extends KoinosNumber {
-  constructor(
-    number: bigint | string | KoinosNumber | KoinosBigInt | number = 0
-  ) {
+  constructor(number: NumberLike = 0) {
     super(number, "Int32", MAX_INT32, MIN_INT32);
   }
 

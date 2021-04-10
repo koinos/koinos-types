@@ -1,5 +1,7 @@
 import * as ByteBuffer from "bytebuffer";
 
+export type VariableBlobLike = string | ByteBuffer | VariableBlob;
+
 export interface KoinosClass {
   serialize(vb: VariableBlob): VariableBlob;
 }
@@ -16,7 +18,7 @@ function remove0xPrefix(str: string): string {
 export class VariableBlob {
   public buffer: ByteBuffer;
 
-  constructor(b: string | ByteBuffer | VariableBlob | number = 0) {
+  constructor(b: VariableBlobLike | number = 0) {
     if (b instanceof VariableBlob) {
       this.buffer = new ByteBuffer() as ByteBuffer;
       b.buffer.copyTo(this.buffer, 0, 0, b.buffer.buffer.length);

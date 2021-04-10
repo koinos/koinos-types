@@ -1,10 +1,12 @@
 import * as ByteBuffer from "bytebuffer";
 import { VariableBlob } from "./VariableBlob";
 
+export type StringLike = string | KoinosString;
+
 export class KoinosString {
   public str: string;
 
-  constructor(str: string | KoinosString = "") {
+  constructor(str: StringLike = "") {
     this.str = str instanceof KoinosString ? str.str : str;
   }
 

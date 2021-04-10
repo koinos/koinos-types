@@ -1,11 +1,10 @@
 import * as ByteBuffer from "bytebuffer";
 import { VariableBlob } from "./VariableBlob";
 import { UInt64 } from "./UInt64";
-import { KoinosNumber } from "./KoinosNumber";
-import { KoinosBigInt } from "./KoinosBigInt";
+import { NumberLike } from "./KoinosNumber";
 
 export interface JsonMultihash {
-  id: number | bigint | string | KoinosNumber | KoinosBigInt;
+  id: NumberLike;
   digest: string | ByteBuffer | VariableBlob;
 }
 
