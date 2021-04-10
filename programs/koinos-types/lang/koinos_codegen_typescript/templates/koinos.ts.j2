@@ -1,1 +1,21 @@
-"types"
+{% macro class(decl) %}
+{% set className = ts_name(decl["name"]) %}
+export class {{className}} {
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob();
+    if (!blob) vb.flip();
+    return vb;
+  }
+
+  static deserialize(vb: VariableBlob): {{className}} {
+    
+  }
+}
+
+export default {{className}};
+{% endmacro %}
+
+{% for name, decl in decls_by_name.items() -%}
+{% if decl["info"]["type"] == "Struct" %}{{class(decl)}}
+{%- endif -%}
+{% endfor %}
