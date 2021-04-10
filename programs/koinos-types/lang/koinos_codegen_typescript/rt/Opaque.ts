@@ -1,13 +1,4 @@
-import { VariableBlob } from "./VariableBlob";
-
-interface KoinosClass {
-  serialize(vb: VariableBlob): VariableBlob;
-}
-
-interface KoinosClassBuilder<T extends KoinosClass> {
-  new (): T;
-  deserialize(vb: VariableBlob): T;
-}
+import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
 
 export class Opaque<T extends KoinosClass> {
   private native: T;

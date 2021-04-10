@@ -1,11 +1,14 @@
 import { VariableBlob } from "./VariableBlob";
 import { KoinosNumber } from "./KoinosNumber";
+import { KoinosBigInt } from "./KoinosBigInt";
 
 export const MAX_INT32 = 0x7fffffff;
 export const MIN_INT32 = -0x80000000;
 export class Int32 extends KoinosNumber {
-  constructor(n = 0) {
-    super(n, "Int32", MAX_INT32, MIN_INT32);
+  constructor(
+    number: bigint | string | KoinosNumber | KoinosBigInt | number = 0
+  ) {
+    super(number, "Int32", MAX_INT32, MIN_INT32);
   }
 
   serialize(blob?: VariableBlob): VariableBlob {

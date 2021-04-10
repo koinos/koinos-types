@@ -1,4 +1,5 @@
 import { VariableBlob } from "./VariableBlob";
+import { KoinosNumber } from "./KoinosNumber";
 
 export class KoinosBigInt {
   public num: bigint;
@@ -8,12 +9,15 @@ export class KoinosBigInt {
   private unsigned: boolean;
 
   constructor(
-    number: bigint | string | number,
+    number: bigint | string | KoinosNumber | KoinosBigInt | number,
     bits: number,
     max: bigint,
     min = BigInt(0)
   ) {
-    const n = BigInt(number);
+    let n: bigint;
+    if (number instanceof KoinosBigInt) n = number.num;
+    else if (number instanceof KoinosNumber) n = BigInt(number.num);
+    else n = BigInt(number);
     this.unsigned = min === BigInt(0);
     this.bytes = bits / 8;
     this.num = n;

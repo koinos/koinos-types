@@ -9,12 +9,26 @@ export interface KoinosClassBuilder<T extends KoinosClass> {
   deserialize(vb: VariableBlob): T;
 }
 
+function remove0xPrefix(str: string): string {
+  return str.startsWith("0x") ? str.slice(2) : str;
+}
+
 export class VariableBlob {
   public buffer: ByteBuffer;
 
-  constructor(b: ByteBuffer | number = 0) {
-    if (b instanceof ByteBuffer) this.buffer = b;
-    else this.buffer = ByteBuffer.allocate(b) as ByteBuffer;
+  constructor(b: string | ByteBuffer | VariableBlob | number = 0) {
+    if (b instanceof VariableBlob) {
+      this.buffer = new ByteBuffer() as ByteBuffer;
+      b.buffer.copyTo(this.buffer, 0, 0, b.buffer.buffer.length);
+      this.buffer.offset = b.buffer.offset;
+      this.buffer.limit = b.buffer.limit;
+    } else if (b instanceof ByteBuffer) {
+      this.buffer = b;
+    } else if (typeof b === "string") {
+      this.buffer = ByteBuffer.fromHex(remove0xPrefix(b)) as ByteBuffer;
+    } else {
+      this.buffer = ByteBuffer.allocate(b) as ByteBuffer;
+    }
   }
 
   length(): number {

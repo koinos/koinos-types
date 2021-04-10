@@ -1,14 +1,27 @@
+import * as ByteBuffer from "bytebuffer";
 import { VariableBlob } from "./VariableBlob";
 import { UInt64 } from "./UInt64";
+import { KoinosNumber } from "./KoinosNumber";
+import { KoinosBigInt } from "./KoinosBigInt";
+
+export interface JsonMultihash {
+  id: number | bigint | string | KoinosNumber | KoinosBigInt;
+  digest: string | ByteBuffer | VariableBlob;
+}
 
 export class Multihash {
   public id: UInt64;
 
   public digest: VariableBlob;
 
-  constructor() {
-    this.id = new UInt64(0);
-    this.digest = new VariableBlob();
+  constructor(
+    json: JsonMultihash = {
+      id: 0,
+      digest: "",
+    }
+  ) {
+    this.id = new UInt64(json.id);
+    this.digest = new VariableBlob(json.digest);
   }
 
   equals(m: Multihash): boolean {

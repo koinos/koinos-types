@@ -24,33 +24,28 @@ import {
 
 describe("Koinos Types - Typescript", () => {
   it("should compare VariableBlobs", () => {
-    expect.assertions(2);
-    const vb1 = new VariableBlob(9);
-    const vb2 = new VariableBlob(5);
-    const vb3 = new VariableBlob(5);
-
+    expect.assertions(3);
     const num1 = new Int16(1000);
     const num2 = new Int64(1000);
-    num1.serialize(vb1);
-    num1.serialize(vb2);
-    num2.serialize(vb3);
-    vb1.flip();
-    vb2.flip();
-    vb3.flip();
+    const vb1 = new VariableBlob(9).serialize(num1).flip();
+    const vb2 = new VariableBlob(5).serialize(num1).flip();
+    const vb3 = new VariableBlob(5).serialize(num2).flip();
+    const vb4 = new VariableBlob(vb3);
     expect(vb1.equals(vb2)).toBe(true);
     expect(vb1.equals(vb3)).toBe(false);
+    expect(vb3.equals(vb4)).toBe(true);
   });
 
   it("Serialize and desearialize", () => {
     expect.assertions(24);
-    const vb = new VariableBlob();
-    const vb1 = new KoinosString("test variable blob").serialize();
+    const vb1 = new VariableBlob("ce123456af");
+    const multihash = new Multihash({
+      id: 123,
+      digest: "0xff1234567890",
+    });
 
-    const multihash = new Multihash();
-    multihash.id = new UInt64(123);
-    multihash.digest = new KoinosString("digest").serialize();
-
-    vb.serialize(vb1)
+    const vb = new VariableBlob()
+      .serialize(vb1)
       .serialize(new KoinosBoolean(true))
       .serialize(new KoinosString("test"))
       .serialize(new Int8(100))

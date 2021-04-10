@@ -4,8 +4,8 @@ import { VariableBlob } from "./VariableBlob";
 export class KoinosString {
   public str: string;
 
-  constructor(str = "") {
-    this.str = str;
+  constructor(str: string | KoinosString = "") {
+    this.str = str instanceof KoinosString ? str.str : str;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {

@@ -3,8 +3,8 @@ import { VariableBlob } from "./VariableBlob";
 export class KoinosBoolean {
   public bool: boolean;
 
-  constructor(bool = false) {
-    this.bool = bool;
+  constructor(bool: boolean | KoinosBoolean = false) {
+    this.bool = bool instanceof KoinosBoolean ? bool.bool : bool;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {

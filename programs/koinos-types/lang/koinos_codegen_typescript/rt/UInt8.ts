@@ -1,10 +1,13 @@
 import { VariableBlob } from "./VariableBlob";
 import { KoinosNumber } from "./KoinosNumber";
+import { KoinosBigInt } from "./KoinosBigInt";
 
 export const MAX_UINT8 = 0xff;
 export class UInt8 extends KoinosNumber {
-  constructor(n = 0) {
-    super(n, "UInt8", MAX_UINT8);
+  constructor(
+    number: bigint | string | KoinosNumber | KoinosBigInt | number = 0
+  ) {
+    super(number, "UInt8", MAX_UINT8);
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
