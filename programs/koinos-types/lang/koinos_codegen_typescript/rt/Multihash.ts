@@ -1,11 +1,11 @@
-import * as ByteBuffer from "bytebuffer";
-import { VariableBlob } from "./VariableBlob";
+import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { UInt64 } from "./UInt64";
 import { NumberLike } from "./KoinosNumber";
+import { VarInt } from "./VarInt";
 
 export interface JsonMultihash {
   id: NumberLike;
-  digest: string | ByteBuffer | VariableBlob;
+  digest: VariableBlobLike;
 }
 
 export class Multihash {
@@ -38,20 +38,16 @@ export class Multihash {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob();
-    // TODO: Use Long instead of Number to construct the varint
-    vb.buffer.writeVarint64(Number(this.id.num));
+    vb.serialize(new VarInt(this.id));
     vb.serialize(this.digest);
     if (!blob) vb.flip();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Multihash {
-    const id = vb.buffer.readVarint64().toNumber();
-    const digest = vb.deserializeVariableBlob();
-    const multihash = new Multihash();
-    multihash.id = new UInt64(id);
-    multihash.digest = digest;
-    return multihash;
+    const id = vb.deserialize(VarInt);
+    const digest = vb.deserialize(VariableBlob);
+    return new Multihash({ id, digest });
   }
 }
 

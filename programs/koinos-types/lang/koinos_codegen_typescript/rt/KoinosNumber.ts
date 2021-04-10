@@ -1,6 +1,13 @@
 import { KoinosBigInt } from "./KoinosBigInt";
+import { VarInt } from "./VarInt";
 
-export type NumberLike = number | bigint | string | KoinosNumber | KoinosBigInt;
+export type NumberLike =
+  | number
+  | bigint
+  | string
+  | KoinosNumber
+  | KoinosBigInt
+  | VarInt;
 
 export class KoinosNumber {
   public num: number;
@@ -9,6 +16,7 @@ export class KoinosNumber {
     let n: number;
     if (number instanceof KoinosBigInt) n = Number(number.num);
     else if (number instanceof KoinosNumber) n = number.num;
+    else if (number instanceof VarInt) n = number.num;
     else n = Number(number);
     if (n < min || n > max) throw new Error(`${name} is out of bounds`);
     this.num = n;

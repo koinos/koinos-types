@@ -1,5 +1,6 @@
 import { VariableBlob } from "./VariableBlob";
 import { KoinosNumber, NumberLike } from "./KoinosNumber";
+import { VarInt } from "./VarInt";
 
 export class KoinosBigInt {
   public num: bigint;
@@ -12,6 +13,7 @@ export class KoinosBigInt {
     let n: bigint;
     if (number instanceof KoinosBigInt) n = number.num;
     else if (number instanceof KoinosNumber) n = BigInt(number.num);
+    else if (number instanceof VarInt) n = BigInt(number.num);
     else n = BigInt(number);
     this.unsigned = min === BigInt(0);
     this.bytes = bits / 8;

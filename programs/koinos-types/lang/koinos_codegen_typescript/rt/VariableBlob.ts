@@ -1,4 +1,5 @@
 import * as ByteBuffer from "bytebuffer";
+import { VarInt } from "./VarInt";
 
 export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 
@@ -20,10 +21,7 @@ export class VariableBlob {
 
   constructor(b: VariableBlobLike | number = 0) {
     if (b instanceof VariableBlob) {
-      this.buffer = new ByteBuffer() as ByteBuffer;
-      b.buffer.copyTo(this.buffer, 0, 0, b.buffer.buffer.length);
-      this.buffer.offset = b.buffer.offset;
-      this.buffer.limit = b.buffer.limit;
+      this.buffer = b.buffer;
     } else if (b instanceof ByteBuffer) {
       this.buffer = b;
     } else if (typeof b === "string") {
@@ -59,9 +57,8 @@ export class VariableBlob {
       vbModified = new VariableBlob();
       vbInput = this;
     }
-    vbModified.buffer
-      .writeVarint64(vbInput.buffer.limit)
-      .append(vbInput.buffer);
+    vbModified.serialize(new VarInt(vbInput.buffer.limit));
+    vbModified.buffer.append(vbInput.buffer);
     if (!blob) vbModified.flip();
     return vbModified;
   }
@@ -73,7 +70,7 @@ export class VariableBlob {
   }
 
   deserializeVariableBlob(): VariableBlob {
-    const size = this.buffer.readVarint64().toNumber();
+    const size = this.deserialize(VarInt).toNumber();
     if (size < 0) throw new Error("Could not deserialize variable blob");
 
     const { limit, offset } = this.buffer;
