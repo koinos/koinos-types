@@ -3,6 +3,7 @@ export * from "./KoinosBoolean";
 export * from "./KoinosString";
 export * from "./KoinosNumber";
 export * from "./KoinosBigInt";
+export * from "./VarInt";
 export * from "./Int8";
 export * from "./Int16";
 export * from "./Int32";

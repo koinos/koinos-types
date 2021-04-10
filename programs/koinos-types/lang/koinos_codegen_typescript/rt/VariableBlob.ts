@@ -4,7 +4,7 @@ import { VarInt } from "./VarInt";
 export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 
 export interface KoinosClass {
-  serialize(vb: VariableBlob): VariableBlob;
+  serialize(vb?: VariableBlob): VariableBlob;
 }
 
 export interface KoinosClassBuilder<T extends KoinosClass> {

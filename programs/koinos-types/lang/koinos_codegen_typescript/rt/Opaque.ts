@@ -20,7 +20,7 @@ export class Opaque<T extends KoinosClass> {
 
   unbox(): void {
     if (!this.native && this.blob)
-      this.native = this.ClassT.deserialize(this.blob);
+      this.native = this.blob.deserialize(this.ClassT);
   }
 
   box(): void {
@@ -59,9 +59,7 @@ export class Opaque<T extends KoinosClass> {
   }
 
   private serialize(): void {
-    this.blob = new VariableBlob();
-    this.native.serialize(this.blob);
-    this.blob.flip();
+    this.blob = this.native.serialize();
   }
 }
 
