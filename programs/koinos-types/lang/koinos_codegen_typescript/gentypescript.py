@@ -262,8 +262,14 @@ def generate_typescript(schema):
 
     for template_name in template_names:
         j2_template = env.get_template(template_name)
-        out_filename = os.path.splitext(template_name)[0]
-        result_files[out_filename] = j2_template.render(ctx)
+        for name, decl in decls_by_name.items():
+            # out_filename = os.path.splitext(ts_name(decl["name"]))[0]
+            if decl["info"]["type"] == "Struct":
+                out_filename = ts_name(decl["name"]) + ".ts"
+                result_files[out_filename] = j2_template.render({
+                    "decl": decl,
+                    "ts_name" : ts_name,
+                })
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
