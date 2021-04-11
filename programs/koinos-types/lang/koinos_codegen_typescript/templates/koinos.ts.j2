@@ -1,19 +1,28 @@
-{% macro class(decl) %}
 {% set className = ts_name(decl["name"]) %}
+
+export interface Json{{className}} {
+  {% for field in decl["fields"]%}{{field["name"]}}: {{typeref(field["tref"])}};
+  {% endfor %}
+}
+
 export class {{className}} {
+  {% for field in decl["fields"]%}public {{field["name"]}}: {{typeref(field["tref"])}};
+  
+  {% endfor %}constructor(json: Json{{className}}) {
+    {% for field in decl["fields"]%}this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});
+  {% if loop.last %}}{% else %}  {% endif %}{% endfor %}
+
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob();
-    if (!blob) vb.flip();
+    {% for field in decl["fields"]%}vb.serialize(this.{{field["name"]}});
+    {% endfor %}if (!blob) vb.flip();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): {{className}} {
-    
+    {% for field in decl["fields"] %}const {{field["name"]}} = vb.deserialize({{typeref(field["tref"])}});
+    {% endfor %}return new {{className}}({ {% for field in decl["fields"] %}{{field["name"]}}{% if not loop.last %},{% endif%} {% endfor %}});
   }
 }
 
 export default {{className}};
-{% endmacro %}
-
-{% if decl["info"]["type"] == "Struct" %}{{class(decl)}}
-{%- endif -%}

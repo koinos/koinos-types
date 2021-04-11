@@ -59,6 +59,17 @@ def ts_name(name):
 
     return u
 
+def typeref(tref):
+    if tref["info"]["type"] == "IntLiteral":
+        return tref["value"]
+    if tref["name"][-1] == "vector":
+        return "Vector<" + typeref(tref["args"][0]) +">"
+    if tref["name"][-1] == "fixed_blob":
+        return "FixedBlob" + typeref(tref["args"][0])
+    if tref["name"][-1] == "opaque":
+        return "Opaque<" + typeref(tref["args"][0]) +">"
+    return ts_name(tref["name"][-1])
+
 def decl_fixed_blob(length):
     fixed_blobs.add(length)
     return ""
@@ -263,13 +274,14 @@ def generate_typescript(schema):
     for template_name in template_names:
         j2_template = env.get_template(template_name)
         for name, decl in decls_by_name.items():
-            # out_filename = os.path.splitext(ts_name(decl["name"]))[0]
             if decl["info"]["type"] == "Struct":
                 out_filename = ts_name(decl["name"]) + ".ts"
                 result_files[out_filename] = j2_template.render({
                     "decl": decl,
                     "ts_name" : ts_name,
+                    "typeref": typeref,
                 })
+                print(decl)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
