@@ -4,7 +4,6 @@ namespace koinos { namespace chain {
 enum class system_call_id : uint32
 {
    prints = 0x9b229941,
-   verify_block_header = 0x9625504e,
    apply_block = 0x94ab4ff5,
    apply_transaction = 0x9d8b55da,
    apply_reserved_operation = 0x9aa85924,
