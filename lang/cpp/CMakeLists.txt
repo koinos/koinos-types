@@ -55,7 +55,7 @@ add_library(Koinos::types ALIAS koinos_types)
 # Any boost library that is not header only must be build against wasm.
 # It is easier to simply to utilize those libraries. Most boost libraries are header only.
 if (ENABLE_JSON)
-   add_compile_definitions(ENABLE_JSON)
+   target_compile_definitions(koinos_types INTERFACE ENABLE_JSON=1)
    target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
 else()
    target_link_libraries(koinos_types INTERFACE Boost::headers)
