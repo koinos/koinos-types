@@ -1,5 +1,6 @@
 import {
   VariableBlob,
+  FixedBlob,
   KoinosBoolean,
   KoinosString,
   Int8,
@@ -38,7 +39,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(25);
+    expect.assertions(26);
     const vb1 = new VariableBlob("ce123456af");
     const multihash = new Multihash({
       id: 123,
@@ -71,6 +72,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
       .serialize(new Vector([new Int8(2), new Int8(4), new Int8(6)]))
+      .serialize(new FixedBlob(5, "1122334455"))
       .flip();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -102,6 +104,7 @@ describe("Koinos Types - Typescript", () => {
       4,
       6,
     ]);
+    expect(vb.deserializeFixedBlob(5).toHex()).toBe("1122334455");
   });
 
   it("should create an opaque class", () => {

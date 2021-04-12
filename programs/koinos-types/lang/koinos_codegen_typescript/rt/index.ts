@@ -1,4 +1,5 @@
 export * from "./VariableBlob";
+export * from "./FixedBlob";
 export * from "./KoinosBoolean";
 export * from "./KoinosString";
 export * from "./KoinosNumber";
