@@ -1,5 +1,6 @@
 import * as ByteBuffer from "bytebuffer";
 import { VarInt } from "./VarInt";
+import { Vector } from "./Vector";
 
 export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 
@@ -87,6 +88,12 @@ export class VariableBlob {
     if (new ClassT() instanceof VariableBlob)
       return (this.deserializeVariableBlob() as unknown) as T;
     return (ClassT as KoinosClassBuilder<T>).deserialize(this);
+  }
+
+  deserializeVector<T extends KoinosClass>(
+    ClassT: KoinosClassBuilder<T>
+  ): Vector<T> {
+    return Vector.deserialize(ClassT, this);
   }
 
   toHex(): string {

@@ -20,6 +20,7 @@ import {
   BlockHeightType,
   Multihash,
   Opaque,
+  Vector,
 } from ".";
 
 describe("Koinos Types - Typescript", () => {
@@ -37,7 +38,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(24);
+    expect.assertions(25);
     const vb1 = new VariableBlob("ce123456af");
     const multihash = new Multihash({
       id: 123,
@@ -69,6 +70,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new TimestampType("1234567890"))
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
+      .serialize(new Vector([new Int8(2), new Int8(4), new Int8(6)]))
       .flip();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -95,6 +97,11 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserialize(TimestampType).toString()).toBe("1234567890");
     expect(vb.deserialize(BlockHeightType).toString()).toBe("123456");
     expect(vb.deserialize(Multihash).equals(multihash)).toBe(true);
+    expect(vb.deserializeVector(Int8).items.map((i) => i.num)).toStrictEqual([
+      2,
+      4,
+      6,
+    ]);
   });
 
   it("should create an opaque class", () => {

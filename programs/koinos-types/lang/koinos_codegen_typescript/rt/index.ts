@@ -22,3 +22,4 @@ export * from "./TimestampType";
 export * from "./BlockHeightType";
 export * from "./Multihash";
 export * from "./Opaque";
+export * from "./Vector";
