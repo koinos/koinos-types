@@ -1,5 +1,7 @@
 import * as ByteBuffer from "bytebuffer";
+import { FixedBlob } from "./FixedBlob";
 import { VarInt } from "./VarInt";
+import { Vector } from "./Vector";
 
 export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 
@@ -12,7 +14,7 @@ export interface KoinosClassBuilder<T extends KoinosClass> {
   deserialize(vb: VariableBlob): T;
 }
 
-function remove0xPrefix(str: string): string {
+export function remove0xPrefix(str: string): string {
   return str.startsWith("0x") ? str.slice(2) : str;
 }
 
@@ -87,6 +89,21 @@ export class VariableBlob {
     if (new ClassT() instanceof VariableBlob)
       return (this.deserializeVariableBlob() as unknown) as T;
     return (ClassT as KoinosClassBuilder<T>).deserialize(this);
+  }
+
+  deserializeVector<T extends KoinosClass>(
+    ClassT: KoinosClassBuilder<T>
+  ): Vector<T> {
+    return Vector.deserialize(ClassT, this);
+  }
+
+  deserializeFixedBlob(size: number): FixedBlob {
+    const { limit, offset } = this.buffer;
+    if (limit < offset + size) throw new Error("Unexpected EOF");
+    const subfb = new FixedBlob(size);
+    this.buffer.copyTo(subfb.buffer, 0, offset, offset + size);
+    this.buffer.offset += size;
+    return subfb;
   }
 
   toHex(): string {
