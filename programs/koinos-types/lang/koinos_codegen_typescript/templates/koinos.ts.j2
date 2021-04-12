@@ -1,14 +1,16 @@
-{% set className = ts_name(decl["name"]) %}
+{% set className = ts_name(decl["name"]) %}import { 
+  {% for dep in dependencies %}{{dep}},
+  {% endfor%}VariableBlob
+} from "./basetypes";
 
 export interface Json{{className}} {
-  {% for field in decl["fields"]%}{{field["name"]}}: {{typeref(field["tref"])}};
-  {% endfor %}
-}
+  {% for field in decl["fields"]%}{{field["name"]}}: {{typereflike(field["tref"])}};
+{% if loop.last %}}{% else %}  {% endif %}{% endfor %}
 
 export class {{className}} {
   {% for field in decl["fields"]%}public {{field["name"]}}: {{typeref(field["tref"])}};
   
-  {% endfor %}constructor(json: Json{{className}}) {
+  {% endfor %}constructor(json?: Json{{className}}) {
     {% for field in decl["fields"]%}this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});
   {% if loop.last %}}{% else %}  {% endif %}{% endfor %}
 

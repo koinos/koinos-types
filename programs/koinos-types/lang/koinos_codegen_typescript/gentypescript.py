@@ -70,6 +70,28 @@ def typeref(tref):
         return "Opaque<" + typeref(tref["args"][0]) +">"
     return ts_name(tref["name"][-1])
 
+def typereflike(tref):
+    if tref["name"][-1] in ['int8', 'uint8', 'int16',
+      'uint16', 'int32', 'uint32', 'int64', 'uint64',
+      'int128', 'uint128', 'int160', 'uint160',
+      'int256', 'uint256', 'block_height_type',
+      'timestamp_type']:
+      return "NumberLike"
+    if tref["name"][-1] == "string":
+      return "StringLike"
+    if tref["name"][-1] == "boolean":
+      return "BooleanLike"
+    if tref["name"][-1] in ['variable_blob', 'fixed_blob']:
+      return "VariableBlobLike"
+    return "Json" + typeref(tref)
+
+def get_dependencies(decl):
+    dep = set()
+    for field in decl["fields"]:
+        dep.add(typereflike(field["tref"]))
+        dep.add(typeref(field["tref"]))
+    return dep
+
 def decl_fixed_blob(length):
     fixed_blobs.add(length)
     return ""
@@ -275,11 +297,14 @@ def generate_typescript(schema):
         j2_template = env.get_template(template_name)
         for name, decl in decls_by_name.items():
             if decl["info"]["type"] == "Struct":
+                dependencies = get_dependencies(decl)
                 out_filename = ts_name(decl["name"]) + ".ts"
                 result_files[out_filename] = j2_template.render({
                     "decl": decl,
+                    "dependencies" : dependencies, 
                     "ts_name" : ts_name,
                     "typeref": typeref,
+                    "typereflike": typereflike,
                 })
                 print(decl)
 
@@ -287,7 +312,7 @@ def generate_typescript(schema):
     for root, dirs, files in os.walk(rt_path):
         for f in files:
             filepath = os.path.join(root, f)
-            relpath = os.path.relpath(filepath, rt_path)
+            relpath = "basetypes/" + os.path.relpath(filepath, rt_path)
             with open(filepath, "r") as f:
                 content = f.read()
             result_files[relpath] = content
