@@ -1,5 +1,7 @@
-find_package(Boost CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+if (NOT GENERATE_ONLY)
+   find_package(Boost CONFIG REQUIRED)
+   find_package(nlohmann_json CONFIG REQUIRED)
+endif()
 
 # C++
 set(KOINOS_CPP_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/cpp")
@@ -52,7 +54,12 @@ add_library(Koinos::types ALIAS koinos_types)
 # We specifically do not want to link to boost, only include boost headers.
 # Any boost library that is not header only must be build against wasm.
 # It is easier to simply to utilize those libraries. Most boost libraries are header only.
-target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
+if (ENABLE_JSON)
+   add_compile_definitions(ENABLE_JSON)
+   target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
+else()
+   target_link_libraries(koinos_types INTERFACE Boost::headers)
+endif()
 target_include_directories(koinos_types INTERFACE
    $<BUILD_INTERFACE:${KOINOS_CPP_OUTPUT_INCLUDE_DIR}>
    $<INSTALL_INTERFACE:include>
@@ -80,4 +87,3 @@ install(
    NAMESPACE Koinos::
    DESTINATION ${KOINOS_LIB_CONFIG_INSTALL_DIR}
 )
-

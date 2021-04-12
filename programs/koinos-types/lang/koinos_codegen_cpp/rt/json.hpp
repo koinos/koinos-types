@@ -1,4 +1,6 @@
 #pragma once
+#ifdef ENABLE_JSON
+
 #include <koinos/pack/rt/json_fwd.hpp>
 
 #include <koinos/pack/rt/exceptions.hpp>
@@ -596,3 +598,4 @@ template< typename T > struct jsonifiable< T, typename std::enable_if_t< reflect
 #undef JSON_UNSIGNED_INT_SERIALIZER
 #undef JSON_SIGNED_BOOST_INT_SERIALIZER
 #undef JSON_UNSIGNED_BOOST_INT_SERIALIZER
+#endif

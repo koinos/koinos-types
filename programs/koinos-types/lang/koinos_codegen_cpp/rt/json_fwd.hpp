@@ -1,4 +1,5 @@
 #pragma once
+#ifdef ENABLE_JSON
 
 #include <koinos/pack/rt/basetypes.hpp>
 
@@ -113,3 +114,6 @@ std::ostream& operator<<( std::ostream& o, const T& t )                         
 
 #undef KOINOS_DECLARE_PRIMITIVE_JSON_SERIALIZER
 #undef KOINOS_DECLARE_BASE_JSON_SERIALIZER
+#else
+#define KOINOS_DEFINE_JSON_STREAM_OPERATOR( NS )
+#endif

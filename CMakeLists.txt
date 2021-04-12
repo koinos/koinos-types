@@ -10,31 +10,34 @@ if(CCACHE_PROGRAM)
    set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS   "${CMAKE_SOURCE_DIR}/ci/ccache_clang++")
 endif()
 
+option(ENABLE_HUNTER "Use Hunter to pull C++ dependencies" ON)
 option(HUNTER_RUN_UPLOAD "Upload Hunter packages to binary cache server" OFF)
 
-set(
-   HUNTER_CACHE_SERVERS
-   "https://github.com/koinos/hunter-cache"
-   CACHE
-   STRING
-   "Default cache server"
-)
+if (ENABLE_HUNTER)
+   set(
+      HUNTER_CACHE_SERVERS
+      "https://github.com/koinos/hunter-cache"
+      CACHE
+      STRING
+      "Default cache server"
+   )
 
-set(
-   HUNTER_PASSWORDS_PATH
-   "${CMAKE_CURRENT_LIST_DIR}/cmake/Hunter/passwords.cmake"
-   CACHE
-   FILEPATH
-   "Hunter passwords"
-)
+   set(
+      HUNTER_PASSWORDS_PATH
+      "${CMAKE_CURRENT_LIST_DIR}/cmake/Hunter/passwords.cmake"
+      CACHE
+      FILEPATH
+      "Hunter passwords"
+   )
 
-include("cmake/HunterGate.cmake")
+   include("cmake/HunterGate.cmake")
 
-HunterGate(
-   URL "https://github.com/cpp-pm/hunter/archive/v0.23.287.tar.gz"
-   SHA1 "69371a638d697bbf09f4f08dd0aad996efcc79d9"
-   LOCAL
-)
+   HunterGate(
+      URL "https://github.com/cpp-pm/hunter/archive/v0.23.287.tar.gz"
+      SHA1 "69371a638d697bbf09f4f08dd0aad996efcc79d9"
+      LOCAL
+   )
+endif()
 
 project(koinos_types VERSION 0.1.0 LANGUAGES CXX)
 
@@ -56,6 +59,7 @@ set(KOINOS_LIB_CMAKE_PROJECT_TARGETS_FILE "${KOINOS_LIB_CMAKE_CONFIG_DIR}/${PROJ
 set(KOINOS_LIB_PKGCONFIG_INSTALL_DIR      "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 option(BUILD_TESTS "Build Tests" ON)
+option(ENABLE_JSON "Build C++ with JSON support" ON)
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
 
 # This is to force color output when using ccache with Unix Makefiles
@@ -89,8 +93,10 @@ if (NOT TARGET coverage)
   endif()
 endif()
 
-hunter_add_package(Boost COMPONENTS system test program_options)
-hunter_add_package(nlohmann_json)
+if (ENABLE_HUNTER)
+   hunter_add_package(Boost COMPONENTS system test program_options)
+   hunter_add_package(nlohmann_json)
+endif()
 
 add_subdirectory(lang)
 add_subdirectory(programs)
