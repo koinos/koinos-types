@@ -1,5 +1,10 @@
 if (ENABLE_HUNTER)
    find_package(Boost CONFIG REQUIRED)
+else()
+   find_package(Boost 1.57 REQUIRED)
+endif()
+
+if (ENABLE_JSON)
    find_package(nlohmann_json CONFIG REQUIRED)
 endif()
 
