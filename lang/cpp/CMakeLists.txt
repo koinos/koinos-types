@@ -1,4 +1,4 @@
-if (NOT GENERATE_ONLY)
+if (ENABLE_HUNTER)
    find_package(Boost CONFIG REQUIRED)
    find_package(nlohmann_json CONFIG REQUIRED)
 endif()
