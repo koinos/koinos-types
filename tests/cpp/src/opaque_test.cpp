@@ -82,8 +82,9 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
-   BOOST_TEST_MESSAGE( "Serialize binary and json" );
 #ifdef JSON_ENABLED
+   BOOST_TEST_MESSAGE( "Serialize binary and json" );
+
    auto to_blob = to_variable_blob( o );
    BOOST_CHECK( std::equal( to_blob.begin(), to_blob.end(), serialized_bin.begin(), serialized_bin.end() ) );
 
