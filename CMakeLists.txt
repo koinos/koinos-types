@@ -10,34 +10,32 @@ if(CCACHE_PROGRAM)
    set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS   "${CMAKE_SOURCE_DIR}/ci/ccache_clang++")
 endif()
 
-option(ENABLE_HUNTER "Use Hunter to pull C++ dependencies" ON)
+option(HUNTER_ENABLED "Enable Hunter package manager" ON)
 option(HUNTER_RUN_UPLOAD "Upload Hunter packages to binary cache server" OFF)
 
-if (ENABLE_HUNTER)
-   set(
-      HUNTER_CACHE_SERVERS
-      "https://github.com/koinos/hunter-cache"
-      CACHE
-      STRING
-      "Default cache server"
-   )
+set(
+   HUNTER_CACHE_SERVERS
+   "https://github.com/koinos/hunter-cache"
+   CACHE
+   STRING
+   "Default cache server"
+)
 
-   set(
-      HUNTER_PASSWORDS_PATH
-      "${CMAKE_CURRENT_LIST_DIR}/cmake/Hunter/passwords.cmake"
-      CACHE
-      FILEPATH
-      "Hunter passwords"
-   )
+set(
+   HUNTER_PASSWORDS_PATH
+   "${CMAKE_CURRENT_LIST_DIR}/cmake/Hunter/passwords.cmake"
+   CACHE
+   FILEPATH
+   "Hunter passwords"
+)
 
-   include("cmake/HunterGate.cmake")
+include("cmake/HunterGate.cmake")
 
-   HunterGate(
-      URL "https://github.com/cpp-pm/hunter/archive/v0.23.287.tar.gz"
-      SHA1 "69371a638d697bbf09f4f08dd0aad996efcc79d9"
-      LOCAL
-   )
-endif()
+HunterGate(
+   URL "https://github.com/cpp-pm/hunter/archive/v0.23.287.tar.gz"
+   SHA1 "69371a638d697bbf09f4f08dd0aad996efcc79d9"
+   LOCAL
+)
 
 project(koinos_types VERSION 0.1.0 LANGUAGES CXX)
 
@@ -93,10 +91,8 @@ if (NOT TARGET coverage)
   endif()
 endif()
 
-if (ENABLE_HUNTER)
-   hunter_add_package(Boost COMPONENTS system test program_options)
-   hunter_add_package(nlohmann_json)
-endif()
+hunter_add_package(Boost COMPONENTS system test program_options)
+hunter_add_package(nlohmann_json)
 
 add_subdirectory(lang)
 add_subdirectory(programs)

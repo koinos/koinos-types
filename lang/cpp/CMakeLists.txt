@@ -1,4 +1,4 @@
-if (ENABLE_HUNTER)
+if (HUNTER_ENABLED)
    find_package(Boost CONFIG REQUIRED)
 else()
    find_package(Boost 1.57 REQUIRED)
