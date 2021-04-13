@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
    BOOST_TEST_MESSAGE( "Serialize binary and json" );
-
+#ifdef JSON_ENABLED
    auto to_blob = to_variable_blob( o );
    BOOST_CHECK( std::equal( to_blob.begin(), to_blob.end(), serialized_bin.begin(), serialized_bin.end() ) );
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    from_json( expected_json, o );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
-
+#endif
    BOOST_TEST_MESSAGE( "Check state transitions between boxed, unboxed, and mutable" );
 
    // Check no-op boxed->boxed (box and make_immutable)

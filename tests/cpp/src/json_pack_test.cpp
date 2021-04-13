@@ -1,4 +1,4 @@
-
+#ifdef JSON_ENABLED
 #include <boost/test/unit_test.hpp>
 
 #include <koinos/tests/pack_fixture.hpp>
@@ -423,3 +423,4 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
 */
 
 BOOST_AUTO_TEST_SUITE_END()
+#endif
