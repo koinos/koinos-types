@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ENABLE_JSON
+#ifdef JSON_ENABLED
 
 #include <koinos/pack/rt/json_fwd.hpp>
 

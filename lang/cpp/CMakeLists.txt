@@ -4,7 +4,7 @@ else()
    find_package(Boost 1.57 REQUIRED)
 endif()
 
-if (ENABLE_JSON)
+if (JSON_ENABLED)
    find_package(nlohmann_json CONFIG REQUIRED)
 endif()
 
@@ -59,8 +59,8 @@ add_library(Koinos::types ALIAS koinos_types)
 # We specifically do not want to link to boost, only include boost headers.
 # Any boost library that is not header only must be build against wasm.
 # It is easier to simply to utilize those libraries. Most boost libraries are header only.
-if (ENABLE_JSON)
-   target_compile_definitions(koinos_types INTERFACE ENABLE_JSON=1)
+if (JSON_ENABLED)
+   target_compile_definitions(koinos_types INTERFACE JSON_ENABLED=1)
    target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
 else()
    target_link_libraries(koinos_types INTERFACE Boost::headers)
