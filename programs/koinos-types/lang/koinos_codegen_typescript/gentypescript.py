@@ -63,11 +63,11 @@ def typeref(tref):
     if tref["info"]["type"] == "IntLiteral":
         return tref["value"]
     if tref["name"][-1] == "vector":
-        return "Vector<" + typeref(tref["args"][0]) +">"
+        return "Vector<" + typeref(tref["targs"][0]) +">"
     if tref["name"][-1] == "fixed_blob":
-        return "FixedBlob" + typeref(tref["args"][0])
+        return "FixedBlob" + typeref(tref["targs"][0])
     if tref["name"][-1] == "opaque":
-        return "Opaque<" + typeref(tref["args"][0]) +">"
+        return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
 
 def typereflike(tref):

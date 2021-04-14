@@ -3,21 +3,21 @@
   {% endfor%}VariableBlob
 } from "./basetypes";
 
-export interface Json{{className}} {
-  {% for field in decl["fields"]%}{{field["name"]}}: {{typereflike(field["tref"])}};
-{% if loop.last %}}{% else %}  {% endif %}{% endfor %}
+export interface Json{{className}} { {% for field in decl["fields"]%}
+  {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
+}
 
 export class {{className}} {
   {% for field in decl["fields"]%}public {{field["name"]}}: {{typeref(field["tref"])}};
   
-  {% endfor %}constructor(json?: Json{{className}}) {
-    {% for field in decl["fields"]%}this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});
-  {% if loop.last %}}{% else %}  {% endif %}{% endfor %}
+  {% endfor %}constructor(json?: Json{{className}}) { {% for field in decl["fields"] %}
+    this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});{% endfor %}
+  }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
-    {% for field in decl["fields"]%}vb.serialize(this.{{field["name"]}});
-    {% endfor %}if (!blob) vb.flip();
+    const vb = blob || new VariableBlob();{% for field in decl["fields"] %}
+    vb.serialize(this.{{field["name"]}});{% endfor %}
+    if (!blob) vb.flip();
     return vb;
   }
 
