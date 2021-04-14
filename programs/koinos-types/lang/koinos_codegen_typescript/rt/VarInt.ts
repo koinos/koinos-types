@@ -1,5 +1,5 @@
-import { KoinosBigInt } from "./KoinosBigInt";
-import { KoinosNumber, NumberLike } from "./KoinosNumber";
+import { BigNum } from "./BigNum";
+import { Num, NumberLike } from "./Num";
 import { VariableBlob } from "./VariableBlob";
 
 export class VarInt {
@@ -8,8 +8,8 @@ export class VarInt {
 
   constructor(number: NumberLike = 0) {
     let n: number;
-    if (number instanceof KoinosBigInt) n = Number(number.num);
-    else if (number instanceof KoinosNumber) n = number.num;
+    if (number instanceof BigNum) n = Number(number.num);
+    else if (number instanceof Num) n = number.num;
     else n = Number(number);
     this.num = n;
   }

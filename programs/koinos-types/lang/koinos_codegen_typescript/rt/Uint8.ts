@@ -1,10 +1,10 @@
 import { VariableBlob } from "./VariableBlob";
-import { KoinosNumber, NumberLike } from "./KoinosNumber";
+import { Num, NumberLike } from "./Num";
 
 export const MAX_UINT8 = 0xff;
-export class UInt8 extends KoinosNumber {
+export class Uint8 extends Num {
   constructor(number: NumberLike = 0) {
-    super(number, "UInt8", MAX_UINT8);
+    super(number, "Uint8", MAX_UINT8);
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -14,11 +14,11 @@ export class UInt8 extends KoinosNumber {
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): UInt8 {
+  static deserialize(vb: VariableBlob): Uint8 {
     if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
     const value = vb.buffer.readByte();
-    return new UInt8(value);
+    return new Uint8(value);
   }
 }
 
-export default UInt8;
+export default Uint8;

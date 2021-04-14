@@ -1,4 +1,4 @@
-import { UInt64 } from "./UInt64";
+import { Uint64 } from "./Uint64";
 
-export class TimestampType extends UInt64 {}
+export class TimestampType extends Uint64 {}
 export default TimestampType;
