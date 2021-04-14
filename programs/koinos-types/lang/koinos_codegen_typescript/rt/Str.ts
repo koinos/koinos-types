@@ -1,13 +1,13 @@
 import * as ByteBuffer from "bytebuffer";
 import { VariableBlob } from "./VariableBlob";
 
-export type StringLike = string | KoinosString;
+export type StringLike = string | Str;
 
-export class KoinosString {
+export class Str {
   public str: string;
 
   constructor(str: StringLike = "") {
-    this.str = str instanceof KoinosString ? str.str : str;
+    this.str = str instanceof Str ? str.str : str;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -18,9 +18,9 @@ export class KoinosString {
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): KoinosString {
+  static deserialize(vb: VariableBlob): Str {
     const subvb = vb.deserialize(VariableBlob);
-    return new KoinosString(subvb.buffer.toUTF8());
+    return new Str(subvb.buffer.toUTF8());
   }
 
   toString(): string {
@@ -28,4 +28,4 @@ export class KoinosString {
   }
 }
 
-export default KoinosString;
+export default Str;

@@ -1,12 +1,12 @@
 import { VariableBlob } from "./VariableBlob";
 
-export type BooleanLike = boolean | KoinosBoolean;
+export type BooleanLike = boolean | Bool;
 
-export class KoinosBoolean {
+export class Bool {
   public bool: boolean;
 
   constructor(bool: BooleanLike = false) {
-    this.bool = bool instanceof KoinosBoolean ? bool.bool : bool;
+    this.bool = bool instanceof Bool ? bool.bool : bool;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -16,11 +16,11 @@ export class KoinosBoolean {
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): KoinosBoolean {
+  static deserialize(vb: VariableBlob): Bool {
     if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
     const value = vb.buffer.readByte();
     if (value !== 0 && value !== 1) throw new Error("Boolean must be 0 or 1");
-    return new KoinosBoolean(!!value);
+    return new Bool(!!value);
   }
 
   toBoolean(): boolean {
@@ -32,4 +32,4 @@ export class KoinosBoolean {
   }
 }
 
-export default KoinosBoolean;
+export default Bool;

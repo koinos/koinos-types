@@ -1,6 +1,6 @@
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
-import { UInt64 } from "./UInt64";
-import { NumberLike } from "./KoinosNumber";
+import { Uint64 } from "./Uint64";
+import { NumberLike } from "./Num";
 import { VarInt } from "./VarInt";
 
 export interface JsonMultihash {
@@ -9,7 +9,7 @@ export interface JsonMultihash {
 }
 
 export class Multihash {
-  public id: UInt64;
+  public id: Uint64;
 
   public digest: VariableBlob;
 
@@ -19,7 +19,7 @@ export class Multihash {
       digest: "",
     }
   ) {
-    this.id = new UInt64(json.id);
+    this.id = new Uint64(json.id);
     this.digest = new VariableBlob(json.digest);
   }
 

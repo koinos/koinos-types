@@ -1,9 +1,9 @@
 import { VariableBlob } from "./VariableBlob";
-import { KoinosNumber, NumberLike } from "./KoinosNumber";
+import { Num, NumberLike } from "./Num";
 
 export const MAX_INT16 = 0x7fff;
 export const MIN_INT16 = -0x8000;
-export class Int16 extends KoinosNumber {
+export class Int16 extends Num {
   constructor(number: NumberLike = 0) {
     super(number, "Int16", MAX_INT16, MIN_INT16);
   }
