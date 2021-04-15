@@ -27,6 +27,10 @@ export class Bool {
     return this.bool;
   }
 
+  toJSON(): boolean {
+    return this.bool;
+  }
+
   toString(): string {
     return this.bool.toString();
   }

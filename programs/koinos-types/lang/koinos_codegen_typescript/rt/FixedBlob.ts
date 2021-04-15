@@ -1,5 +1,6 @@
 import * as ByteBuffer from "bytebuffer";
-import { VariableBlob, VariableBlobLike, remove0xPrefix } from "./VariableBlob";
+import * as bs58 from "bs58";
+import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 
 export class FixedBlob {
   public buffer: ByteBuffer;
@@ -14,7 +15,15 @@ export class FixedBlob {
     } else if (b instanceof ByteBuffer) {
       this.buffer = b;
     } else if (typeof b === "string") {
-      this.buffer = ByteBuffer.fromHex(remove0xPrefix(b)) as ByteBuffer;
+      if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
+      const buffer = new ByteBuffer();
+      buffer.buffer = bs58.decode(b.slice(1));
+      if (buffer.buffer.length !== size)
+        throw new Error(
+          `Invalid blob size: ${buffer.buffer.length}. Expected ${size}`
+        );
+      buffer.limit = size;
+      this.buffer = buffer;
     }
   }
 
@@ -40,6 +49,10 @@ export class FixedBlob {
     vb.buffer.offset += this.size;
     if (!blob) vb.flip();
     return vb;
+  }
+
+  toJSON(): string {
+    return "z" + bs58.encode(this.buffer.buffer);
   }
 
   toHex(): string {

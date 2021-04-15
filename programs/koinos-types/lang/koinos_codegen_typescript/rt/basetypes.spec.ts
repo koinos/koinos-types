@@ -1,3 +1,4 @@
+import * as JSONbig from "json-bigint";
 import {
   VariableBlob,
   FixedBlob,
@@ -39,11 +40,11 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(26);
-    const vb1 = new VariableBlob("ce123456af");
+    expect.assertions(27);
+    const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash({
       id: 123,
-      digest: "0xff1234567890",
+      digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
 
     const vb = new VariableBlob()
@@ -71,8 +72,8 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new TimestampType("1234567890"))
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
-      .serialize(new Vector([new Int8(2), new Int8(4), new Int8(6)]))
-      .serialize(new FixedBlob(5, "1122334455"))
+      .serialize(new Vector(Int8, [2, 4, 6]))
+      .serialize(new FixedBlob(7, "z36UjcYNBG9"))
       .flip();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -99,12 +100,12 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserialize(TimestampType).toString()).toBe("1234567890");
     expect(vb.deserialize(BlockHeightType).toString()).toBe("123456");
     expect(vb.deserialize(Multihash).equals(multihash)).toBe(true);
-    expect(vb.deserializeVector(Int8).items.map((i) => i.num)).toStrictEqual([
-      2,
-      4,
-      6,
-    ]);
-    expect(vb.deserializeFixedBlob(5).toHex()).toBe("1122334455");
+    expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
+    expect(vb.deserializeFixedBlob(7).toJSON()).toBe("z36UjcYNBG9");
+
+    expect(JSONbig.stringify(multihash.toJSON())).toBe(
+      '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'
+    );
   });
 
   it("should create an opaque class", () => {

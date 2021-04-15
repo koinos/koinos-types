@@ -1,4 +1,5 @@
 import * as ByteBuffer from "bytebuffer";
+import * as bs58 from "bs58";
 import { FixedBlob } from "./FixedBlob";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
@@ -7,10 +8,12 @@ export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 
 export interface KoinosClass {
   serialize(vb?: VariableBlob): VariableBlob;
+
+  toJSON(): unknown;
 }
 
 export interface KoinosClassBuilder<T extends KoinosClass> {
-  new (): T;
+  new (json?: any): T;
   deserialize(vb: VariableBlob): T;
 }
 
@@ -27,7 +30,10 @@ export class VariableBlob {
     } else if (b instanceof ByteBuffer) {
       this.buffer = b;
     } else if (typeof b === "string") {
-      this.buffer = ByteBuffer.fromHex(remove0xPrefix(b)) as ByteBuffer;
+      if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
+      this.buffer = new ByteBuffer();
+      this.buffer.buffer = bs58.decode(b.slice(1));
+      this.buffer.limit = this.buffer.buffer.length;
     } else {
       this.buffer = ByteBuffer.allocate(b) as ByteBuffer;
     }
@@ -104,6 +110,10 @@ export class VariableBlob {
     this.buffer.copyTo(subfb.buffer, 0, offset, offset + size);
     this.buffer.offset += size;
     return subfb;
+  }
+
+  toJSON(): string {
+    return "z" + bs58.encode(this.buffer.buffer);
   }
 
   toHex(): string {

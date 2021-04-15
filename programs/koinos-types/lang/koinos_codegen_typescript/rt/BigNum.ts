@@ -59,6 +59,10 @@ export class BigNum {
     return this.num;
   }
 
+  toJSON(): bigint {
+    return this.num;
+  }
+
   toString(radix?: number): string {
     return this.num.toString(radix);
   }

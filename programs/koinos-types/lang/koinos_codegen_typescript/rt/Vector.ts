@@ -4,8 +4,10 @@ import { VarInt } from "./VarInt";
 export class Vector<T extends KoinosClass> {
   public items: T[];
 
-  constructor(items: T[] = []) {
-    this.items = items;
+  constructor(ClassT: KoinosClassBuilder<T>, items: (T | unknown)[] = []) {
+    this.items = items.map((item) =>
+      item instanceof ClassT ? item : new ClassT(item)
+    );
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -22,7 +24,11 @@ export class Vector<T extends KoinosClass> {
   ): Vector<K> {
     const len = vb.deserialize(VarInt).num;
     const items = new Array(len).fill(null).map(() => vb.deserialize(ClassT));
-    return new Vector<K>(items);
+    return new Vector<K>(ClassT, items);
+  }
+
+  toJSON(): unknown[] {
+    return this.items.map((item) => item.toJSON());
   }
 }
 
