@@ -17,10 +17,6 @@ export interface KoinosClassBuilder<T extends KoinosClass> {
   deserialize(vb: VariableBlob): T;
 }
 
-export function remove0xPrefix(str: string): string {
-  return str.startsWith("0x") ? str.slice(2) : str;
-}
-
 export class VariableBlob {
   public buffer: ByteBuffer;
 
