@@ -2,6 +2,12 @@ import { VariableBlob } from "./VariableBlob";
 import { Num, NumberLike } from "./Num";
 import { VarInt } from "./VarInt";
 
+const MAX_INT64 = BigInt("0x7" + "F".repeat(15));
+const MIN_INT64 = -BigInt("0x8" + "0".repeat(15));
+function isInt64(n: bigint): boolean {
+  return n >= MIN_INT64 && n <= MAX_INT64;
+}
+
 export class BigNum {
   public num: bigint;
 
@@ -59,8 +65,8 @@ export class BigNum {
     return this.num;
   }
 
-  toJSON(): bigint {
-    return this.num;
+  toJSON(): bigint | string {
+    return isInt64(this.num) ? this.num : this.num.toString();
   }
 
   toString(radix?: number): string {
