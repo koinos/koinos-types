@@ -20,6 +20,10 @@ export class Num {
     return this.num;
   }
 
+  toJSON(): number {
+    return this.num;
+  }
+
   toString(radix?: number): string {
     return this.num.toString(radix);
   }

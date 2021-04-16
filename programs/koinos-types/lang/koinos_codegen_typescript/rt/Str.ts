@@ -26,6 +26,10 @@ export class Str {
   toString(): string {
     return this.str;
   }
+
+  toJSON(): string {
+    return this.str;
+  }
 }
 
 export default Str;

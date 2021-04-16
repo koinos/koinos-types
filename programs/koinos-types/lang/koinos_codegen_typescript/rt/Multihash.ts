@@ -15,8 +15,8 @@ export class Multihash {
 
   constructor(
     json: JsonMultihash = {
-      id: 0,
-      digest: "",
+      id: undefined,
+      digest: undefined,
     }
   ) {
     this.id = new Uint64(json.id);
@@ -48,6 +48,13 @@ export class Multihash {
     const id = vb.deserialize(VarInt);
     const digest = vb.deserialize(VariableBlob);
     return new Multihash({ id, digest });
+  }
+
+  toJSON(): JsonMultihash {
+    return {
+      id: this.id.toJSON(),
+      digest: this.digest.toJSON(),
+    };
   }
 }
 

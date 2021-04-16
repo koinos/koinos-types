@@ -31,6 +31,10 @@ export class VarInt {
     return this.num;
   }
 
+  toJSON(): number {
+    return this.num;
+  }
+
   toString(radix?: number): string {
     return this.num.toString(radix);
   }

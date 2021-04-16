@@ -1,3 +1,4 @@
+import * as JSONbig from "json-bigint";
 import {
   VariableBlob,
   FixedBlob,
@@ -22,6 +23,8 @@ import {
   Multihash,
   Opaque,
   Vector,
+  MAX_INT64,
+  MIN_INT64,
 } from ".";
 
 describe("Koinos Types - Typescript", () => {
@@ -39,11 +42,11 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(26);
-    const vb1 = new VariableBlob("ce123456af");
+    expect.assertions(27);
+    const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash({
       id: 123,
-      digest: "0xff1234567890",
+      digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
 
     const vb = new VariableBlob()
@@ -71,40 +74,59 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new TimestampType("1234567890"))
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
-      .serialize(new Vector([new Int8(2), new Int8(4), new Int8(6)]))
-      .serialize(new FixedBlob(5, "1122334455"))
+      .serialize(new Vector(Int8, [2, 4, 6]))
+      .serialize(new FixedBlob(7, "z36UjcYNBG9"))
       .flip();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
-    expect(vb.deserialize(Bool).toBoolean()).toBe(true);
-    expect(vb.deserialize(Str).toString()).toBe("test");
-    expect(vb.deserialize(Int8).toNumber()).toBe(100);
-    expect(vb.deserialize(Uint8).toNumber()).toBe(100);
-    expect(vb.deserialize(Int16).toNumber()).toBe(1000);
-    expect(vb.deserialize(Uint16).toNumber()).toBe(1000);
-    expect(vb.deserialize(Int32).toNumber()).toBe(10000);
-    expect(vb.deserialize(Uint32).toNumber()).toBe(10000);
-    expect(vb.deserialize(Int64).toString()).toBe("100000");
-    expect(vb.deserialize(Int64).toString()).toBe("-100000");
-    expect(vb.deserialize(Uint64).toString()).toBe("100000");
-    expect(vb.deserialize(Int128).toString()).toBe("100000");
-    expect(vb.deserialize(Int128).toString()).toBe("-100000");
-    expect(vb.deserialize(Uint128).toString()).toBe("100000");
-    expect(vb.deserialize(Int160).toString()).toBe("100000");
-    expect(vb.deserialize(Int160).toString()).toBe("-100000");
-    expect(vb.deserialize(Uint160).toString()).toBe("100000");
-    expect(vb.deserialize(Int256).toString()).toBe("100000");
-    expect(vb.deserialize(Int256).toString()).toBe("-100000");
-    expect(vb.deserialize(Uint256).toString()).toBe("100000");
-    expect(vb.deserialize(TimestampType).toString()).toBe("1234567890");
-    expect(vb.deserialize(BlockHeightType).toString()).toBe("123456");
+    expect(vb.deserialize(Bool).toJSON()).toBe(true);
+    expect(vb.deserialize(Str).toJSON()).toBe("test");
+    expect(vb.deserialize(Int8).toJSON()).toBe(100);
+    expect(vb.deserialize(Uint8).toJSON()).toBe(100);
+    expect(vb.deserialize(Int16).toJSON()).toBe(1000);
+    expect(vb.deserialize(Uint16).toJSON()).toBe(1000);
+    expect(vb.deserialize(Int32).toJSON()).toBe(10000);
+    expect(vb.deserialize(Uint32).toJSON()).toBe(10000);
+    expect(vb.deserialize(Int64).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int64).toJSON()).toBe(BigInt(-100000));
+    expect(vb.deserialize(Uint64).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int128).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int128).toJSON()).toBe(BigInt(-100000));
+    expect(vb.deserialize(Uint128).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int160).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int160).toJSON()).toBe(BigInt(-100000));
+    expect(vb.deserialize(Uint160).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int256).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(Int256).toJSON()).toBe(BigInt(-100000));
+    expect(vb.deserialize(Uint256).toJSON()).toBe(BigInt(100000));
+    expect(vb.deserialize(TimestampType).toJSON()).toBe(BigInt(1234567890));
+    expect(vb.deserialize(BlockHeightType).toJSON()).toBe(BigInt(123456));
     expect(vb.deserialize(Multihash).equals(multihash)).toBe(true);
-    expect(vb.deserializeVector(Int8).items.map((i) => i.num)).toStrictEqual([
-      2,
-      4,
-      6,
-    ]);
-    expect(vb.deserializeFixedBlob(5).toHex()).toBe("1122334455");
+    expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
+    expect(vb.deserializeFixedBlob(7).toJSON()).toBe("z36UjcYNBG9");
+
+    expect(JSONbig.stringify(multihash.toJSON())).toBe(
+      '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'
+    );
+  });
+
+  it("should transform integers to json as number or string depending on value", () => {
+    expect.assertions(4);
+    // serialized as numbers
+    expect(JSONbig.stringify(new Int256(MAX_INT64).toJSON())).toBe(
+      "9223372036854775807"
+    );
+    expect(JSONbig.stringify(new Int256(MIN_INT64).toJSON())).toBe(
+      "-9223372036854775808"
+    );
+
+    // serialized as strings
+    expect(JSONbig.stringify(new Int256(MAX_INT64 + BigInt(1)).toJSON())).toBe(
+      '"9223372036854775808"'
+    );
+    expect(JSONbig.stringify(new Int256(MIN_INT64 - BigInt(1)).toJSON())).toBe(
+      '"-9223372036854775809"'
+    );
   });
 
   it("should create an opaque class", () => {
