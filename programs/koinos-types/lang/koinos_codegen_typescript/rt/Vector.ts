@@ -11,7 +11,7 @@ export class Vector<T extends KoinosClass> {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.serialize(new VarInt(this.items.length));
     this.items.forEach((item) => vb.serialize(item));
     if (!blob) vb.flip();
@@ -25,6 +25,13 @@ export class Vector<T extends KoinosClass> {
     const len = vb.deserialize(VarInt).num;
     const items = new Array(len).fill(null).map(() => vb.deserialize(ClassT));
     return new Vector<K>(ClassT, items);
+  }
+
+  calcSerializedSize(): number {
+    const header = Math.ceil(Math.log2(this.items.length + 1) / 7);
+    const sizes = this.items.map((item) => item.calcSerializedSize());
+    const dataSize = sizes.reduce((t, v) => t + v, 0);
+    return header + dataSize;
   }
 
   toJSON(): unknown[] {

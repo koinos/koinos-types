@@ -44,11 +44,15 @@ export class FixedBlob {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     this.buffer.copyTo(vb.buffer, vb.buffer.offset, 0, this.size);
     vb.buffer.offset += this.size;
     if (!blob) vb.flip();
     return vb;
+  }
+
+  calcSerializedSize(): number {
+    return this.size;
   }
 
   toJSON(): string {

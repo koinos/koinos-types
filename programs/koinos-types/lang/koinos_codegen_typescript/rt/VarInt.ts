@@ -15,7 +15,7 @@ export class VarInt {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.buffer.writeVarint64(Number(this.num));
     if (!blob) vb.flip();
     return vb;
@@ -25,6 +25,10 @@ export class VarInt {
     if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
     const value = vb.buffer.readVarint64().toNumber();
     return new VarInt(value);
+  }
+
+  calcSerializedSize(): number {
+    return Math.ceil(Math.log2(this.num + 1) / 7);
   }
 
   toNumber(): number {

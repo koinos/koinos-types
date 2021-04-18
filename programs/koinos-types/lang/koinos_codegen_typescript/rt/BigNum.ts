@@ -29,7 +29,7 @@ export class BigNum {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     let numString: string;
     if (this.num >= BigInt(0)) {
       numString = this.num.toString(16);
@@ -59,6 +59,10 @@ export class BigNum {
       return BigInt(numString) - BigInt("0x1" + "0".repeat(2 * this.bytes));
     }
     return BigInt(numString);
+  }
+
+  calcSerializedSize(): number {
+    return this.bytes;
   }
 
   toBigInt(): bigint {

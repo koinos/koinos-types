@@ -8,7 +8,7 @@ export class Uint16 extends Num {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(2);
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.buffer.writeUint16(this.num);
     if (!blob) vb.flip();
     return vb;
@@ -18,6 +18,10 @@ export class Uint16 extends Num {
     if (vb.buffer.limit < 2) throw new Error("Unexpected EOF");
     const value = vb.buffer.readUint16();
     return new Uint16(value);
+  }
+
+  calcSerializedSize(): number {
+    return 2;
   }
 }
 

@@ -11,7 +11,7 @@ export class Str {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     const buffer = ByteBuffer.fromUTF8(this.str) as ByteBuffer;
     vb.buffer.writeVarint64(buffer.limit).append(buffer);
     if (!blob) vb.flip();
@@ -21,6 +21,12 @@ export class Str {
   static deserialize(vb: VariableBlob): Str {
     const subvb = vb.deserialize(VariableBlob);
     return new Str(subvb.buffer.toUTF8());
+  }
+
+  calcSerializedSize(): number {
+    const size = new TextEncoder().encode(this.str).length;
+    const header = Math.ceil(Math.log2(size + 1) / 7);
+    return header + size;
   }
 
   toString(): string {

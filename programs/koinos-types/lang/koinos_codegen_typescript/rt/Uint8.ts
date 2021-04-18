@@ -8,7 +8,7 @@ export class Uint8 extends Num {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(1);
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.buffer.writeByte(this.num);
     if (!blob) vb.flip();
     return vb;
@@ -18,6 +18,10 @@ export class Uint8 extends Num {
     if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
     const value = vb.buffer.readByte();
     return new Uint8(value);
+  }
+
+  calcSerializedSize(): number {
+    return 1;
   }
 }
 

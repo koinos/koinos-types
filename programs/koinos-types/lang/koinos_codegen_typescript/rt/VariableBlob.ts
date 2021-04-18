@@ -9,6 +9,8 @@ export type VariableBlobLike = string | ByteBuffer | VariableBlob;
 export interface KoinosClass {
   serialize(vb?: VariableBlob): VariableBlob;
 
+  calcSerializedSize(): number;
+
   toJSON(): unknown;
 }
 
@@ -58,7 +60,7 @@ export class VariableBlob {
       vbModified = this;
       vbInput = blob;
     } else {
-      vbModified = new VariableBlob();
+      vbModified = new VariableBlob(this.calcSerializedSize());
       vbInput = this;
     }
     vbModified.serialize(new VarInt(vbInput.buffer.limit));
@@ -106,6 +108,11 @@ export class VariableBlob {
     this.buffer.copyTo(subfb.buffer, 0, offset, offset + size);
     this.buffer.offset += size;
     return subfb;
+  }
+
+  calcSerializedSize(): number {
+    const header = Math.ceil(Math.log2(this.buffer.limit + 1) / 7);
+    return header + this.buffer.limit;
   }
 
   toJSON(): string {

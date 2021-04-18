@@ -9,7 +9,7 @@ export class Int32 extends Num {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(4);
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.buffer.writeInt32(this.num);
     if (!blob) vb.flip();
     return vb;
@@ -19,6 +19,10 @@ export class Int32 extends Num {
     if (vb.buffer.limit < 4) throw new Error("Unexpected EOF");
     const value = vb.buffer.readInt32();
     return new Int32(value);
+  }
+
+  calcSerializedSize(): number {
+    return 4;
   }
 }
 

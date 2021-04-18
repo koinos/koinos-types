@@ -10,7 +10,7 @@ export class Bool {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(1);
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.buffer.writeByte(this.bool ? 1 : 0);
     if (!blob) vb.flip();
     return vb;
@@ -21,6 +21,10 @@ export class Bool {
     const value = vb.buffer.readByte();
     if (value !== 0 && value !== 1) throw new Error("Boolean must be 0 or 1");
     return new Bool(!!value);
+  }
+
+  calcSerializedSize(): number {
+    return 1;
   }
 
   toBoolean(): boolean {
