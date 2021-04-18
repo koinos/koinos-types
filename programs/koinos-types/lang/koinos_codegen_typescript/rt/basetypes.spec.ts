@@ -21,6 +21,7 @@ import {
   TimestampType,
   BlockHeightType,
   Multihash,
+  MultihashVector,
   Opaque,
   VarInt,
   Vector,
@@ -43,12 +44,22 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(27);
+    expect.assertions(28);
     const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash({
       id: 123,
       digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
+    const jsonMultihashVector = {
+      id: 1234,
+      digests: [
+        "z16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGA",
+        "z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGB",
+        "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGC",
+        "z46UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGD",
+      ],
+    };
+    const multihashVector = new MultihashVector(jsonMultihashVector);
 
     const vb = new VariableBlob()
       .serialize(vb1)
@@ -75,6 +86,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new TimestampType("1234567890"))
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
+      .serialize(multihashVector)
       .serialize(new Vector(Int8, [2, 4, 6]))
       .serialize(new FixedBlob(7, "z36UjcYNBG9"))
       .flip();
@@ -103,6 +115,9 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserialize(TimestampType).toJSON()).toBe(BigInt(1234567890));
     expect(vb.deserialize(BlockHeightType).toJSON()).toBe(BigInt(123456));
     expect(vb.deserialize(Multihash).equals(multihash)).toBe(true);
+    expect(vb.deserialize(MultihashVector).toJSON()).toStrictEqual(
+      jsonMultihashVector
+    );
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserializeFixedBlob(7).toJSON()).toBe("z36UjcYNBG9");
 
@@ -151,6 +166,8 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("should calculate the size required for serialization", () => {
+    expect.assertions(22);
+
     const vb = new VariableBlob("zABCDEF1234567");
     expect(vb.calcSerializedSize()).toBe(vb.serialize().buffer.limit);
 
@@ -214,6 +231,19 @@ describe("Koinos Types - Typescript", () => {
     });
     expect(multihash.calcSerializedSize()).toBe(
       multihash.serialize().buffer.limit
+    );
+
+    const multihashVector = new MultihashVector({
+      id: 1234,
+      digests: [
+        "z16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGA",
+        "z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGB",
+        "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGC",
+        "z46UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGD",
+      ],
+    });
+    expect(multihashVector.calcSerializedSize()).toBe(
+      multihashVector.serialize().buffer.limit
     );
 
     const vector = new Vector(Str, ["alice", "bob", "carl"]);
