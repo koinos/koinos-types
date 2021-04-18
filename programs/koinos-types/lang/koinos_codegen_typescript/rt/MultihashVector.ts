@@ -35,7 +35,7 @@ export class MultihashVector {
     vb.serialize(this.id);
     vb.serialize(new VarInt(sizeDigest));
     vb.serialize(this.digests);
-    if (!blob) vb.flip();
+    if (!blob) vb.offset = 0;
     return vb;
   }
 

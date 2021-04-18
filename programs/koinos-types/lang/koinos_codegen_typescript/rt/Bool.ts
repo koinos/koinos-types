@@ -11,14 +11,16 @@ export class Bool {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    vb.buffer.writeByte(this.bool ? 1 : 0);
-    if (!blob) vb.flip();
+    vb.buffer[vb.offset] = this.bool ? 1 : 0;
+    vb.offset += 1;
+    if (!blob) vb.offset = 0;
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Bool {
-    if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
-    const value = vb.buffer.readByte();
+    if (vb.offset < vb.length()) throw new Error("Unexpected EOF");
+    const value = vb.buffer[vb.offset];
+    vb.offset += 1;
     if (value !== 0 && value !== 1) throw new Error("Boolean must be 0 or 1");
     return new Bool(!!value);
   }

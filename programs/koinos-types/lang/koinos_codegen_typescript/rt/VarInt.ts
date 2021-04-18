@@ -16,8 +16,11 @@ export class VarInt {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
+    let binStr = this.num.toString(2);
+    if (binStr.length % 7 !== 0)
+      binStr = "0".repeat(7 - (binStr.length % 7)
     vb.buffer.writeVarint64(Number(this.num));
-    if (!blob) vb.flip();
+    if (!blob) vb.offset = 0;
     return vb;
   }
 

@@ -1,10 +1,9 @@
-import * as ByteBuffer from "bytebuffer";
 import * as bs58 from "bs58";
 import { FixedBlob } from "./FixedBlob";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
-export type VariableBlobLike = string | ByteBuffer | VariableBlob | FixedBlob;
+export type VariableBlobLike = string | VariableBlob | FixedBlob;
 
 export interface KoinosClass {
   serialize(vb?: VariableBlob): VariableBlob;
@@ -20,25 +19,26 @@ export interface KoinosClassBuilder<T extends KoinosClass> {
 }
 
 export class VariableBlob {
-  public buffer: ByteBuffer;
+  public buffer: Uint8Array;
+
+  public offset: number;
 
   constructor(b: VariableBlobLike | number = 0) {
     if (b instanceof VariableBlob || b instanceof FixedBlob) {
       this.buffer = b.buffer;
-    } else if (b instanceof ByteBuffer) {
-      this.buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      this.buffer = new ByteBuffer();
-      this.buffer.buffer = bs58.decode(b.slice(1));
-      this.buffer.limit = this.buffer.buffer.length;
+      this.buffer = bs58.decode(b.slice(1));
+    } else if (typeof b === "number") {
+      this.buffer = new Uint8Array(b);
     } else {
-      this.buffer = ByteBuffer.allocate(b) as ByteBuffer;
+      this.buffer = new Uint8Array(0);
     }
+    this.offset = 0;
   }
 
   length(): number {
-    return Math.max(this.buffer.offset, this.buffer.limit);
+    return this.buffer.length;
   }
 
   equals(vb: VariableBlob): boolean {
@@ -48,7 +48,7 @@ export class VariableBlob {
     if (size1 !== size2) return false;
 
     for (let i = 0; i < size1; i += 1)
-      if (this.buffer.buffer[i] !== vb.buffer.buffer[i]) return false;
+      if (this.buffer[i] !== vb.buffer[i]) return false;
 
     return true;
   }
@@ -63,9 +63,10 @@ export class VariableBlob {
       vbModified = new VariableBlob(this.calcSerializedSize());
       vbInput = this;
     }
-    vbModified.serialize(new VarInt(vbInput.buffer.limit));
-    vbModified.buffer.append(vbInput.buffer);
-    if (!blob) vbModified.flip();
+    vbModified.serialize(new VarInt(vbInput.length()));
+    vbModified.buffer.set(vbInput.buffer, vbModified.offset);
+    vbModified.offset += vbInput.length();
+    if (!blob) vbModified.offset = 0;
     return vbModified;
   }
 
@@ -79,11 +80,10 @@ export class VariableBlob {
     const size = this.deserialize(VarInt).toNumber();
     if (size < 0) throw new Error("Could not deserialize variable blob");
 
-    const { limit, offset } = this.buffer;
-    if (limit < offset + size) throw new Error("Unexpected EOF");
+    if (this.length() < this.offset + size) throw new Error("Unexpected EOF");
     const subvb = new VariableBlob(size);
-    this.buffer.copyTo(subvb.buffer, 0, offset, offset + size);
-    this.buffer.offset += size;
+    subvb.buffer.set(this.buffer.subarray(this.offset, this.offset + size));
+    this.offset += size;
     return subvb;
   }
 
@@ -106,22 +106,12 @@ export class VariableBlob {
   }
 
   calcSerializedSize(): number {
-    const header = Math.ceil(Math.log2(this.buffer.limit + 1) / 7);
-    return header + this.buffer.limit;
+    const header = Math.ceil(Math.log2(this.length() + 1) / 7);
+    return header + this.length();
   }
 
   toJSON(): string {
-    return "z" + bs58.encode(this.buffer.buffer);
-  }
-
-  toHex(): string {
-    if (this.buffer.offset !== 0) this.flip();
-    return this.buffer.toHex();
-  }
-
-  flip(): VariableBlob {
-    this.buffer.flip();
-    return this;
+    return "z" + bs58.encode(this.buffer);
   }
 }
 

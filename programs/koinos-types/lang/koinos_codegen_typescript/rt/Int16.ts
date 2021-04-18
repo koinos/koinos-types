@@ -10,14 +10,16 @@ export class Int16 extends Num {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    vb.buffer.writeInt16(this.num);
-    if (!blob) vb.flip();
+    new DataView(vb.buffer.buffer).setInt16(vb.offset, this.num);
+    vb.offset += 2;
+    if (!blob) vb.offset = 0;
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Int16 {
-    if (vb.buffer.limit < 2) throw new Error("Unexpected EOF");
-    const value = vb.buffer.readInt16();
+    if (vb.length() < vb.offset + 2) throw new Error("Unexpected EOF");
+    const value = new DataView(vb.buffer.buffer).getInt16(vb.offset);
+    vb.offset += 2;
     return new Int16(value);
   }
 

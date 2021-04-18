@@ -39,7 +39,7 @@ export class Multihash {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.serialize(this.id);
     vb.serialize(this.digest);
-    if (!blob) vb.flip();
+    if (!blob) vb.offset = 0;
     return vb;
   }
 

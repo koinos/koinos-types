@@ -21,7 +21,7 @@ export class Vector<T extends KoinosClass> {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
     vb.serialize(new VarInt(this.items.length));
     this.items.forEach((item) => vb.serialize(item));
-    if (!blob) vb.flip();
+    if (!blob) vb.offset = 0;
     return vb;
   }
 

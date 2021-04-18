@@ -14,7 +14,7 @@ export class Str {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
     const buffer = ByteBuffer.fromUTF8(this.str) as ByteBuffer;
     vb.buffer.writeVarint64(buffer.limit).append(buffer);
-    if (!blob) vb.flip();
+    if (!blob) vb.offset = 0;
     return vb;
   }
 
