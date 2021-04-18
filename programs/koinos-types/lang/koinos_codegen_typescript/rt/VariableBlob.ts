@@ -16,7 +16,7 @@ export interface KoinosClass {
 
 export interface KoinosClassBuilder<T extends KoinosClass> {
   new (json?: any): T;
-  deserialize(vb: VariableBlob): T;
+  deserialize(vb: VariableBlob, size?: number): T;
 }
 
 export class VariableBlob {
@@ -88,10 +88,13 @@ export class VariableBlob {
   }
 
   deserialize<T extends KoinosClass>(
-    ClassT: KoinosClassBuilder<T> | typeof VariableBlob
+    ClassT: KoinosClassBuilder<T> | typeof VariableBlob,
+    size?: number
   ): T {
     if (new ClassT() instanceof VariableBlob)
       return (this.deserializeVariableBlob() as unknown) as T;
+    if (new ClassT() instanceof FixedBlob)
+      return (ClassT as KoinosClassBuilder<T>).deserialize(this, size);
     return (ClassT as KoinosClassBuilder<T>).deserialize(this);
   }
 
@@ -99,15 +102,6 @@ export class VariableBlob {
     ClassT: KoinosClassBuilder<T>
   ): Vector<T> {
     return Vector.deserialize(ClassT, this);
-  }
-
-  deserializeFixedBlob(size: number): FixedBlob {
-    const { limit, offset } = this.buffer;
-    if (limit < offset + size) throw new Error("Unexpected EOF");
-    const subfb = new FixedBlob(size);
-    this.buffer.copyTo(subfb.buffer, 0, offset, offset + size);
-    this.buffer.offset += size;
-    return subfb;
   }
 
   calcSerializedSize(): number {

@@ -119,7 +119,7 @@ describe("Koinos Types - Typescript", () => {
       jsonMultihashVector
     );
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
-    expect(vb.deserializeFixedBlob(7).toJSON()).toBe("z36UjcYNBG9");
+    expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
 
     expect(JSONbig.stringify(multihash.toJSON())).toBe(
       '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'
