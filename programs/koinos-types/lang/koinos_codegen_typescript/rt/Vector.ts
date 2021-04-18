@@ -1,13 +1,20 @@
 import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
 import { VarInt } from "./VarInt";
+import { FixedBlob } from "./FixedBlob";
 
 export class Vector<T extends KoinosClass> {
   public items: T[];
 
-  constructor(ClassT: KoinosClassBuilder<T>, items: (T | unknown)[] = []) {
-    this.items = items.map((item) =>
-      item instanceof ClassT ? item : new ClassT(item)
-    );
+  constructor(
+    ClassT: KoinosClassBuilder<T>,
+    items: (T | unknown)[] = [],
+    blobSize?: number
+  ) {
+    this.items = items.map((item) => {
+      if (item instanceof ClassT) return item;
+      if (new FixedBlob() instanceof ClassT) return new ClassT(item, blobSize);
+      return new ClassT(item);
+    });
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -20,10 +27,15 @@ export class Vector<T extends KoinosClass> {
 
   static deserialize<K extends KoinosClass>(
     ClassT: KoinosClassBuilder<K>,
-    vb: VariableBlob
+    vb: VariableBlob,
+    blobSize?: number
   ): Vector<K> {
     const len = vb.deserialize(VarInt).num;
-    const items = new Array(len).fill(null).map(() => vb.deserialize(ClassT));
+    const items = new Array(len).fill(null).map(() => {
+      if (new FixedBlob() instanceof ClassT)
+        return vb.deserialize(ClassT, blobSize);
+      return vb.deserialize(ClassT);
+    });
     return new Vector<K>(ClassT, items);
   }
 

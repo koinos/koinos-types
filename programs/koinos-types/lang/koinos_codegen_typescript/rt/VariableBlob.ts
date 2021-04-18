@@ -4,7 +4,7 @@ import { FixedBlob } from "./FixedBlob";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
-export type VariableBlobLike = string | ByteBuffer | VariableBlob;
+export type VariableBlobLike = string | ByteBuffer | VariableBlob | FixedBlob;
 
 export interface KoinosClass {
   serialize(vb?: VariableBlob): VariableBlob;
@@ -15,15 +15,15 @@ export interface KoinosClass {
 }
 
 export interface KoinosClassBuilder<T extends KoinosClass> {
-  new (json?: any): T;
-  deserialize(vb: VariableBlob, size?: number): T;
+  new (json?: any, blobSize?: number): T;
+  deserialize(vb: VariableBlob, blobSize?: number): T;
 }
 
 export class VariableBlob {
   public buffer: ByteBuffer;
 
   constructor(b: VariableBlobLike | number = 0) {
-    if (b instanceof VariableBlob) {
+    if (b instanceof VariableBlob || b instanceof FixedBlob) {
       this.buffer = b.buffer;
     } else if (b instanceof ByteBuffer) {
       this.buffer = b;
@@ -99,9 +99,10 @@ export class VariableBlob {
   }
 
   deserializeVector<T extends KoinosClass>(
-    ClassT: KoinosClassBuilder<T>
+    ClassT: KoinosClassBuilder<T>,
+    blobSize?: number
   ): Vector<T> {
-    return Vector.deserialize(ClassT, this);
+    return Vector.deserialize(ClassT, this, blobSize);
   }
 
   calcSerializedSize(): number {

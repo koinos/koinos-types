@@ -88,7 +88,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(multihash)
       .serialize(multihashVector)
       .serialize(new Vector(Int8, [2, 4, 6]))
-      .serialize(new FixedBlob(7, "z36UjcYNBG9"))
+      .serialize(new FixedBlob("z36UjcYNBG9", 7))
       .flip();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -171,7 +171,7 @@ describe("Koinos Types - Typescript", () => {
     const vb = new VariableBlob("zABCDEF1234567");
     expect(vb.calcSerializedSize()).toBe(vb.serialize().buffer.limit);
 
-    const fb = new FixedBlob(7, "z36UjcYNBG9");
+    const fb = new FixedBlob("z36UjcYNBG9", 7);
     expect(fb.calcSerializedSize()).toBe(fb.serialize().buffer.limit);
 
     const bool = new Bool(true);

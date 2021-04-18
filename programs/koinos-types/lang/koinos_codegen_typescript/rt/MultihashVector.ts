@@ -1,6 +1,8 @@
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { VarInt } from "./VarInt";
 import { NumberLike } from "./Num";
+import { FixedBlob } from "./FixedBlob";
+import { Vector } from "./Vector";
 
 export interface JsonMultihashVector {
   id: NumberLike;
@@ -10,9 +12,7 @@ export interface JsonMultihashVector {
 export class MultihashVector {
   public id: VarInt;
 
-  // TODO: consider using FixedBlob since all digests have the same size
-  // and there is no header on each digest serialization
-  public digests: VariableBlob[];
+  public digests: Vector<FixedBlob>;
 
   constructor(
     json: JsonMultihashVector = {
@@ -21,22 +21,20 @@ export class MultihashVector {
     }
   ) {
     this.id = new VarInt(json.id);
-    this.digests = json.digests.map((digest) => new VariableBlob(digest));
+    const sizeDigest =
+      json.digests.length > 0 ? new VariableBlob(json.digests[0]).length() : 0;
+    this.digests = new Vector(FixedBlob, json.digests, sizeDigest);
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
     // size of a single digest
-    const sizeDigest = this.digests.length > 0 ? this.digests[0].length() : 0;
+    const sizeDigest =
+      this.digests.items.length > 0 ? this.digests.items[0].size : 0;
 
     vb.serialize(this.id);
     vb.serialize(new VarInt(sizeDigest));
-    vb.serialize(new VarInt(this.digests.length));
-    this.digests.forEach((digest) => {
-      if (digest.length() !== sizeDigest)
-        throw new Error("Multihash vector size mismatch");
-      vb.buffer.append(digest.buffer);
-    });
+    vb.serialize(this.digests);
     if (!blob) vb.flip();
     return vb;
   }
@@ -44,34 +42,24 @@ export class MultihashVector {
   static deserialize(vb: VariableBlob): MultihashVector {
     const id = vb.deserialize(VarInt);
     const sizeDigest = vb.deserialize(VarInt).num;
-    const len = vb.deserialize(VarInt).num;
-    if (sizeDigest < 0)
-      throw new Error("Could not deserialize multihash vector");
-    const digests = new Array(len).fill(null).map(() => {
-      const { limit, offset } = vb.buffer;
-      if (limit < offset + sizeDigest) throw new Error("Unexpected EOF");
-      const digest = new VariableBlob(sizeDigest);
-      vb.buffer.copyTo(digest.buffer, 0, offset, offset + sizeDigest);
-      vb.buffer.offset += sizeDigest;
-      return digest;
-    });
+    const digests = vb.deserializeVector(FixedBlob, sizeDigest).items;
     return new MultihashVector({ id, digests });
   }
 
   calcSerializedSize(): number {
-    const sizeDigest = this.digests.length > 0 ? this.digests[0].length() : 0;
+    const sizeDigest =
+      this.digests.items.length > 0 ? this.digests.items[0].size : 0;
     return (
       this.id.calcSerializedSize() +
       new VarInt(sizeDigest).calcSerializedSize() +
-      new VarInt(this.digests.length).calcSerializedSize() +
-      this.digests.length * sizeDigest
+      this.digests.calcSerializedSize()
     );
   }
 
   toJSON(): JsonMultihashVector {
     return {
       id: this.id.toJSON(),
-      digests: this.digests.map((digest) => digest.toJSON()),
+      digests: this.digests.toJSON() as string[],
     };
   }
 }

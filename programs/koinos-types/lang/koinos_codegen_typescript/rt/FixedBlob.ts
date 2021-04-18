@@ -7,7 +7,7 @@ export class FixedBlob {
 
   public size: number;
 
-  constructor(size: number, b?: VariableBlobLike) {
+  constructor(b?: VariableBlobLike, size = 0) {
     this.size = size;
     this.buffer = ByteBuffer.allocate(size) as ByteBuffer;
     if (b instanceof VariableBlob) {
@@ -58,7 +58,7 @@ export class FixedBlob {
   static deserialize(vb: VariableBlob, size: number): FixedBlob {
     const { limit, offset } = vb.buffer;
     if (limit < offset + size) throw new Error("Unexpected EOF");
-    const subfb = new FixedBlob(size);
+    const subfb = new FixedBlob(null, size);
     vb.buffer.copyTo(subfb.buffer, 0, offset, offset + size);
     vb.buffer.offset += size;
     return subfb;
