@@ -41,19 +41,16 @@ export class BigNum {
     }
     for (let i = 0; i < 2 * this.bytes; i += 8) {
       const uint32 = Number("0x" + numString.substring(i, i + 8));
-      new DataView(vb.buffer.buffer).setUint32(vb.offset, uint32);
-      vb.offset += 4;
+      vb.writeUint32(uint32);
     }
-    if (!blob) vb.offset = 0;
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   deserializeBigInt(vb: VariableBlob): bigint {
-    if (vb.length() < vb.offset + this.bytes) throw new Error("Unexpected EOF");
     let numString = "0x";
     for (let i = 0; i < this.bytes / 4; i += 1) {
-      const uint32Str = new DataView(vb.buffer.buffer).getUint32(vb.offset).toString(16);
-      vb.offset += 4;
+      const uint32Str = vb.readUint32().toString(16);
       numString += "0".repeat(8 - uint32Str.length) + uint32Str;
     }
     if (!this.unsigned && Number(numString.substring(0, 3)) >= 8) {

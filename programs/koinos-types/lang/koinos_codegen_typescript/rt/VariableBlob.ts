@@ -3,7 +3,7 @@ import { FixedBlob } from "./FixedBlob";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
-export type VariableBlobLike = string | VariableBlob | FixedBlob;
+export type VariableBlobLike = string | Uint8Array | VariableBlob | FixedBlob;
 
 export interface KoinosClass {
   serialize(vb?: VariableBlob): VariableBlob;
@@ -26,9 +26,11 @@ export class VariableBlob {
   constructor(b: VariableBlobLike | number = 0) {
     if (b instanceof VariableBlob || b instanceof FixedBlob) {
       this.buffer = b.buffer;
+    } else if (b instanceof Uint8Array) {
+      this.buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      this.buffer = bs58.decode(b.slice(1));
+      this.buffer = new Uint8Array(bs58.decode(b.slice(1)));
     } else if (typeof b === "number") {
       this.buffer = new Uint8Array(b);
     } else {
@@ -64,9 +66,8 @@ export class VariableBlob {
       vbInput = this;
     }
     vbModified.serialize(new VarInt(vbInput.length()));
-    vbModified.buffer.set(vbInput.buffer, vbModified.offset);
-    vbModified.offset += vbInput.length();
-    if (!blob) vbModified.offset = 0;
+    vbModified.write(vbInput.buffer);
+    if (!blob) vbModified.resetCursor();
     return vbModified;
   }
 
@@ -78,13 +79,8 @@ export class VariableBlob {
 
   deserializeVariableBlob(): VariableBlob {
     const size = this.deserialize(VarInt).toNumber();
-    if (size < 0) throw new Error("Could not deserialize variable blob");
-
-    if (this.length() < this.offset + size) throw new Error("Unexpected EOF");
-    const subvb = new VariableBlob(size);
-    subvb.buffer.set(this.buffer.subarray(this.offset, this.offset + size));
-    this.offset += size;
-    return subvb;
+    const subBuffer = this.read(size);
+    return new VariableBlob(subBuffer);
   }
 
   deserialize<T extends KoinosClass>(
@@ -112,6 +108,110 @@ export class VariableBlob {
 
   toJSON(): string {
     return "z" + bs58.encode(this.buffer);
+  }
+
+  resetCursor(): VariableBlob {
+    this.offset = 0;
+    return this;
+  }
+
+  checkRemaining(size: number): void {
+    if (this.offset + size > this.buffer.length)
+      throw new Error("Unexpected EOF");
+  }
+
+  write(bytes: Uint8Array): void {
+    this.checkRemaining(bytes.length);
+    this.buffer.set(bytes, this.offset);
+    this.offset += bytes.length;
+  }
+
+  writeInt8(n: number): void {
+    this.checkRemaining(1);
+    new DataView(this.buffer.buffer).setInt8(this.offset, n);
+    this.offset += 1;
+  }
+
+  writeInt16(n: number): void {
+    this.checkRemaining(2);
+    new DataView(this.buffer.buffer).setInt16(this.offset, n);
+    this.offset += 2;
+  }
+
+  writeInt32(n: number): void {
+    this.checkRemaining(4);
+    new DataView(this.buffer.buffer).setInt32(this.offset, n);
+    this.offset += 4;
+  }
+
+  writeUint8(n: number): void {
+    this.checkRemaining(1);
+    // new DataView(this.buffer.buffer).setUint8(this.offset, n);
+    this.buffer[this.offset] = n;
+    this.offset += 1;
+  }
+
+  writeUint16(n: number): void {
+    this.checkRemaining(2);
+    new DataView(this.buffer.buffer).setUint16(this.offset, n);
+    this.offset += 2;
+  }
+
+  writeUint32(n: number): void {
+    this.checkRemaining(4);
+    new DataView(this.buffer.buffer).setUint32(this.offset, n);
+    this.offset += 4;
+  }
+
+  read(size: number): Uint8Array {
+    this.checkRemaining(size);
+    const subBuffer = new Uint8Array(size);
+    subBuffer.set(this.buffer.subarray(this.offset, this.offset + size));
+    this.offset += size;
+    return subBuffer;
+  }
+
+  readInt8(): number {
+    this.checkRemaining(1);
+    const n = new DataView(this.buffer.buffer).getInt8(this.offset);
+    this.offset += 1;
+    return n;
+  }
+
+  readInt16(): number {
+    this.checkRemaining(2);
+    const n = new DataView(this.buffer.buffer).getInt16(this.offset);
+    this.offset += 2;
+    return n;
+  }
+
+  readInt32(): number {
+    this.checkRemaining(4);
+    const n = new DataView(this.buffer.buffer).getInt32(this.offset);
+    this.offset += 4;
+    return n;
+  }
+
+  readUint8(): number {
+    this.checkRemaining(1);
+    // const n = new DataView(this.buffer.buffer).getUint8(this.offset);
+    const n = this.buffer[this.offset];
+    this.offset += 1;
+    return n;
+  }
+
+  readUint16(): number {
+    this.checkRemaining(2);
+    const n = new DataView(this.buffer.buffer).getUint16(this.offset);
+    this.offset += 2;
+    return n;
+  }
+
+  readUint32(): number {
+    this.checkRemaining(4);
+    const n = new DataView(this.buffer.buffer).getUint32(this.offset);
+    this.offset += 4;
+    return n;
   }
 }
 

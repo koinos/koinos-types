@@ -10,16 +10,13 @@ export class Int8 extends Num {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    new DataView(vb.buffer.buffer).setInt8(vb.offset, this.num);
-    vb.offset += 1;
-    if (!blob) vb.offset = 0;
+    vb.writeInt8(this.num);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Int8 {
-    if (vb.length() < vb.offset + 1) throw new Error("Unexpected EOF");
-    const value = new DataView(vb.buffer.buffer).getInt8(vb.offset);
-    vb.offset += 1;
+    const value = vb.readInt8();
     return new Int8(value);
   }
 

@@ -12,6 +12,10 @@ export class FixedBlob {
       if (b.length() !== size)
         throw new Error(`Invalid blob size: ${b.length()}. Expected ${size}`);
       this.buffer = b.buffer;
+    } else if (b instanceof Uint8Array) {
+      if (b.length !== size)
+        throw new Error(`Invalid blob size: ${b.length}. Expected ${size}`);
+      this.buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
       const buffer = bs58.decode(b.slice(1));
@@ -41,18 +45,14 @@ export class FixedBlob {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    vb.buffer.set(this.buffer, vb.offset);
-    vb.offset += this.length();
-    if (!blob) vb.offset = 0;
+    vb.write(this.buffer);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob, size: number): FixedBlob {
-    if (vb.length() < vb.offset + size) throw new Error("Unexpected EOF");
-    const subfb = new FixedBlob(null, size);
-    subfb.buffer.set(vb.buffer.subarray(vb.offset, vb.offset + size));
-    vb.offset += size;
-    return subfb;
+    const subBuffer = vb.read(size);
+    return new FixedBlob(subBuffer, size);
   }
 
   calcSerializedSize(): number {

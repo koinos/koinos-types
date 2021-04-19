@@ -16,18 +16,36 @@ export class VarInt {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    let binStr = this.num.toString(2);
-    if (binStr.length % 7 !== 0)
-      binStr = "0".repeat(7 - (binStr.length % 7)
-    vb.buffer.writeVarint64(Number(this.num));
-    if (!blob) vb.offset = 0;
+    if (this.num === 0) {
+      vb.writeUint8(0);
+      return vb;
+    }
+
+    let n = this.num;
+    let shift7 = this.num;
+    while (n > 0) {
+      shift7 = n >> 7;
+      const group7 = n - (shift7 << 7);
+      if (shift7 > 0) vb.writeUint8(group7 + 128);
+      else vb.writeUint8(group7);
+      n = shift7;
+    }
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): VarInt {
-    if (vb.buffer.limit === 0) throw new Error("Unexpected EOF");
-    const value = vb.buffer.readVarint64().toNumber();
-    return new VarInt(value);
+    let i = 0;
+    let n = 0;
+    let endVarInt = false;
+    while (!endVarInt) {
+      const byte = vb.readUint8();
+      endVarInt = byte < 128;
+      const mod = endVarInt ? byte : byte - 128;
+      n += mod << (7 * i);
+      i += 1;
+    }
+    return new VarInt(n);
   }
 
   calcSerializedSize(): number {

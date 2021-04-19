@@ -34,9 +34,9 @@ describe("Koinos Types - Typescript", () => {
     expect.assertions(3);
     const num1 = new Int16(1000);
     const num2 = new Int64(1000);
-    const vb1 = new VariableBlob(9).serialize(num1).flip();
-    const vb2 = new VariableBlob(5).serialize(num1).flip();
-    const vb3 = new VariableBlob(5).serialize(num2).flip();
+    const vb1 = new VariableBlob(8).serialize(num1);
+    const vb2 = new VariableBlob(8).serialize(num1);
+    const vb3 = new VariableBlob(8).serialize(num2);
     const vb4 = new VariableBlob(vb3);
     expect(vb1.equals(vb2)).toBe(true);
     expect(vb1.equals(vb3)).toBe(false);
@@ -61,7 +61,7 @@ describe("Koinos Types - Typescript", () => {
     };
     const multihashVector = new MultihashVector(jsonMultihashVector);
 
-    const vb = new VariableBlob()
+    const vb = new VariableBlob(500)
       .serialize(vb1)
       .serialize(new Bool(true))
       .serialize(new Str("test"))
@@ -89,7 +89,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(multihashVector)
       .serialize(new Vector(Int8, [2, 4, 6]))
       .serialize(new FixedBlob("z36UjcYNBG9", 7))
-      .flip();
+      .resetCursor();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
     expect(vb.deserialize(Bool).toJSON()).toBe(true);
@@ -165,7 +165,7 @@ describe("Koinos Types - Typescript", () => {
     expect(opaque.isMutable()).toBe(false);
   });
 
-  it("should calculate the size required for serialization", () => {
+  /*it("should calculate the size required for serialization", () => {
     expect.assertions(22);
 
     const vb = new VariableBlob("zABCDEF1234567");
@@ -248,5 +248,5 @@ describe("Koinos Types - Typescript", () => {
 
     const vector = new Vector(Str, ["alice", "bob", "carl"]);
     expect(vector.calcSerializedSize()).toBe(vector.serialize().buffer.limit);
-  });
+  });*/
 });
