@@ -18,7 +18,7 @@ export class FixedBlob {
       this.buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      const buffer = bs58.decode(b.slice(1));
+      const buffer = new Uint8Array(bs58.decode(b.slice(1)));
       if (buffer.length !== size)
         throw new Error(
           `Invalid blob size: ${buffer.length}. Expected ${size}`
