@@ -51,7 +51,7 @@ describe("Koinos Types - Typescript", () => {
       digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
     const jsonMultihashVector = {
-      id: 1234,
+      id: BigInt(1234),
       digests: [
         "z16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGA",
         "z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGB",

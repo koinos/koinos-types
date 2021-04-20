@@ -4,7 +4,6 @@
   },
   "dependencies": {
     "bs58": "^4.0.1",
-    "bytebuffer": "^5.0.1",
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {

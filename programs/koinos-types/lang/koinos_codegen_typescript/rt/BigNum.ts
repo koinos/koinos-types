@@ -4,7 +4,7 @@ import { VarInt } from "./VarInt";
 
 const MAX_INT64 = BigInt("0x7" + "F".repeat(15));
 const MIN_INT64 = -BigInt("0x8" + "0".repeat(15));
-function isInt64(n: bigint): boolean {
+export function isInt64(n: bigint): boolean {
   return n >= MIN_INT64 && n <= MAX_INT64;
 }
 
@@ -19,7 +19,7 @@ export class BigNum {
     let n: bigint;
     if (number instanceof BigNum) n = number.num;
     else if (number instanceof Num) n = BigInt(number.num);
-    else if (number instanceof VarInt) n = BigInt(number.num);
+    else if (number instanceof VarInt) n = number.num;
     else n = BigInt(number);
     this.unsigned = min === BigInt(0);
     this.bytes = bits / 8;

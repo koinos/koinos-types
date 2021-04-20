@@ -10,7 +10,7 @@ export class Num {
     let n: number;
     if (number instanceof BigNum) n = Number(number.num);
     else if (number instanceof Num) n = number.num;
-    else if (number instanceof VarInt) n = number.num;
+    else if (number instanceof VarInt) n = number.toNumber();
     else n = Number(number);
     if (n < min || n > max) throw new Error(`${name} is out of bounds`);
     this.num = n;

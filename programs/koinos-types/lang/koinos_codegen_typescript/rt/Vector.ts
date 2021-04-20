@@ -30,7 +30,7 @@ export class Vector<T extends KoinosClass> {
     vb: VariableBlob,
     blobSize?: number
   ): Vector<K> {
-    const len = vb.deserialize(VarInt).num;
+    const len = vb.deserialize(VarInt).toNumber();
     const items = new Array(len).fill(null).map(() => {
       if (new FixedBlob() instanceof ClassT)
         return vb.deserialize(ClassT, blobSize);
