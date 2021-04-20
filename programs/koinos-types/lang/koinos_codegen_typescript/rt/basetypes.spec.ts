@@ -61,7 +61,7 @@ describe("Koinos Types - Typescript", () => {
     };
     const multihashVector = new MultihashVector(jsonMultihashVector);
 
-    const vb = new VariableBlob(500)
+    const vb = new VariableBlob()
       .serialize(vb1)
       .serialize(new Bool(true))
       .serialize(new Str("test"))
@@ -165,72 +165,72 @@ describe("Koinos Types - Typescript", () => {
     expect(opaque.isMutable()).toBe(false);
   });
 
-  /*it("should calculate the size required for serialization", () => {
+  it("should calculate the size required for serialization", () => {
     expect.assertions(22);
 
     const vb = new VariableBlob("zABCDEF1234567");
-    expect(vb.calcSerializedSize()).toBe(vb.serialize().buffer.limit);
+    expect(vb.calcSerializedSize()).toBe(vb.serialize().length());
 
     const fb = new FixedBlob("z36UjcYNBG9", 7);
-    expect(fb.calcSerializedSize()).toBe(fb.serialize().buffer.limit);
+    expect(fb.calcSerializedSize()).toBe(fb.serialize().length());
 
     const bool = new Bool(true);
-    expect(bool.calcSerializedSize()).toBe(bool.serialize().buffer.limit);
+    expect(bool.calcSerializedSize()).toBe(bool.serialize().length());
 
     const str = new Str("test!$^#🙂🍻");
-    expect(str.calcSerializedSize()).toBe(str.serialize().buffer.limit);
+    expect(str.calcSerializedSize()).toBe(str.serialize().length());
 
     const int8 = new Int8(123);
-    expect(int8.calcSerializedSize()).toBe(int8.serialize().buffer.limit);
+    expect(int8.calcSerializedSize()).toBe(int8.serialize().length());
 
     const int16 = new Int16(12345);
-    expect(int16.calcSerializedSize()).toBe(int16.serialize().buffer.limit);
+    expect(int16.calcSerializedSize()).toBe(int16.serialize().length());
 
     const int32 = new Int32(123456);
-    expect(int32.calcSerializedSize()).toBe(int32.serialize().buffer.limit);
+    expect(int32.calcSerializedSize()).toBe(int32.serialize().length());
 
     const int64 = new Int64(123456);
-    expect(int64.calcSerializedSize()).toBe(int64.serialize().buffer.limit);
+    expect(int64.calcSerializedSize()).toBe(int64.serialize().length());
 
     const int128 = new Int128(123456);
-    expect(int128.calcSerializedSize()).toBe(int128.serialize().buffer.limit);
+    expect(int128.calcSerializedSize()).toBe(int128.serialize().length());
 
     const int160 = new Int160(123456);
-    expect(int160.calcSerializedSize()).toBe(int160.serialize().buffer.limit);
+    expect(int160.calcSerializedSize()).toBe(int160.serialize().length());
 
     const int256 = new Int256(123456);
-    expect(int256.calcSerializedSize()).toBe(int256.serialize().buffer.limit);
+    expect(int256.calcSerializedSize()).toBe(int256.serialize().length());
 
     const uint8 = new Uint8(123);
-    expect(uint8.calcSerializedSize()).toBe(int8.serialize().buffer.limit);
+    expect(uint8.calcSerializedSize()).toBe(int8.serialize().length());
 
     const uint16 = new Uint16(12345);
-    expect(uint16.calcSerializedSize()).toBe(uint16.serialize().buffer.limit);
+    expect(uint16.calcSerializedSize()).toBe(uint16.serialize().length());
 
     const uint32 = new Uint32(123456);
-    expect(uint32.calcSerializedSize()).toBe(uint32.serialize().buffer.limit);
+    expect(uint32.calcSerializedSize()).toBe(uint32.serialize().length());
 
     const uint64 = new Uint64(123456);
-    expect(uint64.calcSerializedSize()).toBe(uint64.serialize().buffer.limit);
+    expect(uint64.calcSerializedSize()).toBe(uint64.serialize().length());
 
     const uint128 = new Uint128(123456);
-    expect(uint128.calcSerializedSize()).toBe(uint128.serialize().buffer.limit);
+    expect(uint128.calcSerializedSize()).toBe(uint128.serialize().length());
 
     const uint160 = new Uint160(123456);
-    expect(uint160.calcSerializedSize()).toBe(uint160.serialize().buffer.limit);
+    expect(uint160.calcSerializedSize()).toBe(uint160.serialize().length());
 
     const uint256 = new Uint256(123456);
-    expect(uint256.calcSerializedSize()).toBe(uint256.serialize().buffer.limit);
+    expect(uint256.calcSerializedSize()).toBe(uint256.serialize().length());
 
     const varint = new VarInt(1234567);
-    expect(varint.calcSerializedSize()).toBe(varint.serialize().buffer.limit);
+    expect(varint.calcSerializedSize()).toBe(varint.serialize().length());
 
     const multihash = new Multihash({
       id: 123,
       digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
     expect(multihash.calcSerializedSize()).toBe(
-      multihash.serialize().buffer.limit
+      multihash.serialize().length()
     );
 
     const multihashVector = new MultihashVector({
@@ -243,10 +243,10 @@ describe("Koinos Types - Typescript", () => {
       ],
     });
     expect(multihashVector.calcSerializedSize()).toBe(
-      multihashVector.serialize().buffer.limit
+      multihashVector.serialize().length()
     );
 
     const vector = new Vector(Str, ["alice", "bob", "carl"]);
-    expect(vector.calcSerializedSize()).toBe(vector.serialize().buffer.limit);
-  });*/
+    expect(vector.calcSerializedSize()).toBe(vector.serialize().length());
+  });
 });

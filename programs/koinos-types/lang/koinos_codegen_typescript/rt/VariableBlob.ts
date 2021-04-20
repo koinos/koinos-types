@@ -115,50 +115,55 @@ export class VariableBlob {
     return this;
   }
 
-  checkRemaining(size: number): void {
-    if (this.offset + size > this.buffer.length)
-      throw new Error("Unexpected EOF");
+  checkRemaining(size: number, canResize = false): void {
+    if (this.offset + size > this.buffer.length) {
+      if (!canResize) throw new Error("Unexpected EOF");
+      const newSize = this.offset + size;
+      const buffer = new Uint8Array(newSize);
+      buffer.set(this.buffer);
+      this.buffer = buffer;
+    }
   }
 
   write(bytes: Uint8Array): void {
-    this.checkRemaining(bytes.length);
+    this.checkRemaining(bytes.length, true);
     this.buffer.set(bytes, this.offset);
     this.offset += bytes.length;
   }
 
   writeInt8(n: number): void {
-    this.checkRemaining(1);
+    this.checkRemaining(1, true);
     new DataView(this.buffer.buffer).setInt8(this.offset, n);
     this.offset += 1;
   }
 
   writeInt16(n: number): void {
-    this.checkRemaining(2);
+    this.checkRemaining(2, true);
     new DataView(this.buffer.buffer).setInt16(this.offset, n);
     this.offset += 2;
   }
 
   writeInt32(n: number): void {
-    this.checkRemaining(4);
+    this.checkRemaining(4, true);
     new DataView(this.buffer.buffer).setInt32(this.offset, n);
     this.offset += 4;
   }
 
   writeUint8(n: number): void {
-    this.checkRemaining(1);
+    this.checkRemaining(1, true);
     // new DataView(this.buffer.buffer).setUint8(this.offset, n);
     this.buffer[this.offset] = n;
     this.offset += 1;
   }
 
   writeUint16(n: number): void {
-    this.checkRemaining(2);
+    this.checkRemaining(2, true);
     new DataView(this.buffer.buffer).setUint16(this.offset, n);
     this.offset += 2;
   }
 
   writeUint32(n: number): void {
-    this.checkRemaining(4);
+    this.checkRemaining(4, true);
     new DataView(this.buffer.buffer).setUint32(this.offset, n);
     this.offset += 4;
   }
