@@ -9,16 +9,19 @@ export class Int32 extends Num {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(4);
-    vb.buffer.writeInt32(this.num);
-    if (!blob) vb.flip();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.writeInt32(this.num);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Int32 {
-    if (vb.buffer.limit < 4) throw new Error("Unexpected EOF");
-    const value = vb.buffer.readInt32();
+    const value = vb.readInt32();
     return new Int32(value);
+  }
+
+  calcSerializedSize(): number {
+    return 4;
   }
 }
 

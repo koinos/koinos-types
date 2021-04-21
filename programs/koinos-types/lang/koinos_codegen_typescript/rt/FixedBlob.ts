@@ -1,30 +1,30 @@
-import * as ByteBuffer from "bytebuffer";
 import * as bs58 from "bs58";
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 
 export class FixedBlob {
-  public buffer: ByteBuffer;
+  public buffer: Uint8Array;
 
   public size: number;
 
-  constructor(size: number, b?: VariableBlobLike) {
+  constructor(b: VariableBlobLike | number = 0, size = 0) {
     this.size = size;
-    this.buffer = ByteBuffer.allocate(size) as ByteBuffer;
-    if (b instanceof VariableBlob) {
-      this.buffer = b.buffer;
-    } else if (b instanceof ByteBuffer) {
-      this.buffer = b;
+    let buffer: Uint8Array;
+    if (b instanceof VariableBlob || b instanceof FixedBlob) {
+      buffer = b.buffer;
+    } else if (b instanceof Uint8Array) {
+      buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      const buffer = new ByteBuffer();
-      buffer.buffer = bs58.decode(b.slice(1));
-      if (buffer.buffer.length !== size)
-        throw new Error(
-          `Invalid blob size: ${buffer.buffer.length}. Expected ${size}`
-        );
-      buffer.limit = size;
-      this.buffer = buffer;
+      buffer = new Uint8Array(bs58.decode(b.slice(1)));
+    } else if (typeof b === "number") {
+      buffer = new Uint8Array(b);
+    } else {
+      buffer = new Uint8Array(size);
     }
+
+    if (buffer.length !== size)
+      throw new Error(`Invalid blob size: ${buffer.length}. Expected ${size}`);
+    this.buffer = buffer;
   }
 
   length(): number {
@@ -32,37 +32,32 @@ export class FixedBlob {
   }
 
   equals(vb: FixedBlob | VariableBlob): boolean {
-    const size1 = this.length();
-    const size2 = vb.length();
+    if (this.length() !== vb.length()) return false;
 
-    if (size1 !== size2) return false;
-
-    for (let i = 0; i < size1; i += 1)
-      if (this.buffer.buffer[i] !== vb.buffer.buffer[i]) return false;
+    for (let i = 0; i < this.length(); i += 1)
+      if (this.buffer[i] !== vb.buffer[i]) return false;
 
     return true;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
-    this.buffer.copyTo(vb.buffer, vb.buffer.offset, 0, this.size);
-    vb.buffer.offset += this.size;
-    if (!blob) vb.flip();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.write(this.buffer);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
+  static deserialize(vb: VariableBlob, size: number): FixedBlob {
+    const subBuffer = vb.read(size);
+    return new FixedBlob(subBuffer, size);
+  }
+
+  calcSerializedSize(): number {
+    return this.size;
+  }
+
   toJSON(): string {
-    return "z" + bs58.encode(this.buffer.buffer);
-  }
-
-  toHex(): string {
-    if (this.buffer.offset !== 0) this.flip();
-    return this.buffer.toHex();
-  }
-
-  flip(): FixedBlob {
-    this.buffer.flip();
-    return this;
+    return "z" + bs58.encode(this.buffer);
   }
 }
 

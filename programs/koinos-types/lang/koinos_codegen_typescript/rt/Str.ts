@@ -1,5 +1,5 @@
-import * as ByteBuffer from "bytebuffer";
 import { VariableBlob } from "./VariableBlob";
+import { VarInt } from "./VarInt";
 
 export type StringLike = string | Str;
 
@@ -11,16 +11,25 @@ export class Str {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
-    const buffer = ByteBuffer.fromUTF8(this.str) as ByteBuffer;
-    vb.buffer.writeVarint64(buffer.limit).append(buffer);
-    if (!blob) vb.flip();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    const bytes = new TextEncoder().encode(this.str);
+    vb.serialize(new VarInt(bytes.length));
+    vb.write(bytes);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Str {
-    const subvb = vb.deserialize(VariableBlob);
-    return new Str(subvb.buffer.toUTF8());
+    const size = vb.deserialize(VarInt).toNumber();
+    const subBuffer = vb.read(size);
+    const str = new TextDecoder().decode(subBuffer);
+    return new Str(str);
+  }
+
+  calcSerializedSize(): number {
+    const size = new TextEncoder().encode(this.str).length;
+    const header = Math.ceil(Math.log2(size + 1) / 7);
+    return header + size;
   }
 
   toString(): string {

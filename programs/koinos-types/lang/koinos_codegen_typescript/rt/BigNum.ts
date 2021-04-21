@@ -4,7 +4,7 @@ import { VarInt } from "./VarInt";
 
 const MAX_INT64 = BigInt("0x7" + "F".repeat(15));
 const MIN_INT64 = -BigInt("0x8" + "0".repeat(15));
-function isInt64(n: bigint): boolean {
+export function isInt64(n: bigint): boolean {
   return n >= MIN_INT64 && n <= MAX_INT64;
 }
 
@@ -19,7 +19,7 @@ export class BigNum {
     let n: bigint;
     if (number instanceof BigNum) n = number.num;
     else if (number instanceof Num) n = BigInt(number.num);
-    else if (number instanceof VarInt) n = BigInt(number.num);
+    else if (number instanceof VarInt) n = number.num;
     else n = BigInt(number);
     this.unsigned = min === BigInt(0);
     this.bytes = bits / 8;
@@ -29,7 +29,7 @@ export class BigNum {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
     let numString: string;
     if (this.num >= BigInt(0)) {
       numString = this.num.toString(16);
@@ -40,18 +40,17 @@ export class BigNum {
       ).toString(16);
     }
     for (let i = 0; i < 2 * this.bytes; i += 8) {
-      const int32 = Number("0x" + numString.substring(i, i + 8));
-      vb.buffer.writeUint32(int32);
+      const uint32 = Number("0x" + numString.substring(i, i + 8));
+      vb.writeUint32(uint32);
     }
-    if (!blob) vb.flip();
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   deserializeBigInt(vb: VariableBlob): bigint {
-    if (vb.buffer.limit < this.bytes) throw new Error("Unexpected EOF");
     let numString = "0x";
     for (let i = 0; i < this.bytes / 4; i += 1) {
-      const uint32Str = vb.buffer.readUint32().toString(16);
+      const uint32Str = vb.readUint32().toString(16);
       numString += "0".repeat(8 - uint32Str.length) + uint32Str;
     }
     if (!this.unsigned && Number(numString.substring(0, 3)) >= 8) {
@@ -59,6 +58,10 @@ export class BigNum {
       return BigInt(numString) - BigInt("0x1" + "0".repeat(2 * this.bytes));
     }
     return BigInt(numString);
+  }
+
+  calcSerializedSize(): number {
+    return this.bytes;
   }
 
   toBigInt(): bigint {

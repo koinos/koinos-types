@@ -1,7 +1,6 @@
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
-import { Uint64 } from "./Uint64";
-import { NumberLike } from "./Num";
 import { VarInt } from "./VarInt";
+import { NumberLike } from "./Num";
 
 export interface JsonMultihash {
   id: NumberLike;
@@ -9,7 +8,7 @@ export interface JsonMultihash {
 }
 
 export class Multihash {
-  public id: Uint64;
+  public id: VarInt;
 
   public digest: VariableBlob;
 
@@ -19,7 +18,7 @@ export class Multihash {
       digest: undefined,
     }
   ) {
-    this.id = new Uint64(json.id);
+    this.id = new VarInt(json.id);
     this.digest = new VariableBlob(json.digest);
   }
 
@@ -37,10 +36,10 @@ export class Multihash {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();
-    vb.serialize(new VarInt(this.id));
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.serialize(this.id);
     vb.serialize(this.digest);
-    if (!blob) vb.flip();
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
@@ -48,6 +47,10 @@ export class Multihash {
     const id = vb.deserialize(VarInt);
     const digest = vb.deserialize(VariableBlob);
     return new Multihash({ id, digest });
+  }
+
+  calcSerializedSize(): number {
+    return this.id.calcSerializedSize() + this.digest.calcSerializedSize();
   }
 
   toJSON(): JsonMultihash {

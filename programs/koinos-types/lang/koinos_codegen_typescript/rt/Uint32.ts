@@ -8,16 +8,19 @@ export class Uint32 extends Num {
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob(4);
-    vb.buffer.writeUint32(this.num);
-    if (!blob) vb.flip();
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.writeUint32(this.num);
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): Uint32 {
-    if (vb.buffer.limit < 4) throw new Error("Unexpected EOF");
-    const value = vb.buffer.readUint32();
+    const value = vb.readUint32();
     return new Uint32(value);
+  }
+
+  calcSerializedSize(): number {
+    return 4;
   }
 }
 
