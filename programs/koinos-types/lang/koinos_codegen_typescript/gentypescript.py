@@ -59,6 +59,16 @@ def ts_name(name):
 
     return u
 
+def path_ts_file(name):
+    p = name.split("::")
+    filename = ts_name(p[-1])
+    folders = p[1:-1]
+    if len(folders) == 0:
+        folders.insert(0, "common")
+    for i in range(len(folders)):
+        folders[i] = folders[i].replace("_","")
+    return "/".join(folders) + "/" + filename
+
 def typeref(tref):
     if tref["info"]["type"] == "IntLiteral":
         return tref["value"]
@@ -298,7 +308,7 @@ def generate_typescript(schema):
         for name, decl in decls_by_name.items():
             if decl["info"]["type"] == "Struct":
                 dependencies = get_dependencies(decl)
-                out_filename = ts_name(decl["name"]) + ".ts"
+                out_filename = path_ts_file(name) + ".ts"
                 result_files[out_filename] = j2_template.render({
                     "decl": decl,
                     "dependencies" : dependencies, 
@@ -306,7 +316,7 @@ def generate_typescript(schema):
                     "typeref": typeref,
                     "typereflike": typereflike,
                 })
-                print(decl)
+                # print(decl)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
