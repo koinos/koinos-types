@@ -229,9 +229,7 @@ describe("Koinos Types - Typescript", () => {
       id: 123,
       digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
     });
-    expect(multihash.calcSerializedSize()).toBe(
-      multihash.serialize().length()
-    );
+    expect(multihash.calcSerializedSize()).toBe(multihash.serialize().length());
 
     const multihashVector = new MultihashVector({
       id: 1234,

@@ -1,7 +1,6 @@
-import { BigNum } from "./BigNum";
+import { BigNum, isInt64 } from "./BigNum";
 import { Num, NumberLike } from "./Num";
 import { VariableBlob } from "./VariableBlob";
-import { isInt64 } from "./BigNum";
 
 const ZERO = BigInt(0);
 const ONE = BigInt(1);
@@ -24,6 +23,7 @@ export class VarInt {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
     if (this.num === ZERO) {
       vb.writeUint8(0);
+      if (!blob) vb.resetCursor();
       return vb;
     }
 

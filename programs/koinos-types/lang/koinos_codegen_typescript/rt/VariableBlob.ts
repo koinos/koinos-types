@@ -43,13 +43,10 @@ export class VariableBlob {
     return this.buffer.length;
   }
 
-  equals(vb: VariableBlob): boolean {
-    const size1 = this.length();
-    const size2 = vb.length();
+  equals(vb: FixedBlob | VariableBlob): boolean {
+    if (this.length() !== vb.length()) return false;
 
-    if (size1 !== size2) return false;
-
-    for (let i = 0; i < size1; i += 1)
+    for (let i = 0; i < this.length(); i += 1)
       if (this.buffer[i] !== vb.buffer[i]) return false;
 
     return true;

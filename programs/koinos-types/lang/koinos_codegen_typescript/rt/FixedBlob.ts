@@ -6,25 +6,25 @@ export class FixedBlob {
 
   public size: number;
 
-  constructor(b?: VariableBlobLike, size = 0) {
+  constructor(b: VariableBlobLike | number = 0, size = 0) {
     this.size = size;
+    let buffer: Uint8Array;
     if (b instanceof VariableBlob || b instanceof FixedBlob) {
-      if (b.length() !== size)
-        throw new Error(`Invalid blob size: ${b.length()}. Expected ${size}`);
-      this.buffer = b.buffer;
+      buffer = b.buffer;
     } else if (b instanceof Uint8Array) {
-      if (b.length !== size)
-        throw new Error(`Invalid blob size: ${b.length}. Expected ${size}`);
-      this.buffer = b;
+      buffer = b;
     } else if (typeof b === "string") {
       if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      const buffer = new Uint8Array(bs58.decode(b.slice(1)));
-      if (buffer.length !== size)
-        throw new Error(
-          `Invalid blob size: ${buffer.length}. Expected ${size}`
-        );
-      this.buffer = buffer;
+      buffer = new Uint8Array(bs58.decode(b.slice(1)));
+    } else if (typeof b === "number") {
+      buffer = new Uint8Array(b);
+    } else {
+      buffer = new Uint8Array(size);
     }
+
+    if (buffer.length !== size)
+      throw new Error(`Invalid blob size: ${buffer.length}. Expected ${size}`);
+    this.buffer = buffer;
   }
 
   length(): number {
@@ -32,12 +32,9 @@ export class FixedBlob {
   }
 
   equals(vb: FixedBlob | VariableBlob): boolean {
-    const size1 = this.length();
-    const size2 = vb.length();
+    if (this.length() !== vb.length()) return false;
 
-    if (size1 !== size2) return false;
-
-    for (let i = 0; i < size1; i += 1)
+    for (let i = 0; i < this.length(); i += 1)
       if (this.buffer[i] !== vb.buffer[i]) return false;
 
     return true;
