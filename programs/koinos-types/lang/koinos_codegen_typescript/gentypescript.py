@@ -75,7 +75,7 @@ def typeref(tref):
     if tref["name"][-1] == "vector":
         return "Vector<" + typeref(tref["targs"][0]) +">"
     if tref["name"][-1] == "fixed_blob":
-        return "FixedBlob" + typeref(tref["targs"][0])
+        return "FixedBlob"# + typeref(tref["targs"][0])
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
@@ -302,21 +302,32 @@ def generate_typescript(schema):
         "koinos.ts.j2",
         # "koinos_test.ts.j2"
         ]
+    j2_template_struct = env.get_template("koinos-struct.ts.j2")
+    j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
 
-    for template_name in template_names:
-        j2_template = env.get_template(template_name)
-        for name, decl in decls_by_name.items():
-            if decl["info"]["type"] == "Struct":
-                dependencies = get_dependencies(decl)
-                out_filename = path_ts_file(name) + ".ts"
-                result_files[out_filename] = j2_template.render({
-                    "decl": decl,
-                    "dependencies" : dependencies, 
-                    "ts_name" : ts_name,
-                    "typeref": typeref,
-                    "typereflike": typereflike,
-                })
-                # print(decl)
+    #for template_name in template_names:
+    #    j2_template = env.get_template(template_name)
+    for name, decl in decls_by_name.items():
+        if decl["info"]["type"] == "Struct":
+            dependencies = get_dependencies(decl)
+            out_filename = path_ts_file(name) + ".ts"
+            result_files[out_filename] = j2_template_struct.render({
+                "decl": decl,
+                "dependencies" : dependencies, 
+                "ts_name" : ts_name,
+                "typeref": typeref,
+                "typereflike": typereflike,
+            })
+        elif decl["info"]["type"] == "Typedef":
+            out_filename = path_ts_file(name) + ".ts"
+            result_files[out_filename] = j2_template_typedef.render({
+                "decl": decl,
+                "ts_name" : ts_name,
+                "typeref": typeref,
+                "typereflike": typereflike,
+            })
+        else:
+            print(decl["info"]["type"])
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):

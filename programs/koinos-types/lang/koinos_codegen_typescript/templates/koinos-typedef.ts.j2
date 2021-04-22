@@ -1,0 +1,4 @@
+{% set className = ts_name(decl["name"]) %}{% set rName = typeref(decl["tref"]) %}import { {{rName}} } from "./basetypes";
+
+export class {{className}} extends {{rName}} {}
+export default {{className}};
