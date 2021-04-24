@@ -1,6 +1,7 @@
 import * as JSONbig from "json-bigint";
 import {
   VariableBlob,
+  Variant,
   FixedBlob,
   Bool,
   Str,
@@ -44,7 +45,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(28);
+    expect.assertions(29);
     const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash({
       id: 123,
@@ -60,6 +61,32 @@ describe("Koinos Types - Typescript", () => {
       ],
     };
     const multihashVector = new MultihashVector(jsonMultihashVector);
+
+    const variantDef = new Variant<
+      Int16,
+      Int32,
+      Int64,
+      Str,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64
+    >(null, [Int16, Int32, Int64, Str]);
+
+    const variant = new Variant<
+      Int16,
+      Int32,
+      Int64,
+      Str,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64
+    >(new Str("test variant"), [Int16, Int32, Int64, Str]);
 
     const vb = new VariableBlob()
       .serialize(vb1)
@@ -89,6 +116,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(multihashVector)
       .serialize(new Vector(Int8, [2, 4, 6]))
       .serialize(new FixedBlob("z36UjcYNBG9", 7))
+      .serialize(variant)
       .resetCursor();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -120,6 +148,7 @@ describe("Koinos Types - Typescript", () => {
     );
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
+    expect(vb.deserializeVariant(variantDef).toJSON()).toBe("test variant");
 
     expect(JSONbig.stringify(multihash.toJSON())).toBe(
       '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'

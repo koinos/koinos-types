@@ -1,5 +1,6 @@
 import * as bs58 from "bs58";
 import { FixedBlob } from "./FixedBlob";
+import { Variant } from "./Variant";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
@@ -96,6 +97,21 @@ export class VariableBlob {
     blobSize?: number
   ): Vector<T> {
     return Vector.deserialize(ClassT, this, blobSize);
+  }
+
+  deserializeVariant<
+    A extends KoinosClass,
+    B extends KoinosClass,
+    C extends KoinosClass,
+    D extends KoinosClass,
+    E extends KoinosClass,
+    F extends KoinosClass,
+    G extends KoinosClass,
+    H extends KoinosClass,
+    I extends KoinosClass,
+    J extends KoinosClass
+  >(variant: Variant<A, B, C, D, E, F, G, H, I, J>) {
+    return variant.deserializeVariant(this);
   }
 
   calcSerializedSize(): number {
