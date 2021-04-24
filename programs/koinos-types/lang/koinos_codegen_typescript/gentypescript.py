@@ -326,6 +326,7 @@ def generate_typescript(schema):
                 "typeref": typeref,
                 "typereflike": typereflike,
             })
+            print(out_filename)
         else:
             print(decl["info"]["type"])
 

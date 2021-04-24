@@ -1,0 +1,21 @@
+{% set className = ts_name(decl["name"]) %}{% set rName = typeref(decl["tref"]) %}import { {{rName}} } from "./basetypes";
+
+import { Variant } from "./Variant";
+import { Int64 } from "./Int64";
+
+export class TestVariant extends Variant<
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64,
+  Int64
+> {
+  constructor(value: Int64 = new Int64()) {
+    super(value, [Int64, Int64]);
+  }
+}
