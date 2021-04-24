@@ -39,6 +39,7 @@ export class Variant<
 
   deserializeVariant(vb: VariableBlob): Variant<A, B, C, D, E, F, G, H, I, J> {
     const i = vb.deserialize(VarInt).toNumber();
+    if (i >= this.Classes.length) throw new Error("Unknown variant tag");
     const value = vb.deserialize(this.Classes[i]);
     return new Variant(value, this.Classes);
   }

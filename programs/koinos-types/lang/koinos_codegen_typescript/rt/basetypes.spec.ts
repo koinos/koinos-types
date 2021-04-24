@@ -62,6 +62,19 @@ describe("Koinos Types - Typescript", () => {
     };
     const multihashVector = new MultihashVector(jsonMultihashVector);
 
+    const variantDef = new Variant<
+      Int16,
+      Int32,
+      Int64,
+      Str,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64,
+      Int64
+    >(null, [Int16, Int32, Int64, Str]);
+
     const variant = new Variant<
       Int16,
       Int32,
@@ -135,7 +148,7 @@ describe("Koinos Types - Typescript", () => {
     );
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
-    expect(variant.deserializeVariant(vb).toJSON()).toBe("test variant");
+    expect(vb.deserializeVariant(variantDef).toJSON()).toBe("test variant");
 
     expect(JSONbig.stringify(multihash.toJSON())).toBe(
       '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'
