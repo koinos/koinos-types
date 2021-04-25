@@ -1,21 +1,17 @@
-{% set className = ts_name(decl["name"]) %}{% set rName = typeref(decl["tref"]) %}import { {{rName}} } from "./basetypes";
-
-import { Variant } from "./Variant";
-import { Int64 } from "./Int64";
-
-export class TestVariant extends Variant<
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64,
-  Int64
+{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep.split("/")[-1]}} } from "{{dep}}";
+{% endfor%}
+export class {{className}} extends Variant<
+{%- for arg in decl["tref"]["targs"] %}
+{%- set arg_type = typeref(arg) %}
+		{{arg_type}},
+{%- endfor %}
+{%- for i in range(10 - len(decl["tref"]["targs"])) %}
+    KoinosClass{{"," if not loop.last}}
+{%- endfor %}
 > {
-  constructor(value: Int64 = new Int64()) {
-    super(value, [Int64, Int64]);
+  constructor(value: {{typeref(decl["tref"]["targs"][0])}} = new {{typeref(decl["tref"]["targs"][0])}}()) {
+    super(value, [{%- for arg in decl["tref"]["targs"] %}
+      {{typeref(arg)}}{{", " if not loop.last}}{%- endfor %}
+    ]);
   }
 }

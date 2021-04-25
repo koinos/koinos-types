@@ -59,6 +59,28 @@ def ts_name(name):
 
     return u
 
+def path(decl, relativeTo = "."):
+    relative = relativeTo.split("/")
+    i = 0
+    for i in range(len(relative)):
+        if relative[i] == decl["name"][i+1]:
+            i = i + 1
+        else:
+            break; 
+    r = relativeTo.count("/") - i
+    
+    filename = ts_name(decl["name"][-1])
+    folders = decl["name"][1+i:-1]
+    if len(folders) == 0 and i == 0:
+        folders.insert(0, "common")
+    for i in range(len(folders)):
+        folders[i] = folders[i].replace("_","")
+    pathFromRoot = "/".join(folders)
+    if len(folders) == 0:
+        pathFromRoot = "."
+    
+    return ("../" * r) + pathFromRoot + "/" + filename
+
 def path_ts_file(name):
     p = name.split("::")
     filename = ts_name(p[-1])
@@ -101,6 +123,14 @@ def get_dependencies(decl):
         dep.add(typereflike(field["tref"]))
         dep.add(typeref(field["tref"]))
     return dep
+
+def get_dependencies2(decl, name):
+    dep = set()
+    for arg in decl["tref"]["targs"]:
+        print(arg)
+        dep.add(path(arg, name))
+    return dep
+
 
 def decl_fixed_blob(length):
     fixed_blobs.add(length)
@@ -304,6 +334,7 @@ def generate_typescript(schema):
         ]
     j2_template_struct = env.get_template("koinos-struct.ts.j2")
     j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
+    j2_template_variant = env.get_template("koinos-variant.ts.j2")
 
     #for template_name in template_names:
     #    j2_template = env.get_template(template_name)
@@ -318,6 +349,18 @@ def generate_typescript(schema):
                 "typeref": typeref,
                 "typereflike": typereflike,
             })
+        elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
+            out_filename = path_ts_file(name) + ".ts"
+            dependencies = get_dependencies2(decl, out_filename)
+            result_files[out_filename] = j2_template_variant.render({
+                "decl": decl,
+                "dependencies" : dependencies,
+                "ts_name" : ts_name,
+                "typeref": typeref,
+                "typereflike": typereflike,
+                "len": len,
+            })
+            print(out_filename)
         elif decl["info"]["type"] == "Typedef":
             out_filename = path_ts_file(name) + ".ts"
             result_files[out_filename] = j2_template_typedef.render({
@@ -326,9 +369,9 @@ def generate_typescript(schema):
                 "typeref": typeref,
                 "typereflike": typereflike,
             })
-            print(out_filename)
-        else:
-            print(decl["info"]["type"])
+            # print(out_filename)
+        #else:
+            # print(decl["info"]["type"])
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
