@@ -125,10 +125,13 @@ def get_dependencies(decl):
     return dep
 
 def get_dependencies2(decl, name):
-    dep = set()
+    dep = []
+    dep.append(["Variant", path({ "name": ["koinos", "basetypes", "variant"]}, name)])
+    dep.append(["KoinosClass", path({ "name": ["koinos", "basetypes", "variable_blob"]}, name)])
     for arg in decl["tref"]["targs"]:
-        print(arg)
-        dep.add(path(arg, name))
+        className = ts_name(arg["name"][-1])
+        pathFile = path(arg, name)
+        dep.append([className, pathFile])
     return dep
 
 

@@ -1,4 +1,4 @@
-{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep.split("/")[-1]}} } from "{{dep}}";
+{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep[0]}} } from "{{dep[1]}}";
 {% endfor%}
 export class {{className}} extends Variant<
 {%- for arg in decl["tref"]["targs"] %}
@@ -9,9 +9,11 @@ export class {{className}} extends Variant<
     KoinosClass{{"," if not loop.last}}
 {%- endfor %}
 > {
-  constructor(value: {{typeref(decl["tref"]["targs"][0])}} = new {{typeref(decl["tref"]["targs"][0])}}()) {
+  constructor(value = new {{typeref(decl["tref"]["targs"][0])}}()) {
     super(value, [{%- for arg in decl["tref"]["targs"] %}
       {{typeref(arg)}}{{", " if not loop.last}}{%- endfor %}
+    ],[{%- for arg in decl["tref"]["targs"] %}
+      "{{"::".join(arg["name"])}}"{{", " if not loop.last}}{%- endfor %}
     ]);
   }
 }
