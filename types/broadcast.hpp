@@ -19,4 +19,10 @@ struct block_irreversible
    block_topology topology;
 };
 
+struct fork_heads
+{
+   std::vector< block_topology > fork_heads;
+   block_topology                last_irreversible_block;
+};
+
 } } // koinos::broadcast

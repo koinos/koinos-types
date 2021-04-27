@@ -43,6 +43,7 @@ typedef std::variant<
 struct active_transaction_data
 {
    uint128                  resource_limit;
+   uint64                   nonce;
    std::vector< operation > operations;
 };
 

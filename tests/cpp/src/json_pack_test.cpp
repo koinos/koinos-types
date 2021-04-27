@@ -1,4 +1,4 @@
-
+#ifdef JSON_ENABLED
 #include <boost/test/unit_test.hpp>
 
 #include <koinos/tests/pack_fixture.hpp>
@@ -315,19 +315,33 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    json j;
    to_json( j, to_j );
 
-   std::string expected = "{\"digest\":\"z31SRtpx1\",\"hash\":1}";
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\x01\x06\x04\x08\x0f\x10\x17\x2a' | base58; echo
+   std::string expected = "\"zAvtuU8Lw8u\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    multihash from_j;
    from_json( j, from_j );
    BOOST_REQUIRE_EQUAL( to_j.digest.size(), from_j.digest.size() );
+
+   j = std::string("zkpt6ajQywrZ");
+   try
+   {
+      from_json( j, from_j );
+      BOOST_REQUIRE( false );
+   }
+   catch( json_type_mismatch& e )
+   {
+      BOOST_REQUIRE_EQUAL( e.what(), "Multihash JSON had extra bytes" );
+   }
+
    for( size_t i = 0; i < to_j.digest.size(); ++i )
    {
       BOOST_REQUIRE_EQUAL( to_j.digest[i], from_j.digest[i] );
    }
 
    to_j.digest.clear();
-   to_j.id = 4640;
+   to_j.id = 0x1220;
    hex_to_vector( to_j.digest, {
       0xBA, 0x78, 0x16, 0xBF, 0x8F, 0x01, 0xCF, 0xEA,
       0x41, 0x41, 0x40, 0xDE, 0x5D, 0xAE, 0x22, 0x23,
@@ -336,7 +350,10 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    } );
 
    to_json( j, to_j );
-   expected = "{\"digest\":\"zDYu3G8aGTMBW1WrTw76zxQJQU4DHLw9MLyy7peG4LKkY\",\"hash\":4640}";
+
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\xa0\x24\x20\xba\x78\x16\xbf\x8f\x01\xcf\xea\x41\x41\x40\xde\x5d\xae\x22\x23\xb0\x03\x61\xa3\x96\x17\x7a\x9c\xb4\x10\xff\x61\xf2\x00\x15\xad' | base58; echo
+   expected = "\"zGymuoch75iSPbDGPsMPFA5QTVJxkGY5Qz4eiTLNbkJY9EvMA\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 }
 
@@ -350,7 +367,9 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 
    json j;
    to_json( j, to_j );
-   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":{\"digest\":\"zt1Zv2yaZ\",\"hash\":1},\"vals\":[108]}";
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\x01\x06foobar' | base58; echo
+   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    test_object from_j;
@@ -404,3 +423,4 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
 */
 
 BOOST_AUTO_TEST_SUITE_END()
+#endif

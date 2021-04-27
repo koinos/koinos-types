@@ -23,13 +23,21 @@ struct get_chain_id_request {};
 
 struct get_fork_heads_request {};
 
+struct read_contract_request
+{
+   contract_id_type contract_id;
+   uint32           entry_point;
+   variable_blob    args;
+};
+
 typedef std::variant<
    chain_reserved_request,
    submit_block_request,
    submit_transaction_request,
    get_head_info_request,
    get_chain_id_request,
-   get_fork_heads_request > chain_rpc_request;
+   get_fork_heads_request,
+   read_contract_request > chain_rpc_request;
 
 struct chain_reserved_response {};
 
@@ -60,6 +68,12 @@ struct get_fork_heads_response
    block_topology                last_irreversible_block;
 };
 
+struct read_contract_response
+{
+   variable_blob result;
+   std::string   logs;
+};
+
 typedef std::variant<
    chain_reserved_response,
    chain_error_response,
@@ -67,6 +81,7 @@ typedef std::variant<
    submit_transaction_response,
    get_head_info_response,
    get_chain_id_response,
-   get_fork_heads_response > chain_rpc_response;
+   get_fork_heads_response,
+   read_contract_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain
