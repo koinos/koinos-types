@@ -73,7 +73,7 @@ describe("Koinos Types - Typescript", () => {
       Int64,
       Int64,
       Int64
-    >(null, [Int16, Int32, Int64, Str]);
+    >(null, [Int16, Int32, Int64, Str], ["int16", "int32", "int64", "string"]);
 
     const variant = new Variant<
       Int16,
@@ -86,7 +86,7 @@ describe("Koinos Types - Typescript", () => {
       Int64,
       Int64,
       Int64
-    >(new Str("test variant"), [Int16, Int32, Int64, Str]);
+    >(new Str("test variant"), [Int16, Int32, Int64, Str], ["int16", "int32", "int64", "string"]);
 
     const vb = new VariableBlob()
       .serialize(vb1)

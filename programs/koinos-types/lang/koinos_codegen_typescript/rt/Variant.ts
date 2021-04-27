@@ -17,12 +17,16 @@ export class Variant<
 
   public Classes: KoinosClassBuilder<A | B | C | D | E | F | G | H | I | J>[];
 
+  public classNames: string[];
+
   constructor(
     value: A | B | C | D | E | F | G | H | I | J,
-    Classes: KoinosClassBuilder<A | B | C | D | E | F | G | H | I | J>[]
+    Classes: KoinosClassBuilder<A | B | C | D | E | F | G | H | I | J>[],
+    classNames: string[]
   ) {
     this.value = value;
     this.Classes = Classes;
+    this.classNames = classNames;
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -41,11 +45,19 @@ export class Variant<
     const i = vb.deserialize(VarInt).toNumber();
     if (i >= this.Classes.length) throw new Error("Unknown variant tag");
     const value = vb.deserialize(this.Classes[i]);
-    return new Variant(value, this.Classes);
+    return new Variant(value, this.Classes, this.classNames);
   }
 
   calcSerializedSize(): number {
     return 1 + this.value.calcSerializedSize();
+  }
+
+  typeToName(): string {
+    for (let i = 0; i < this.Classes.length; i += 1)
+      if (this.value instanceof this.Classes[i]) {
+        return this.classNames[i];
+      }
+    throw new Error("Unknown type name");
   }
 
   toJSON() {
