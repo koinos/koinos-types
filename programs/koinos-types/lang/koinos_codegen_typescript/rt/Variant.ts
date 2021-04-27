@@ -1,5 +1,5 @@
 import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
-import VarInt from "./VarInt";
+import { VarInt } from "./VarInt";
 
 export class Variant<
   A extends KoinosClass,
@@ -60,7 +60,9 @@ export class Variant<
     throw new Error("Unknown type name");
   }
 
-  toJSON() {
+  toJSON(): unknown {
     return this.value.toJSON();
   }
 }
+
+export default Variant;
