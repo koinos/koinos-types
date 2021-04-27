@@ -1175,8 +1175,8 @@ func DeserializeBlockHeightType(vb *VariableBlob) (uint64, *BlockHeightType, err
 
 // Multihash type
 type Multihash struct {
-	ID     UInt64       `json:"hash"`
-	Digest VariableBlob `json:"digest"`
+	ID     UInt64
+	Digest VariableBlob
 }
 
 // NewMultihash factory
@@ -1231,124 +1231,35 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 	return uint64(isize) + dsize, &omh, nil
 }
 
-// --------------------------------
-//  MultihashVector
-// --------------------------------
-
-// MultihashVector type
-type MultihashVector struct {
-	ID      UInt64
-	Digests []VariableBlob
+// MarshalJSON Multihash
+func (m0 Multihash) MarshalJSON() ([]byte, error) {
+	vb := NewVariableBlob()
+	s := m0.Serialize(vb)
+	b58str := "z" + base58.Encode(*s)
+	return json.Marshal(b58str)
 }
 
-// NewMultihashVector comparison
-func NewMultihashVector() *MultihashVector {
-	o := MultihashVector{}
-	o.ID = UInt64(0)
-	o.Digests = make([]VariableBlob, 0)
-	return &o
-}
-
-// Serialize MultihashVector
-func (n *MultihashVector) Serialize(vb *VariableBlob) *VariableBlob {
-	vb = EncodeVarint(vb, uint64(n.ID))
-	size := uint64(0)
-	if len(n.Digests) > 0 {
-		size = uint64(len(n.Digests[0]))
-	}
-	vb = EncodeVarint(vb, size)
-	vb = EncodeVarint(vb, uint64(len(n.Digests)))
-
-	for _, item := range n.Digests {
-		if uint64(len(item)) != size {
-			panic("Multihash vector size mismatch")
-		}
-		*vb = append(*vb, item...)
-	}
-
-	return vb
-}
-
-// DeserializeMultihashVector function
-func DeserializeMultihashVector(vb *VariableBlob) (uint64, *MultihashVector, error) {
-	omv := MultihashVector{}
-	id, i := binary.Uvarint(*vb)
-	if i <= 0 {
-		return 0, &omv, errors.New("Could not deserialize multihash vector id")
-	}
-	omv.ID = UInt64(id)
-	size, j := binary.Uvarint((*vb)[i:])
-	if j <= 0 {
-		return 0, &omv, errors.New("Could not deserialize multihash vector hash size")
-	}
-	i += j
-	entries, j := binary.Uvarint((*vb)[i:])
-	if j <= 0 {
-		return 0, &omv, errors.New("Could not deserialize multihash vector size")
-	}
-	i += j
-
-	if len(*vb) < i+int(entries)*int(size) {
-		return 0, &omv, errors.New("Unexpected EOF")
-	}
-
-	for num := uint64(0); num < entries; num++ {
-		omv.Digests = append(omv.Digests, (*vb)[i:i+int(size)])
-		i += int(size)
-	}
-
-	return uint64(i), &omv, nil
-}
-
-// MarshalJSON MultihashVector
-func (n MultihashVector) MarshalJSON() ([]byte, error) {
-	mhv := struct {
-		ID      uint64   `json:"hash"`
-		Digests []string `json:"digests"`
-	}{ID: uint64(n.ID)}
-	size := uint64(0)
-	if len(n.Digests) > 0 {
-		size = uint64(len(n.Digests[0]))
-	}
-	for _, item := range n.Digests {
-		if uint64(len(item)) != size {
-			panic("Multihash vector size mismatch")
-		}
-		mhv.Digests = append(mhv.Digests, EncodeBytes(item))
-	}
-
-	return json.Marshal(&mhv)
-}
-
-// UnmarshalJSON MultihashVector
-func (n *MultihashVector) UnmarshalJSON(b []byte) error {
-	mhv := struct {
-		ID      uint64   `json:"hash"`
-		Digests []string `json:"digests"`
-	}{}
-
-	err := json.Unmarshal(b, &mhv)
-	if err != nil {
+// UnmarshalJSON Multihash
+func (m0 *Multihash) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
 		return err
 	}
 
-	n.ID = UInt64(mhv.ID)
-	size := uint64(0)
-	for i, item := range mhv.Digests {
-		db, err := DecodeBytes(item)
-		if err != nil {
-			return err
-		}
-		if i == 0 {
-			size = uint64(len(db))
-		} else {
-			if uint64(len(db)) != size {
-				return errors.New("Multihash vector size mismatch")
-			}
-		}
-		n.Digests = append(n.Digests, VariableBlob(db))
+	db, err := DecodeBytes(s)
+	if err != nil {
+		return err
+	}
+	vdb := VariableBlob(db)
+	size, m1, err := DeserializeMultihash(&vdb)
+	if err != nil {
+		return err
+	}
+	if size != uint64(len(db)) {
+		return errors.New("Multihash JSON had extra bytes")
 	}
 
+	*m0 = *m1
 	return nil
 }
 

@@ -45,7 +45,6 @@ struct get_blocks_by_height_response
 struct add_block_request
 {
    block_store::block_item block_to_add;
-   multihash               previous_block_id;
 };
 
 struct add_block_response
@@ -54,8 +53,7 @@ struct add_block_response
 
 struct add_transaction_request
 {
-   multihash                             transaction_id;
-   opaque< protocol::transaction >       transaction;
+   protocol::transaction transaction;
 };
 
 struct add_transaction_response
@@ -72,11 +70,11 @@ struct get_transactions_by_id_response
    std::vector< block_store::transaction_item >      transaction_items;
 };
 
-struct get_last_irreversible_block_request {};
+struct get_highest_block_request {};
 
-struct get_last_irreversible_block_response
+struct get_highest_block_response
 {
-   multihash block_id;
+   block_topology topology;
 };
 
 struct block_store_error_response
@@ -92,7 +90,7 @@ typedef std::variant<
    add_block_request,
    add_transaction_request,
    get_transactions_by_id_request,
-   get_last_irreversible_block_request
+   get_highest_block_request
    > block_store_request;
 
 typedef std::variant<
@@ -103,7 +101,7 @@ typedef std::variant<
    add_block_response,
    add_transaction_response,
    get_transactions_by_id_response,
-   get_last_irreversible_block_response
+   get_highest_block_response
    > block_store_response;
 
 } } }

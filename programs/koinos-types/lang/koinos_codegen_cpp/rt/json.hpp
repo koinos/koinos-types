@@ -1,7 +1,10 @@
 #pragma once
+#ifdef JSON_ENABLED
+
 #include <koinos/pack/rt/json_fwd.hpp>
 
 #include <koinos/pack/rt/exceptions.hpp>
+#include <koinos/pack/rt/multihash_json.hpp>
 #include <koinos/pack/rt/opaque.hpp>
 #include <koinos/pack/rt/reflect.hpp>
 #include <koinos/pack/rt/typename.hpp>
@@ -412,59 +415,6 @@ inline void from_json( const json& j, optional< T >& v, uint32_t depth )
    }
 }
 
-// multihash
-inline void to_json( json& j, const multihash& v )
-{
-   json tmp;
-   to_json( tmp, v.digest );
-   j[ "hash" ] = v.id;
-   j[ "digest" ] = std::move( tmp );
-}
-
-inline void from_json( const json& j, multihash& v, uint32_t depth )
-{
-   if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
-   if( !(j.size() == 2) ) throw json_type_mismatch( "Multihash JSON type must only contain two fields" );
-   if( !(j.contains( "hash" )) ) throw json_type_mismatch( "Multihash JSON type must contain field 'hash'" );
-   if( !(j.contains( "digest" )) ) throw json_type_mismatch( "Multihash JSON type must contain field 'digest'" );
-
-   v.id = j[ "hash" ].get< uint64_t >();
-   from_json( j[ "digest" ], v.digest );
-}
-
-// multihash vector
-inline void to_json( json& j, const multihash_vector& v )
-{
-   j[ "hash" ] = v.id;
-   j[ "digests" ] = json::array();
-   for( const auto& d : v.digests )
-   {
-      json tmp;
-      to_json( tmp, d );
-      j[ "digests" ].emplace_back( std::move( tmp ) );
-   }
-}
-
-inline void from_json( const json& j, multihash_vector& v, uint32_t depth )
-{
-   if( !(j.is_object()) ) throw json_type_mismatch( "Unexpected JSON type: object exptected" );
-   if( !(j.size() == 2) ) throw json_type_mismatch( "MultihashVector JSON type must only contain two fields" );
-   if( !(j.contains( "hash" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'hash'" );
-   if( !(j.contains( "digests" )) ) throw json_type_mismatch( "MultihashVector JSON type must contain field 'digests'" );
-
-   const json& digests = j[ "digests" ];
-
-   if( !(digests.is_array()) ) throw json_type_mismatch( "MultihashVector field 'digest' must be an array" );
-   for( const json& d : digests )
-   {
-      variable_blob tmp;
-      from_json( d, tmp );
-      v.digests.emplace_back( std::move( tmp ) );
-   }
-
-   v.id = j[ "hash" ].get< uint64_t >();
-}
-
 template< typename T >
 inline void to_json( json& j, const opaque< T >& v )
 {
@@ -648,3 +598,4 @@ template< typename T > struct jsonifiable< T, typename std::enable_if_t< reflect
 #undef JSON_UNSIGNED_INT_SERIALIZER
 #undef JSON_SIGNED_BOOST_INT_SERIALIZER
 #undef JSON_UNSIGNED_BOOST_INT_SERIALIZER
+#endif

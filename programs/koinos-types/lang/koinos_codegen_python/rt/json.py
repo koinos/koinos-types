@@ -23,6 +23,3 @@ def ser_object_field(ctx, field_name):
 
 def ser_uint64(ctx, obj):
     ctx.acc.append(str(obj))
-
-def ser_multihash_vector(ctx, obj):
-    ctx.acc.append("<MHV>")

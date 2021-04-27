@@ -10,6 +10,7 @@ if(CCACHE_PROGRAM)
    set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS   "${CMAKE_SOURCE_DIR}/ci/ccache_clang++")
 endif()
 
+option(HUNTER_ENABLED "Enable Hunter package manager" ON)
 option(HUNTER_RUN_UPLOAD "Upload Hunter packages to binary cache server" OFF)
 
 set(
@@ -56,6 +57,7 @@ set(KOINOS_LIB_CMAKE_PROJECT_TARGETS_FILE "${KOINOS_LIB_CMAKE_CONFIG_DIR}/${PROJ
 set(KOINOS_LIB_PKGCONFIG_INSTALL_DIR      "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 option(BUILD_TESTS "Build Tests" ON)
+option(JSON_ENABLED "Build C++ with JSON support" ON)
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
 
 # This is to force color output when using ccache with Unix Makefiles

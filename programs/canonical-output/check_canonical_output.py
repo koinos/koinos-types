@@ -139,22 +139,17 @@ def main(argv):
          target = os.path.split(dir_name)[1]
 
          print("Running canonical output for %s... " % target, end='')
-         p = subprocess.Popen([python_bin + " ./driver.py"], cwd=dir_name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-         p.wait()
+         p = subprocess.run(["./driver.py"], cwd=dir_name)
 
          types_bin = os.path.join(dir_name, 'types.bin')
          types_json = os.path.join(dir_name, 'types.json')
 
          if not os.path.isfile(types_bin):
             print("Failed (Language target %s did not produce the output file: types.bin)" % target)
-            print(p.communicate()[0].decode("utf-8"), file=sys.stdout)
-            print(p.communicate()[1].decode("utf-8"), file=sys.stderr)
             return 1
 
          if not os.path.isfile(types_json):
             print("Failed (Language target %s did not produce the output file: types.json" % target)
-            print(p.communicate()[0].decode("utf-8"), file=sys.stdout)
-            print(p.communicate()[1].decode("utf-8"), file=sys.stderr)
             return 1
 
          binary_files[target] = open(types_bin, "rb")

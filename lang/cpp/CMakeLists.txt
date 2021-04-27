@@ -1,5 +1,12 @@
-find_package(Boost CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+if (HUNTER_ENABLED)
+   find_package(Boost CONFIG REQUIRED)
+else()
+   find_package(Boost 1.57 REQUIRED)
+endif()
+
+if (JSON_ENABLED)
+   find_package(nlohmann_json CONFIG REQUIRED)
+endif()
 
 # C++
 set(KOINOS_CPP_OUTPUT_DIR "${CMAKE_BINARY_DIR}/generated/cpp")
@@ -20,6 +27,8 @@ set(KOINOS_CPP_OUTPUT_FILES
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/exceptions.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/json_fwd.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/json.hpp"
+   "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/multihash_binary.hpp"
+   "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/multihash_json.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/pack_fwd.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/reflect.hpp"
    "${KOINOS_CPP_OUTPUT_INCLUDE_DIR}/koinos/pack/rt/typename.hpp"
@@ -50,7 +59,12 @@ add_library(Koinos::types ALIAS koinos_types)
 # We specifically do not want to link to boost, only include boost headers.
 # Any boost library that is not header only must be build against wasm.
 # It is easier to simply to utilize those libraries. Most boost libraries are header only.
-target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
+if (JSON_ENABLED)
+   target_compile_definitions(koinos_types INTERFACE JSON_ENABLED=1)
+   target_link_libraries(koinos_types INTERFACE Boost::headers nlohmann_json::nlohmann_json)
+else()
+   target_link_libraries(koinos_types INTERFACE Boost::headers)
+endif()
 target_include_directories(koinos_types INTERFACE
    $<BUILD_INTERFACE:${KOINOS_CPP_OUTPUT_INCLUDE_DIR}>
    $<INSTALL_INTERFACE:include>
@@ -78,4 +92,3 @@ install(
    NAMESPACE Koinos::
    DESTINATION ${KOINOS_LIB_CONFIG_INSTALL_DIR}
 )
-
