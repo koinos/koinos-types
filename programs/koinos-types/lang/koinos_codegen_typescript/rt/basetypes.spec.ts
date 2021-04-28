@@ -45,7 +45,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(29);
+    expect.assertions(30);
     const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash({
       id: 123,
@@ -73,7 +73,7 @@ describe("Koinos Types - Typescript", () => {
       Int64,
       Int64,
       Int64
-    >(null, [Int16, Int32, Int64, Str]);
+    >(null, [Int16, Int32, Int64, Str], ["int16", "int32", "int64", "string"]);
 
     const variant = new Variant<
       Int16,
@@ -86,7 +86,11 @@ describe("Koinos Types - Typescript", () => {
       Int64,
       Int64,
       Int64
-    >(new Str("test variant"), [Int16, Int32, Int64, Str]);
+    >(
+      new Str("test variant"),
+      [Int16, Int32, Int64, Str],
+      ["int16", "int32", "int64", "string"]
+    );
 
     const vb = new VariableBlob()
       .serialize(vb1)
@@ -114,6 +118,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new BlockHeightType(123456))
       .serialize(multihash)
       .serialize(multihashVector)
+      .serialize(new Opaque(Str, "test opaque"))
       .serialize(new Vector(Int8, [2, 4, 6]))
       .serialize(new FixedBlob("z36UjcYNBG9", 7))
       .serialize(variant)
@@ -146,6 +151,7 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserialize(MultihashVector).toJSON()).toStrictEqual(
       jsonMultihashVector
     );
+    expect(vb.deserializeOpaque(Str).toJSON()).toBe("test opaque");
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
     expect(vb.deserializeVariant(variantDef).toJSON()).toBe("test variant");
@@ -176,8 +182,7 @@ describe("Koinos Types - Typescript", () => {
 
   it("should create an opaque class", () => {
     expect.assertions(10);
-    const num = new Int32(123456);
-    const opaque = new Opaque(Int32, num);
+    const opaque = new Opaque(Int32, 123456);
     expect(opaque.isUnboxed()).toBe(true);
     expect(opaque.isMutable()).toBe(true);
     opaque.box();
@@ -195,7 +200,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("should calculate the size required for serialization", () => {
-    expect.assertions(22);
+    expect.assertions(23);
 
     const vb = new VariableBlob("zABCDEF1234567");
     expect(vb.calcSerializedSize()).toBe(vb.serialize().length());
@@ -275,5 +280,8 @@ describe("Koinos Types - Typescript", () => {
 
     const vector = new Vector(Str, ["alice", "bob", "carl"]);
     expect(vector.calcSerializedSize()).toBe(vector.serialize().length());
+
+    const opaque = new Opaque(Str, "test!$^#🙂🍻");
+    expect(opaque.calcSerializedSize()).toBe(opaque.serialize().length());
   });
 });

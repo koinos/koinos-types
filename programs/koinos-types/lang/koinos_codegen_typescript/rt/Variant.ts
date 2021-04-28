@@ -1,5 +1,5 @@
 import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
-import VarInt from "./VarInt";
+import { VarInt } from "./VarInt";
 
 export class Variant<
   A extends KoinosClass,
@@ -45,7 +45,7 @@ export class Variant<
     const i = vb.deserialize(VarInt).toNumber();
     if (i >= this.Classes.length) throw new Error("Unknown variant tag");
     const value = vb.deserialize(this.Classes[i]);
-    return new Variant(value, this.Classes);
+    return new Variant(value, this.Classes, this.classNames);
   }
 
   calcSerializedSize(): number {
@@ -60,7 +60,9 @@ export class Variant<
     throw new Error("Unknown type name");
   }
 
-  toJSON() {
+  toJSON(): unknown {
     return this.value.toJSON();
   }
 }
+
+export default Variant;

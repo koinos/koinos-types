@@ -1,4 +1,5 @@
 #pragma once
+#ifdef JSON_ENABLED
 
 #include <koinos/pack/rt/basetypes.hpp>
 
@@ -47,7 +48,6 @@ KOINOS_DECLARE_BASE_JSON_SERIALIZER( uint256_t )
 KOINOS_DECLARE_PRIMITIVE_JSON_SERIALIZER( bool )
 
 KOINOS_DECLARE_BASE_JSON_SERIALIZER( multihash )
-KOINOS_DECLARE_BASE_JSON_SERIALIZER( multihash_vector )
 
 KOINOS_DECLARE_BASE_JSON_SERIALIZER( block_height_type )
 KOINOS_DECLARE_BASE_JSON_SERIALIZER( timestamp_type )
@@ -114,3 +114,6 @@ std::ostream& operator<<( std::ostream& o, const T& t )                         
 
 #undef KOINOS_DECLARE_PRIMITIVE_JSON_SERIALIZER
 #undef KOINOS_DECLARE_BASE_JSON_SERIALIZER
+#else
+#define KOINOS_DEFINE_JSON_STREAM_OPERATOR( NS );
+#endif

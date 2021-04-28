@@ -4,7 +4,6 @@ struct chain_reserved_request {};
 
 struct submit_block_request
 {
-   block_topology  topology;
    protocol::block block;
    boolean         verify_passive_data;
    boolean         verify_block_signature;
@@ -13,7 +12,6 @@ struct submit_block_request
 
 struct submit_transaction_request
 {
-   transaction_topology  topology;
    protocol::transaction transaction;
    boolean               verify_passive_data;
    boolean               verify_transaction_signatures;
@@ -23,13 +21,14 @@ struct get_head_info_request {};
 
 struct get_chain_id_request {};
 
-struct get_pending_transactions_request
-{
-   multihash start;
-   uint64    limit;
-};
-
 struct get_fork_heads_request {};
+
+struct read_contract_request
+{
+   contract_id_type contract_id;
+   uint32           entry_point;
+   variable_blob    args;
+};
 
 typedef std::variant<
    chain_reserved_request,
@@ -37,8 +36,8 @@ typedef std::variant<
    submit_transaction_request,
    get_head_info_request,
    get_chain_id_request,
-   get_pending_transactions_request,
-   get_fork_heads_request > chain_rpc_request;
+   get_fork_heads_request,
+   read_contract_request > chain_rpc_request;
 
 struct chain_reserved_response {};
 
@@ -54,9 +53,7 @@ struct submit_transaction_response {};
 
 struct get_head_info_response
 {
-   multihash         id;
-   multihash         previous_id;
-   block_height_type height;
+   block_topology    head_topology;
    block_height_type last_irreversible_height;
 };
 
@@ -65,15 +62,16 @@ struct get_chain_id_response
    multihash chain_id;
 };
 
-struct get_pending_transactions_response
-{
-   std::vector< protocol::transaction > transactions;
-};
-
 struct get_fork_heads_response
 {
    std::vector< block_topology > fork_heads;
    block_topology                last_irreversible_block;
+};
+
+struct read_contract_response
+{
+   variable_blob result;
+   std::string   logs;
 };
 
 typedef std::variant<
@@ -83,7 +81,7 @@ typedef std::variant<
    submit_transaction_response,
    get_head_info_response,
    get_chain_id_response,
-   get_pending_transactions_response,
-   get_fork_heads_response > chain_rpc_response;
+   get_fork_heads_response,
+   read_contract_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain

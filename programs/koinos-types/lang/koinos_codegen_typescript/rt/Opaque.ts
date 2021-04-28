@@ -7,14 +7,17 @@ export class Opaque<T extends KoinosClass> {
 
   private ClassT: KoinosClassBuilder<T>;
 
-  constructor(ClassT: KoinosClassBuilder<T>, nativeOrBlob?: T | VariableBlob) {
+  constructor(
+    ClassT: KoinosClassBuilder<T>,
+    data?: T | VariableBlob | unknown
+  ) {
     this.ClassT = ClassT;
-    if (nativeOrBlob instanceof ClassT) {
-      this.native = nativeOrBlob;
-    } else if (nativeOrBlob instanceof VariableBlob) {
-      this.blob = nativeOrBlob;
+    if (data instanceof ClassT) {
+      this.native = data;
+    } else if (data instanceof VariableBlob) {
+      this.blob = data;
     } else {
-      this.native = new ClassT();
+      this.native = new ClassT(data);
     }
   }
 
@@ -25,7 +28,7 @@ export class Opaque<T extends KoinosClass> {
 
   box(): void {
     if (this.native) {
-      if (!this.blob) this.serialize();
+      if (!this.blob) this.blob = this.native.serialize();
       this.native = null;
     }
   }
@@ -35,7 +38,7 @@ export class Opaque<T extends KoinosClass> {
   }
 
   makeImmutable(): void {
-    if (this.native && !this.blob) this.serialize();
+    if (this.native && !this.blob) this.blob = this.native.serialize();
   }
 
   makeMutable(): void {
@@ -48,7 +51,7 @@ export class Opaque<T extends KoinosClass> {
   }
 
   getBlob(): VariableBlob {
-    if (this.native && !this.blob) this.serialize();
+    if (this.native && !this.blob) this.blob = this.native.serialize();
     return this.blob;
   }
 
@@ -58,8 +61,30 @@ export class Opaque<T extends KoinosClass> {
     return this.native;
   }
 
-  private serialize(): void {
-    this.blob = this.native.serialize();
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.write(this.getBlob().buffer);
+    if (!blob) vb.resetCursor();
+    return vb;
+  }
+
+  static deserialize<K extends KoinosClass>(
+    ClassT: KoinosClassBuilder<K>,
+    vb: VariableBlob
+  ): Opaque<K> {
+    const native = vb.deserialize(ClassT);
+    return new Opaque<K>(ClassT, native);
+  }
+
+  calcSerializedSize(): number {
+    return this.isUnboxed()
+      ? this.native.calcSerializedSize()
+      : this.blob.length();
+  }
+
+  toJSON(): unknown {
+    if (!this.isUnboxed()) throw new Error("Opaque type not unboxed");
+    return this.native.toJSON();
   }
 }
 

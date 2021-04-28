@@ -1,543 +1,479 @@
 [
    {
-      "type" : "unused_extensions_type",
-      "json" : {}
+      "type": "unused_extensions_type",
+      "json": {}
    },
    {
-      "type" : "protocol::reserved_operation",
-      "json" : {
-         "extensions" : {}
-      }
-   },
-   {
-      "type" : "protocol::nop_operation",
-      "json" : {
+      "type": "protocol::reserved_operation",
+      "json": {
          "extensions": {}
       }
    },
    {
-      "type" : "protocol::create_system_contract_operation",
-      "json" : {
-         "contract_id" : "zgbSfgRniygaM8Ty9Zg5qsvGzRhR",
-         "bytecode" : "zHUKsUCuPZRe",
-         "extensions" : {}
+      "type": "protocol::nop_operation",
+      "json": {
+         "extensions": {}
       }
    },
    {
-      "type" : "chain::system_call_target_reserved",
-      "json" : {}
-   },
-   {
-      "type" : "chain::contract_call_bundle",
-      "json" : {
-         "contract_id" : "zhQJuVPvm22Ke7S9mFQJxo3HKMU3",
-         "entry_point" : 400
+      "type": "protocol::create_system_contract_operation",
+      "json": {
+         "contract_id": "zgbSfgRniygaM8Ty9Zg5qsvGzRhR",
+         "bytecode": "zHUKsUCuPZRe",
+         "extensions": {}
       }
    },
    {
-      "type" : "protocol::set_system_call_operation",
-      "json" : {
-         "call_id" : 300,
-         "target" : {
-            "type" : "koinos::chain::system_call_target_reserved",
-            "value" : {}
+      "type": "chain::system_call_target_reserved",
+      "json": {}
+   },
+   {
+      "type": "chain::contract_call_bundle",
+      "json": {
+         "contract_id": "zhQJuVPvm22Ke7S9mFQJxo3HKMU3",
+         "entry_point": 400
+      }
+   },
+   {
+      "type": "protocol::set_system_call_operation",
+      "json": {
+         "call_id": 300,
+         "target": {
+            "type": "koinos::chain::system_call_target_reserved",
+            "value": {}
          }
       }
    },
    {
-      "type" : "protocol::contract_call_operation",
-      "json" :
-      {
-         "contract_id" : "ziDB9JN4o4N4w6QLNw8Y5iAHeHEf",
-         "entry_point" : 500,
-         "args" : "zXZuL1k6oQ7w9k",
-         "extensions" : {}
+      "type": "protocol::contract_call_operation",
+      "json": {
+         "contract_id": "ziDB9JN4o4N4w6QLNw8Y5iAHeHEf",
+         "entry_point": 500,
+         "args": "zXZuL1k6oQ7w9k",
+         "extensions": {}
       }
    },
    {
-      "type" : "protocol::active_transaction_data",
-      "json" :
-      {
-         "resource_limit": "3480523478260483267"
+      "type": "protocol::active_transaction_data",
+      "json": {
+         "resource_limit": "3480523478260483267",
+         "nonce": 1
       }
    },
    {
-      "type" : "protocol::passive_transaction_data",
-      "json" : {}
+      "type": "protocol::passive_transaction_data",
+      "json": {}
    },
    {
-      "type" : "protocol::transaction",
-      "json" :
-      {
+      "type": "protocol::transaction",
+      "json": {
          "active_data": {
-            "resource_limit" : "3480523478260483267"
+            "resource_limit": "3480523478260483267",
+            "nonce": 1
          },
-         "passive_data" : {},
-         "signature_data" : "zXoAa5DbgvuAbW",
-         "operations" :[
+         "passive_data": {},
+         "signature_data": "zXoAa5DbgvuAbW",
+         "operations": [
             {
-               "type" : "koinos::protocol::reserved_operation",
-               "value" : {
-                  "extensions" : {}
+               "type": "koinos::protocol::reserved_operation",
+               "value": {
+                  "extensions": {}
                }
             },
             {
-               "type" : "koinos::protocol::nop_operation",
-               "value" : {
-                  "extensions" : {}
+               "type": "koinos::protocol::nop_operation",
+               "value": {
+                  "extensions": {}
                }
             },
             {
-               "type" : "koinos::protocol::create_system_contract_operation",
-               "value" : {
-                  "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                  "bytecode" : "z7C2VTyPuYsLx",
-                  "extensions" : {}
+               "type": "koinos::protocol::create_system_contract_operation",
+               "value": {
+                  "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                  "bytecode": "z7C2VTyPuYsLx",
+                  "extensions": {}
                }
             }
          ]
       }
    },
    {
-      "type" : "protocol::active_block_data",
-      "json" : {
-         "header_hashes" : {
-            "hash" : 70,
-            "digests" : [
+      "type": "protocol::active_block_data",
+      "json": {
+         "header_hashes": {
+            "hash": 70,
+            "digests": [
                "z2EiQdzYMa2t",
                "z2EiQdzYMa2u",
                "z2EiQdzYMa2v"
             ]
          },
-         "height" : 30,
-         "timestamp" : 40
+         "height": 30,
+         "timestamp": 40
       }
    },
    {
-      "type" : "protocol::passive_block_data",
-      "json" : {}
+      "type": "protocol::passive_block_data",
+      "json": {}
    },
    {
-      "type" : "protocol::block",
-      "json" : {
-         "active_data" : {
-            "header_hashes" : {
-               "hash" : 70,
-               "digests" : [
-                  "z2EiQdzYMa2t",
-                  "z2EiQdzYMa2u",
-                  "z2EiQdzYMa2v"
-               ]
-            },
-            "height" : 30,
-            "timestamp" : 40
+      "type": "protocol::block",
+      "json": {
+         "id": "z3396kz2ywyU8s",
+         "header": {
+            "previous": "z3396kz2ywyU8s",
+            "height": 30,
+            "timestamp": 40
          },
-         "passive_data" : {},
-         "signature_data" : "zXoAa5DbgvuAbW",
-         "transactions" : [
+         "active_data": {},
+         "passive_data": {},
+         "signature_data": "zXoAa5DbgvuAbW",
+         "transactions": [
             {
+               "id": "z3396kz2ywyU8s",
                "active_data": {
-                  "resource_limit" : "3480523478260483267"
+                  "resource_limit": "3480523478260483267",
+                  "nonce": 1,
+                  "operations": [
+                     {
+                        "type": "koinos::protocol::reserved_operation",
+                        "value": {
+                           "extensions": {}
+                        }
+                     },
+                     {
+                        "type": "koinos::protocol::nop_operation",
+                        "value": {
+                           "extensions": {}
+                        }
+                     },
+                     {
+                        "type": "koinos::protocol::create_system_contract_operation",
+                        "value": {
+                           "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                           "bytecode": "z7C2VTyPuYsLx",
+                           "extensions": {}
+                        }
+                     }
+                  ]
                },
-               "passive_data" : {},
-               "signature_data" : "z",
-               "operations" : [
+               "passive_data": {},
+               "signature_data": "z"
+            }
+         ]
+      }
+   },
+   {
+      "type": "chain::head_info",
+      "json": {
+         "head_topology": {
+            "id": "zDQePGgMRmMPgwyu",
+            "height": 100,
+            "previous": "zAvpWTnQXpthbhiT"
+         },
+         "last_irreversible_height": 100
+      }
+   },
+   {
+      "type": "koinos::block_topology",
+      "json": {
+         "id": "zDQePGgMRmMPgwyu",
+         "height": 100,
+         "previous": "zFtUGpPpXGTi3rjm"
+      }
+   },
+   {
+      "type": "chain::void_type",
+      "json": {}
+   },
+   {
+      "type": "chain::prints_args",
+      "json": {
+         "message": "prints arguments"
+      }
+   },
+   {
+      "type": "chain::verify_block_signature_args",
+      "json": {
+         "signature_data": "zQT2iJXiFShP1KGPeeeet",
+         "digest": "z3396kz2ywyU8s"
+      }
+   },
+   {
+      "type": "chain::verify_merkle_root_args",
+      "json": {
+         "root": "z61BvZeNkaP",
+         "hashes": [
+            "zfoxVHZEMqGU",
+            "zb8MrNpnNivu"
+         ]
+      }
+   },
+   {
+      "type": "chain::apply_block_args",
+      "json": {
+         "block": {
+            "id": "z3396kz2ywyU8s",
+            "header": {
+               "previous": "z3396kz2ywyU8s",
+               "height": 30,
+               "timestamp": 40
+            },
+            "active_data": {},
+            "passive_data": {},
+            "signature_data": "zXoAa5DbgvuAbW",
+            "transactions": [
+               {
+                  "id": "z3396kz2ywyU8s",
+                  "active_data": {
+                     "resource_limit": "3480523478260483267",
+                     "nonce": 1,
+                     "operations": [
+                        {
+                           "type": "koinos::protocol::reserved_operation",
+                           "value": {
+                              "extensions": {}
+                           }
+                        },
+                        {
+                           "type": "koinos::protocol::nop_operation",
+                           "value": {
+                              "extensions": {}
+                           }
+                        },
+                        {
+                           "type": "koinos::protocol::create_system_contract_operation",
+                           "value": {
+                              "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                              "bytecode": "z7C2VTyPuYsLx",
+                              "extensions": {}
+                           }
+                        }
+                     ]
+                  },
+                  "passive_data": {}
+               }
+            ]
+         },
+         "check_passive_data": true,
+         "check_block_signature": true,
+         "check_transaction_signatures": true
+      }
+   },
+   {
+      "type": "chain::apply_transaction_args",
+      "json": {
+         "transaction": {
+            "id": "z3396kz2ywyU8s",
+            "active_data": {
+               "resource_limit": "3480523478260483267",
+               "nonce": 1,
+               "operations": [
                   {
-                     "type" : "koinos::protocol::reserved_operation",
-                     "value" : {
-                        "extensions" : {}
+                     "type": "koinos::protocol::reserved_operation",
+                     "value": {
+                        "extensions": {}
                      }
                   },
                   {
-                     "type" : "koinos::protocol::nop_operation",
-                     "value" : {
-                        "extensions" : {}
+                     "type": "koinos::protocol::nop_operation",
+                     "value": {
+                        "extensions": {}
                      }
                   },
                   {
-                     "type" : "koinos::protocol::create_system_contract_operation",
-                     "value" : {
-                        "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                        "bytecode" : "z7C2VTyPuYsLx",
-                        "extensions" : {}
+                     "type": "koinos::protocol::create_system_contract_operation",
+                     "value": {
+                        "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                        "bytecode": "z7C2VTyPuYsLx",
+                        "extensions": {}
                      }
                   }
                ]
             },
-            {
-               "opaque" : {
-                  "type" : "koinos::protocol::transaction",
-                  "value" : "z4J725obzBtuEy6g4NWm2oht9s"
-               }
-            }
-         ]
-      }
-   },
-   {
-      "type" : "chain::head_info",
-      "json" : {
-         "id" : {
-            "hash" : 50,
-            "digest" : "zX1ECcx53wEief"
-         },
-         "height" : 100
-      }
-   },
-   {
-      "type" : "koinos::block_topology",
-      "json" : {
-         "id" : {
-            "hash" : 50,
-            "digest" : "zX1ECcx53wEief"
-         },
-         "height" : 100,
-         "previous" : {
-            "hash" : 60,
-            "digest" : "zX1y299dhZWP95"
+            "passive_data": {},
+            "signature_data": "z7C2VTyPuYsLx"
          }
       }
    },
    {
-      "type" : "chain::void_type",
-      "json" : {}
-   },
-   {
-      "type" : "chain::prints_args",
-      "json" : {
-         "message" : "prints arguments"
-      }
-   },
-   {
-      "type" : "chain::verify_block_signature_args",
-      "json" : {
-         "signature_data" : "zQT2iJXiFShP1KGPeeeet",
-         "digest" : {
-            "hash" : 800,
-            "digest" : "zF3tLyoe9Z"
+      "type": "chain::apply_upload_contract_operation_args",
+      "json": {
+         "op": {
+            "contract_id": "zgkdgumXXYheR7YQSPQDLHBkcvxo",
+            "bytecode": "ziqBePgdHDavsiJtyDW3bqpWQ"
          }
       }
    },
    {
-      "type" : "chain::verify_merkle_root_args",
-      "json" : {
-         "root" : {
-            "hash" : 900,
-            "digest" : "zW6nLdh"
-         },
-         "hashes" : [
-            {
-               "hash" : 1000,
-               "digest" : "z3hBu9M8C"
+      "type": "chain::apply_reserved_operation_args",
+      "json": {
+         "extensions": {}
+      }
+   },
+   {
+      "type": "chain::apply_execute_contract_operation_args",
+      "json": {
+         "op": {
+            "contract_id": "zjBnP7JQZuRLLEMCnHyoxqfierGX",
+            "entry_point": 7,
+            "args": "z4NFXLCDLy97g2eUtNgygsp6N8r",
+            "extensions": {}
+         }
+      }
+   },
+   {
+      "type": "chain::apply_set_system_call_operation_args",
+      "json": {
+         "op": {
+            "call_id": 8,
+            "target": {
+               "type": "koinos::chain::thunk_id",
+               "value": 2406348109
             },
-            {
-               "hash" : 1100,
-               "digest" : "z3hBu9M8D"
-            }
-         ]
-      }
-   },
-   {
-      "type" : "chain::apply_block_args",
-      "json" : {
-         "block" : {
-            "active_data" : {
-               "header_hashes" : {
-                  "hash" : 70,
-                  "digests": [
-                     "z2EiQdzYMa2t",
-                     "z2EiQdzYMa2u",
-                     "z2EiQdzYMa2v"
-                  ]
-               }
-            },
-            "height" : 30,
-            "timestamp" : 40,
-            "passive_data" : {},
-            "signature_data" : "zXoAa5DbgvuAbW",
-            "transactions" : [
-               {
-                  "active_data": {
-                     "resource_limit" : "3480523478260483267"
-                  },
-                  "passive_data" : {},
-                  "signature_data" : "z23Ap51zkyD67RAyeyr",
-                  "operations" : [
-                     {
-                        "type" : "koinos::protocol::reserved_operation",
-                        "value" : {
-                           "extensions" : {}
-                        }
-                     },
-                     {
-                        "type" : "koinos::protocol::nop_operation",
-                        "value" : {
-                           "extensions" : {}
-                        }
-                     },
-                     {
-                        "type" : "koinos::protocol::create_system_contract_operation",
-                        "value" : {
-                           "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                           "bytecode" : "z7C2VTyPuYsLx",
-                           "extensions" : {}
-                        }
-                     }
-                  ]
-               },
-               {
-                  "opaque" : {
-                     "type" : "koinos::protocol::transaction",
-                     "value" : "z4J725obzBtuEy6g4NWm2oht9s"
-                  }
-               }
-            ]
-         },
-         "enable_check_passive_data" : true,
-         "enable_check_block_signature" : true,
-         "enable_check_transaction_signatures" : true
-      }
-   },
-   {
-      "type" : "chain::apply_transaction_args",
-      "json" : {
-         "trx" : {
-            "active_data": {
-               "resource_limit" : "3480523478260483267"
-            },
-            "passive_data" : {},
-            "signature_data" : "z23Ap51zkyD67RAyeyr",
-            "operations" : [
-               {
-                  "type" : "koinos::protocol::reserved_operation",
-                  "value" : {
-                     "extensions" : {}
-                  }
-               },
-               {
-                  "type" : "koinos::protocol::nop_operation",
-                  "value" : {
-                     "extensions" : {}
-                  }
-               },
-               {
-                  "type" : "koinos::protocol::create_system_contract_operation",
-                  "value" : {
-                     "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                     "bytecode" : "z7C2VTyPuYsLx",
-                     "extensions" : {}
-                  }
-               }
-            ]
+            "extensions": {}
          }
       }
    },
    {
-      "type" : "chain::apply_upload_contract_operation_args",
-      "json" : {
-         "op" : {
-            "contract_id" : "zgkdgumXXYheR7YQSPQDLHBkcvxo",
-            "bytecode" : "ziqBePgdHDavsiJtyDW3bqpWQ"
-         }
-      }
-   },
-   {
-      "type" : "chain::apply_reserved_operation_args",
-      "json" : {
-         "extensions" : {}
-      }
-   },
-   {
-      "type" : "chain::apply_execute_contract_operation_args",
-      "json" : {
-         "op" : {
-            "contract_id" : "zjBnP7JQZuRLLEMCnHyoxqfierGX",
-            "entry_point" : 7,
-            "args" : "z4NFXLCDLy97g2eUtNgygsp6N8r",
-            "extensions" : {}
-         }
-      }
-   },
-   {
-      "type" : "chain::apply_set_system_call_operation_args",
-      "json" : {
-         "op" : {
-            "call_id" : 8,
-            "target" : {
-               "type" : "koinos::chain::thunk_id",
-               "value" : 2406348109
-            },
-            "extensions" : {}
-         }
-      }
-   },
-   {
-      "type" : "chain::db_put_object_args",
-      "json" : {
-         "space" : 100,
-         "key" : 200,
-         "obj" : "zF9MGAPBas"
-      }
-   },
-   {
-      "type" : "chain::db_get_object_args",
-      "json" : {
+      "type": "chain::db_put_object_args",
+      "json": {
          "space": 100,
-         "key" : 200,
-         "object_size_hint" : 300
+         "key": 200,
+         "obj": "zF9MGAPBas"
       }
    },
    {
-      "type" : "chain::execute_contract_args",
-      "json" : {
-         "contract_id" : "zmcw5JqHcG92FMA18CZQbQ9ggmaF",
-         "entry_point" : 10,
-         "args" : "ziqBePgdHDavsiJj13gV7qDMV"
+      "type": "chain::db_get_object_args",
+      "json": {
+         "space": 100,
+         "key": 200,
+         "object_size_hint": 300
       }
    },
    {
-      "type" : "chain::exit_contract_args",
-      "json" : {
-         "exit_code" : 0
+      "type": "chain::execute_contract_args",
+      "json": {
+         "contract_id": "zmcw5JqHcG92FMA18CZQbQ9ggmaF",
+         "entry_point": 10,
+         "args": "ziqBePgdHDavsiJj13gV7qDMV"
       }
    },
    {
-      "type" : "chain::hash_args",
-      "json" : {
-         "code" : 120,
-         "obj" : "zF9MGAPBas",
-         "size" : 7
+      "type": "chain::exit_contract_args",
+      "json": {
+         "exit_code": 0
       }
    },
    {
-      "type" : "chain::set_contract_return_args",
-      "json" : {
-         "value" : "zFArFa8RG1"
+      "type": "chain::hash_args",
+      "json": {
+         "code": 120,
+         "obj": "zF9MGAPBas",
+         "size": 7
       }
    },
    {
-      "type" : "rpc::chain::submit_block_request",
-      "json" : {
-         "topology" : {
-            "id" : {
-               "hash" : 60,
-               "digest" : "zX1y299dhZWP95"
+      "type": "chain::set_contract_return_args",
+      "json": {
+         "value": "zFArFa8RG1"
+      }
+   },
+   {
+      "type": "rpc::chain::submit_block_request",
+      "json": {
+         "block": {
+            "id": "z3396kz2ywyU8s",
+            "header": {
+               "previous": "z3396kz2ywyU8s",
+               "height": 30,
+               "timestamp": 40
             },
-            "height" : 100,
-            "previous" : {
-               "hash" : 70,
-               "digest" : "zX2hqfMCMBn3dV"
-            }
-         },
-         "block" : {
-            "active_data" : {
-               "previous_block" : {
-                  "hash" : 70,
-                  "digest" : "zX2hqfMCMBn3dV"
-               },
-               "transaction_merkle_root" : {
-                  "hash" : 70,
-                  "digest" : "zX2hqfMCMBn3dV"
-               },
-               "passive_data_merkle_root" : {
-                  "hash" : 70,
-                  "digest" : "zX2hqfMCMBn3dV"
-               },
-               "height" : 30,
-               "timestamp" : 40
-            },
-            "passive_data" : {},
-            "signature_data" : "zXoAa5DbgvuAbW",
-            "transactions" : [
+            "active_data": {},
+            "passive_data": {},
+            "signature_data": "zXoAa5DbgvuAbW",
+            "transactions": [
                {
+                  "id": "z3396kz2ywyU8s",
                   "active_data": {
-                     "resource_limit" : "3480523478260483267"
+                     "resource_limit": "3480523478260483267",
+                     "nonce": 1,
+                     "operations": [
+                        {
+                           "type": "koinos::protocol::reserved_operation",
+                           "value": {
+                              "extensions": {}
+                           }
+                        },
+                        {
+                           "type": "koinos::protocol::nop_operation",
+                           "value": {
+                              "extensions": {}
+                           }
+                        },
+                        {
+                           "type": "koinos::protocol::create_system_contract_operation",
+                           "value": {
+                              "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                              "bytecode": "z7C2VTyPuYsLx",
+                              "extensions": {}
+                           }
+                        }
+                     ]
                   },
-                  "passive_data" : {},
-                  "signature_data" : "z23Ap51zkyD67RAyeyr",
-                  "operations" : [
-                     {
-                        "type" : "koinos::protocol::reserved_operation",
-                        "value" : {
-                           "extensions" : {}
-                        }
-                     },
-                     {
-                        "type" : "koinos::protocol::nop_operation",
-                        "value" : {
-                           "extensions" : {}
-                        }
-                     },
-                     {
-                        "type" : "koinos::protocol::create_system_contract_operation",
-                        "value" : {
-                           "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                           "bytecode" : "z7C2VTyPuYsLx",
-                           "extensions" : {}
-                        }
-                     }
-                  ]
-               },
-               {
-                  "opaque" : {
-                     "type" : "koinos::protocol::transaction",
-                     "value" : "z4J725obzBtuEy6g4NWm2oht9s"
-                  }
+                  "passive_data": {}
                }
             ]
          },
-         "verify_passive_data" : true,
-         "verify_block_signature" : true,
-         "verify_transaction_signatures" : true
+         "verify_passive_data": true,
+         "verify_block_signature": true,
+         "verify_transaction_signatures": true
       }
    },
    {
-      "type" : "rpc::chain::submit_transaction_request",
-      "json" : {
-         "topology" : {
-            "id" : {
-               "hash" : 70,
-               "digest" : "zX2hqfMCMBn3dV"
-            }
-         },
-         "transaction" : {
+      "type": "rpc::chain::submit_transaction_request",
+      "json": {
+         "transaction": {
+            "id": "z3396kz2ywyU8s",
             "active_data": {
-               "resource_limit": "3480523478260483267"
+               "resource_limit": "3480523478260483267",
+               "nonce": 1,
+               "operations": [
+                  {
+                     "type": "koinos::protocol::reserved_operation",
+                     "value": {
+                        "extensions": {}
+                     }
+                  },
+                  {
+                     "type": "koinos::protocol::nop_operation",
+                     "value": {
+                        "extensions": {}
+                     }
+                  },
+                  {
+                     "type": "koinos::protocol::create_system_contract_operation",
+                     "value": {
+                        "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
+                        "bytecode": "z7C2VTyPuYsLx",
+                        "extensions": {}
+                     }
+                  }
+               ]
             },
-            "passive_data" : {},
-            "signature_data" : "zXoAa5DbgvuAbW",
-            "operations" :[
-               {
-                  "type" : "koinos::protocol::reserved_operation",
-                  "value" : {
-                     "extensions" : {}
-                  }
-               },
-               {
-                  "type" : "koinos::protocol::nop_operation",
-                  "value" : {
-                     "extensions" : {}
-                  }
-               },
-               {
-                  "type" : "koinos::protocol::create_system_contract_operation",
-                  "value" : {
-                     "contract_id" : "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
-                     "bytecode" : "z7C2VTyPuYsLx",
-                     "extensions" : {}
-                  }
-               }
-            ]
+            "passive_data": {},
+            "signature_data": "z7C2VTyPuYsLx"
          },
-         "verify_passive_data" : true,
-         "verify_transaction_signatures" : true
+         "verify_passive_data": true,
+         "verify_transaction_signatures": true
       }
    },
    {
-      "type" : "rpc::chain::submit_block_response",
-      "json" : {}
+      "type": "rpc::chain::submit_block_response",
+      "json": {}
    },
    {
-      "type" : "rpc::chain::submit_transaction_response",
-      "json" : {}
+      "type": "rpc::chain::submit_transaction_response",
+      "json": {}
    }
 ]

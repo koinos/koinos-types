@@ -1,4 +1,4 @@
-
+#ifdef JSON_ENABLED
 #include <boost/test/unit_test.hpp>
 
 #include <koinos/tests/pack_fixture.hpp>
@@ -315,19 +315,33 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    json j;
    to_json( j, to_j );
 
-   std::string expected = "{\"digest\":\"z31SRtpx1\",\"hash\":1}";
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\x01\x06\x04\x08\x0f\x10\x17\x2a' | base58; echo
+   std::string expected = "\"zAvtuU8Lw8u\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    multihash from_j;
    from_json( j, from_j );
    BOOST_REQUIRE_EQUAL( to_j.digest.size(), from_j.digest.size() );
+
+   j = std::string("zkpt6ajQywrZ");
+   try
+   {
+      from_json( j, from_j );
+      BOOST_REQUIRE( false );
+   }
+   catch( json_type_mismatch& e )
+   {
+      BOOST_REQUIRE_EQUAL( e.what(), "Multihash JSON had extra bytes" );
+   }
+
    for( size_t i = 0; i < to_j.digest.size(); ++i )
    {
       BOOST_REQUIRE_EQUAL( to_j.digest[i], from_j.digest[i] );
    }
 
    to_j.digest.clear();
-   to_j.id = 4640;
+   to_j.id = 0x1220;
    hex_to_vector( to_j.digest, {
       0xBA, 0x78, 0x16, 0xBF, 0x8F, 0x01, 0xCF, 0xEA,
       0x41, 0x41, 0x40, 0xDE, 0x5D, 0xAE, 0x22, 0x23,
@@ -336,38 +350,11 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    } );
 
    to_json( j, to_j );
-   expected = "{\"digest\":\"zDYu3G8aGTMBW1WrTw76zxQJQU4DHLw9MLyy7peG4LKkY\",\"hash\":4640}";
+
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\xa0\x24\x20\xba\x78\x16\xbf\x8f\x01\xcf\xea\x41\x41\x40\xde\x5d\xae\x22\x23\xb0\x03\x61\xa3\x96\x17\x7a\x9c\xb4\x10\xff\x61\xf2\x00\x15\xad' | base58; echo
+   expected = "\"zGymuoch75iSPbDGPsMPFA5QTVJxkGY5Qz4eiTLNbkJY9EvMA\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
-}
-
-BOOST_AUTO_TEST_CASE( multihash_vector_test )
-{
-   multihash_vector to_j;
-   to_j.id = 1;
-   variable_blob digest_a;
-   digest_a = { 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
-   variable_blob digest_b;
-   digest_b = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-   to_j.digests.push_back( digest_a );
-   to_j.digests.push_back( digest_b );
-
-   json j;
-   to_json( j, to_j );
-
-   std::string expected = "{\"digests\":[\"z31SRtpx1\",\"zW7LcTy7\"],\"hash\":1}";
-   BOOST_REQUIRE_EQUAL( j.dump(), expected );
-
-   multihash_vector from_j;
-   from_json( j, from_j );
-   BOOST_REQUIRE_EQUAL( to_j.id, from_j.id );
-   BOOST_REQUIRE_EQUAL( to_j.digests.size(), from_j.digests.size() );
-   BOOST_REQUIRE_EQUAL( to_j.digests[0].size(), from_j.digests[0].size() );
-   BOOST_REQUIRE_EQUAL( to_j.digests[1].size(), from_j.digests[1].size() );
-   for( size_t i = 0; i < to_j.digests[0].size(); ++i )
-   {
-      BOOST_REQUIRE_EQUAL( to_j.digests[0][i], from_j.digests[0][i] );
-      BOOST_REQUIRE_EQUAL( to_j.digests[1][i], from_j.digests[1][i] );
-   }
 }
 
 BOOST_AUTO_TEST_CASE( reflect_test )
@@ -380,7 +367,9 @@ BOOST_AUTO_TEST_CASE( reflect_test )
 
    json j;
    to_json( j, to_j );
-   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":{\"digest\":\"zt1Zv2yaZ\",\"hash\":1},\"vals\":[108]}";
+   // Expected string generated using Python base58 (pip install base58) as follows:
+   // echo -n z; echo -ne '\x01\x06foobar' | base58; echo
+   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    test_object from_j;
@@ -399,7 +388,6 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
    // Empty set<T>           should be []
    // Empty array< T, N >    should be []
    // Empty optional         should be null
-   // Empty multihash_vector should be {"digests":[],"hash":0}
    // Empty struct           should be {}
    //
    std::string json_earray = "[]";
@@ -411,14 +399,12 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
    std::set< uint32_t >      empty_set;
    std::array< uint32_t, 0 > empty_array;
    std::optional< uint32_t > empty_optional;
-   multihash_vector          empty_mhv;
    extensions                empty_struct;
 
    { json j; to_json( j, empty_vector   ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_set      ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_array    ); BOOST_REQUIRE_EQUAL( j.dump(), json_earray  ); }
    { json j; to_json( j, empty_optional ); BOOST_REQUIRE_EQUAL( j.dump(), json_null    ); }
-   { json j; to_json( j, empty_mhv      ); BOOST_REQUIRE_EQUAL( j.dump(), json_emhv    ); }
    { json j; to_json( j, empty_struct   ); BOOST_REQUIRE_EQUAL( j.dump(), json_eobject ); }
 }
 
@@ -437,3 +423,4 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
 */
 
 BOOST_AUTO_TEST_SUITE_END()
+#endif
