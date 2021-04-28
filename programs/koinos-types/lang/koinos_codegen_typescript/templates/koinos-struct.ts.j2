@@ -1,8 +1,5 @@
-{% set className = ts_name(decl["name"]) %}import { 
-  {% for dep in dependencies %}{{dep}},
-  {% endfor%}VariableBlob
-} from "./basetypes";
-
+{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep[0]}} } from "{{dep[1]}}";
+{% endfor%}
 export interface Json{{className}} { {% for field in decl["fields"]%}
   {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
 }
@@ -10,20 +7,34 @@ export interface Json{{className}} { {% for field in decl["fields"]%}
 export class {{className}} {
   {% for field in decl["fields"]%}public {{field["name"]}}: {{typeref(field["tref"])}};
   
-  {% endfor %}constructor(json?: Json{{className}}) { {% for field in decl["fields"] %}
+  {% endfor %}constructor(
+    json: Json{{className}} = { {% for field in decl["fields"]%}
+      {{field["name"]}}: undefined,{% endfor %}
+    }
+  ) { {% for field in decl["fields"] %}
     this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});{% endfor %}
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    const vb = blob || new VariableBlob();{% for field in decl["fields"] %}
+    const vb = blob || new VariableBlob(this.calcSerializedSize());{% for field in decl["fields"] %}
     vb.serialize(this.{{field["name"]}});{% endfor %}
-    if (!blob) vb.flip();
+    if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): {{className}} {
     {% for field in decl["fields"] %}const {{field["name"]}} = vb.deserialize({{typeref(field["tref"])}});
     {% endfor %}return new {{className}}({ {% for field in decl["fields"] %}{{field["name"]}}{% if not loop.last %},{% endif%} {% endfor %}});
+  }
+
+  calcSerializedSize(): number {
+    return {% for field in decl["fields"] %}this.{{field["name"]}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
+  {{"    " if not loop.last}}{{"}" if loop.last}}{% endfor %}
+
+  toJSON(): Json{{className}} {
+    return { {% for field in decl["fields"] %}
+      {{field["name"]}}: this.{{field["name"]}}.toJSON(),{% endfor %}
+    };
   }
 }
 

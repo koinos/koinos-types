@@ -132,11 +132,14 @@ def typereflike(tref):
       return "VariableBlobLike"
     return "Json" + typeref(tref)
 
-def get_dependencies(decl):
-    dep = set()
+def get_dependencies(decl, name):
+    dep = []
+    dep.append(["VariableBlob", path({ "name": ["koinos", "variable_blob"]}, name)])
     for field in decl["fields"]:
-        dep.add(typereflike(field["tref"]))
-        dep.add(typeref(field["tref"]))
+        className = ts_name(field["tref"]["name"][-1])
+        pathFile = path(field["tref"], name)
+        dep.append([className, pathFile])
+        dep.append([typereflike(field["tref"]), pathFile])
     return dep
 
 def get_dependencies2(decl, name):
@@ -358,8 +361,8 @@ def generate_typescript(schema):
     #    j2_template = env.get_template(template_name)
     for name, decl in decls_by_name.items():
         if decl["info"]["type"] == "Struct":
-            dependencies = get_dependencies(decl)
             out_filename = path_ts_file(name) + ".ts"
+            dependencies = get_dependencies(decl, out_filename)
             result_files[out_filename] = j2_template_struct.render({
                 "decl": decl,
                 "dependencies" : dependencies, 
