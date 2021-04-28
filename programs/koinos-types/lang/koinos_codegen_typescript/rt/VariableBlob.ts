@@ -16,7 +16,7 @@ export interface KoinosClass {
 }
 
 export interface KoinosClassBuilder<T extends KoinosClass> {
-  new (json?: any, blobSize?: number): T;
+  new (json?: unknown, blobSize?: number): T;
   deserialize(vb: VariableBlob, blobSize?: number): T;
 }
 
