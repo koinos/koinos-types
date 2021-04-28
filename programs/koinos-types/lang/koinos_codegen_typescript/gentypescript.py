@@ -72,7 +72,10 @@ def path(decl, relativeTo = "."):
     filename = ts_name(decl["name"][-1])
     folders = decl["name"][1+i:-1]
     if len(folders) == 0 and i == 0:
-        folders.insert(0, "common")
+        if isBaseType(decl["name"][-1]):
+            folders.insert(0, "basetypes")
+        else:
+            folders.insert(0, "common")
     for i in range(len(folders)):
         folders[i] = folders[i].replace("_","")
     pathFromRoot = "/".join(folders)
@@ -86,7 +89,10 @@ def path_ts_file(name):
     filename = ts_name(p[-1])
     folders = p[1:-1]
     if len(folders) == 0:
-        folders.insert(0, "common")
+        if isBaseType(p[-1]):
+            folders.insert(0, "basetypes")
+        else:
+            folders.insert(0, "common")
     for i in range(len(folders)):
         folders[i] = folders[i].replace("_","")
     return "/".join(folders) + "/" + filename
@@ -101,6 +107,15 @@ def typeref(tref):
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
+
+def isBaseType(name):
+    if name in ['vector', 'variant', 'string', 'boolean',
+    'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32',
+    'int64', 'uint64', 'int128', 'uint128', 'int160', 'uint160',
+    'int256', 'uint256', 'multihash', 'variable_blob',
+    'fixed_blob', 'timestamp_type','block_height_type', 'opaque']:
+      return True
+    return False
 
 def typereflike(tref):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
@@ -126,8 +141,8 @@ def get_dependencies(decl):
 
 def get_dependencies2(decl, name):
     dep = []
-    dep.append(["Variant", path({ "name": ["koinos", "basetypes", "variant"]}, name)])
-    dep.append(["KoinosClass", path({ "name": ["koinos", "basetypes", "variable_blob"]}, name)])
+    dep.append(["Variant", path({ "name": ["std", "variant"]}, name)])
+    dep.append(["KoinosClass", path({ "name": ["koinos", "variable_blob"]}, name)])
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
         pathFile = path(arg, name)
