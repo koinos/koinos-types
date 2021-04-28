@@ -145,7 +145,7 @@ typedef void_type apply_reserved_operation_return;
 
 struct apply_execute_contract_operation_args
 {
-   protocol::contract_call_operation op;
+   protocol::call_contract_operation op;
 };
 
 typedef void_type apply_execute_contract_operation_return;
