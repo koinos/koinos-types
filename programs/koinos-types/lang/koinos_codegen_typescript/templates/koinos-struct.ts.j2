@@ -1,7 +1,7 @@
-{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep[0]}} } from "{{dep[1]}}";
+{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export interface Json{{className}} { {% for field in decl["fields"]%}
-  {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
+  {{field["name"]}}: {{typereflike(field["tref"])[0]}};{% endfor %}
 }
 
 export class {{className}} {
