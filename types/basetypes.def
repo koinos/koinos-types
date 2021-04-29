@@ -1,6 +1,7 @@
 KOINOS_BASETYPE( std::vector )
 KOINOS_BASETYPE( std::variant )
 KOINOS_BASETYPE( std::string )
+KOINOS_BASETYPE( std::optional )
 KOINOS_BASETYPE( koinos::boolean )
 KOINOS_BASETYPE( koinos::int8 )
 KOINOS_BASETYPE( koinos::uint8 )
