@@ -115,6 +115,20 @@ def typeref(tref):
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
 
+def typeref_constructor(tref):
+    if tref["name"][-1] == "opaque":
+        return "Opaque(" + typeref(tref["targs"][0]) +", "
+    if tref["name"][-1] == "vector":
+        return "Vector(" + typeref(tref["targs"][0]) +", "
+    return typeref(tref) + "("
+
+def deserializeType(tref):
+    if tref["name"][-1] == "opaque":
+        return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").getNative()"
+    if tref["name"][-1] == "vector":
+        return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").items"
+    return "deserialize(" + typeref(tref) + ")"
+
 def isBaseType(name):
     if name in ['vector', 'variant', 'string', 'boolean',
     'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32',
@@ -131,14 +145,18 @@ def typereflike(tref):
       'int128', 'uint128', 'int160', 'uint160',
       'int256', 'uint256', 'block_height_type',
       'timestamp_type']:
-        return ["NumberLike", { "name": ["koinos", "number"]}]
+        return "NumberLike"
     if tref["name"][-1] == "string":
-        return ["StringLike", { "name": ["koinos", "string"]}]
+        return "StringLike"
     if tref["name"][-1] == "boolean":
-        return ["BooleanLike", { "name": ["koinos", "boolean"]}]
+        return "BooleanLike"
     if tref["name"][-1] in ['variable_blob', 'fixed_blob']:
-        return ["VariableBlobLike", { "name": ["koinos", "variable_blob"]}]
-    return ["Json" + typeref(tref), tref]
+        return "VariableBlobLike"
+    if tref["name"][-1] == "vector":
+        return typereflike(tref["targs"][0]) + "[]"
+    if tref["name"][-1] == "opaque":
+        return typereflike(tref["targs"][0])
+    return "Json" + ts_name(tref["name"][-1])
 
 def insertJsonlikeDependency(deps, className, tref, nameRef):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
@@ -154,6 +172,9 @@ def insertJsonlikeDependency(deps, className, tref, nameRef):
     elif tref["name"][-1] in ['variable_blob', 'fixed_blob']:
         deps = insertDependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     elif tref["name"][-1] == "opaque":
+        className = ts_name(tref["targs"][0]["name"][-1])
+        deps = insertJsonlikeDependency(deps, className, tref["targs"][0], nameRef)
+    elif tref["name"][-1] == "vector":
         className = ts_name(tref["targs"][0]["name"][-1])
         deps = insertJsonlikeDependency(deps, className, tref["targs"][0], nameRef)
     else:
@@ -184,22 +205,19 @@ def insertDependency(deps, className, tref, nameRef, insertJsonlike = True):
 
 def get_dependencies(decl, nameRef):
     dep = []
-    d = set()
-    d.add("VariableBlob")
-    dep.append([d, path({ "name": ["koinos", "variable_blob"]}, nameRef)])
+    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     for field in decl["fields"]:
         className = ts_name(field["tref"]["name"][-1])
         dep = insertDependency(dep, className, field["tref"], nameRef)
     return dep
 
-def get_dependencies2(decl, name):
+def get_dependencies2(decl, nameRef):
     dep = []
-    dep.append(["Variant", path({ "name": ["std", "variant"]}, name)])
-    dep.append(["KoinosClass", path({ "name": ["koinos", "variable_blob"]}, name)])
+    dep = insertDependency(dep, "Variant", { "name": ["std", "variant"]}, nameRef, False)
+    dep = insertDependency(dep, "KoinosClass", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
-        pathFile = path(arg, name)
-        dep.append([className, pathFile])
+        dep = insertDependency(dep, className, arg, nameRef, False)
     return dep
 
 
@@ -418,7 +436,10 @@ def generate_typescript(schema):
                 "dependencies" : dependencies, 
                 "ts_name" : ts_name,
                 "typeref": typeref,
+                "typeref_constructor": typeref_constructor,
                 "typereflike": typereflike,
+                "deserializeType": deserializeType,
+                "len": len,
             })
         elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
             out_filename = path_ts_file(name) + ".ts"
@@ -428,7 +449,6 @@ def generate_typescript(schema):
                 "dependencies" : dependencies,
                 "ts_name" : ts_name,
                 "typeref": typeref,
-                "typereflike": typereflike,
                 "len": len,
             })
             #print(out_filename)

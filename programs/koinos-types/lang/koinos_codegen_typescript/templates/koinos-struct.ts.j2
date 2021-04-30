@@ -1,7 +1,7 @@
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export interface Json{{className}} { {% for field in decl["fields"]%}
-  {{field["name"]}}: {{typereflike(field["tref"])[0]}};{% endfor %}
+  {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
 }
 
 export class {{className}} {
@@ -12,7 +12,7 @@ export class {{className}} {
       {{field["name"]}}: undefined,{% endfor %}
     }
   ) { {% for field in decl["fields"] %}
-    this.{{field["name"]}} = new {{typeref(field["tref"])}}(json.{{field["name"]}});{% endfor %}
+    this.{{field["name"]}} = new {{typeref_constructor(field["tref"])}}json.{{field["name"]}});{% endfor %}
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -23,13 +23,13 @@ export class {{className}} {
   }
 
   static deserialize(vb: VariableBlob): {{className}} {
-    {% for field in decl["fields"] %}const {{field["name"]}} = vb.deserialize({{typeref(field["tref"])}});
+    {% for field in decl["fields"] %}const {{field["name"]}} = vb.{{deserializeType(field["tref"])}};
     {% endfor %}return new {{className}}({ {% for field in decl["fields"] %}{{field["name"]}}{% if not loop.last %},{% endif%} {% endfor %}});
   }
 
   calcSerializedSize(): number {
     return {% for field in decl["fields"] %}this.{{field["name"]}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
-  {{"    " if not loop.last}}{{"}" if loop.last}}{% endfor %}
+  {% endfor %}{{"0;" if len(decl["fields"]) == 0 }} }
 
   toJSON(): Json{{className}} {
     return { {% for field in decl["fields"] %}

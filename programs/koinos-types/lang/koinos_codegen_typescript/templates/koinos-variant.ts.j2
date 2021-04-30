@@ -1,4 +1,4 @@
-{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{dep[0]}} } from "{{dep[1]}}";
+{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export class {{className}} extends Variant<
 {%- for arg in decl["tref"]["targs"] %}
