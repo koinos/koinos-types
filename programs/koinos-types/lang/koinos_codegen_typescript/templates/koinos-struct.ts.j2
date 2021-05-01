@@ -1,39 +1,46 @@
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export interface Json{{className}} { {% for field in decl["fields"]%}
-  {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
+  {{camelCase(field["name"])}}: {{typereflike(field["tref"])}};{% endfor %}
 }
 
 export class {{className}} {
-  {% for field in decl["fields"]%}public {{field["name"]}}: {{typeref(field["tref"])}};
+  {% for field in decl["fields"]%}public {{camelCase(field["name"])}}: {{typeref(field["tref"])}};
   
   {% endfor %}constructor(
+    {% if len(decl["fields"]) > 0 %}
     json: Json{{className}} = { {% for field in decl["fields"]%}
-      {{field["name"]}}: undefined,{% endfor %}
-    }
+      {{camelCase(field["name"])}}: undefined,{% endfor %}
+    } {% endif %}
   ) { {% for field in decl["fields"] %}
-    this.{{field["name"]}} = new {{typeref_constructor(field["tref"])}}json.{{field["name"]}});{% endfor %}
+    this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}json.{{camelCase(field["name"])}});{% endfor %}
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());{% for field in decl["fields"] %}
-    vb.serialize(this.{{field["name"]}});{% endfor %}
+    vb.serialize(this.{{camelCase(field["name"])}});{% endfor %}
     if (!blob) vb.resetCursor();
     return vb;
   }
 
   static deserialize(vb: VariableBlob): {{className}} {
-    {% for field in decl["fields"] %}const {{field["name"]}} = vb.{{deserializeType(field["tref"])}};
-    {% endfor %}return new {{className}}({ {% for field in decl["fields"] %}{{field["name"]}}{% if not loop.last %},{% endif%} {% endfor %}});
+    {% for field in decl["fields"] %}const {{camelCase(field["name"])}} = vb.{{deserializeType(field["tref"])}};
+    {% endfor %}return new {{className}}(
+      {% if len(decl["fields"]) > 0 %}
+      { 
+        {% for field in decl["fields"] %}{{camelCase(field["name"])}}{% if not loop.last %},{% endif%} {% endfor %}
+      }
+      {% endif %}
+    );
   }
 
   calcSerializedSize(): number {
-    return {% for field in decl["fields"] %}this.{{field["name"]}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
+    return {% for field in decl["fields"] %}this.{{camelCase(field["name"])}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
   {% endfor %}{{"0;" if len(decl["fields"]) == 0 }} }
 
   toJSON(): Json{{className}} {
     return { {% for field in decl["fields"] %}
-      {{field["name"]}}: this.{{field["name"]}}.toJSON(),{% endfor %}
+      {{camelCase(field["name"])}}: this.{{camelCase(field["name"])}}.toJSON(){{" as "+typereflike(field["tref"]) if field["tref"]["name"][-1] == "vector"}},{% endfor %}
     };
   }
 }

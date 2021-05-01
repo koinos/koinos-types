@@ -27,6 +27,10 @@ def cpp_namespace(name):
         return ""
     return "::".join(u[:-1])
 
+def camelCase(name):
+    u = name.replace("_", " ").title().replace(" ", "")
+    return u[0].lower() + u[1:]
+
 def ts_name(name):
     if name == 'boolean':
         return 'Bool'
@@ -34,11 +38,12 @@ def ts_name(name):
         return 'Str'
     if name == 'number':
         return 'Num'
+    if name == 'varint':
+        return 'VarInt'
 
     u = name
 
     # Fix integer naming
-    if u.startswith("ui"): u = "u_i" + u[2:]
     if u.endswith("_t"): u = u[-2:]
 
     # Convert to pascal case
@@ -110,7 +115,7 @@ def typeref(tref):
     if tref["name"][-1] == "vector":
         return "Vector<" + typeref(tref["targs"][0]) +">"
     if tref["name"][-1] == "fixed_blob":
-        return "FixedBlob"# + typeref(tref["targs"][0])
+        return "FixedBlob" + str(typeref(tref["targs"][0]))
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
@@ -135,7 +140,7 @@ def isBaseType(name):
     'int64', 'uint64', 'int128', 'uint128', 'int160', 'uint160',
     'int256', 'uint256', 'multihash', 'variable_blob',
     'fixed_blob', 'timestamp_type','block_height_type', 'opaque',
-    'number']:
+    'number', 'varint']:
       return True
     return False
 
@@ -213,8 +218,8 @@ def get_dependencies(decl, nameRef):
 
 def get_dependencies2(decl, nameRef):
     dep = []
-    dep = insertDependency(dep, "Variant", { "name": ["std", "variant"]}, nameRef, False)
-    dep = insertDependency(dep, "KoinosClass", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insertDependency(dep, "VarInt", { "name": ["koinos", "varint"]}, nameRef, False)
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
         dep = insertDependency(dep, className, arg, nameRef, False)
@@ -435,6 +440,7 @@ def generate_typescript(schema):
                 "decl": decl,
                 "dependencies" : dependencies, 
                 "ts_name" : ts_name,
+                "camelCase" : camelCase,
                 "typeref": typeref,
                 "typeref_constructor": typeref_constructor,
                 "typereflike": typereflike,

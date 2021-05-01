@@ -1,19 +1,43 @@
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
-export class {{className}} extends Variant<
-{%- for arg in decl["tref"]["targs"] %}
-{%- set arg_type = typeref(arg) %}
-		{{arg_type}},
-{%- endfor %}
-{%- for i in range(10 - len(decl["tref"]["targs"])) %}
-    KoinosClass{{"," if not loop.last}}
-{%- endfor %}
-> {
-  constructor(value = new {{typeref(decl["tref"]["targs"][0])}}()) {
-    super(value, [{%- for arg in decl["tref"]["targs"] %}
-      {{typeref(arg)}}{{", " if not loop.last}}{%- endfor %}
-    ],[{%- for arg in decl["tref"]["targs"] %}
-      "{{"::".join(arg["name"])}}"{{", " if not loop.last}}{%- endfor %}
-    ]);
+
+export type {{className}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
+  {%- endfor %};
+
+export class {{className}} {
+  public value: {{className}}Value;
+
+  constructor( value: {{className}}Value = new {{typeref(decl["tref"]["targs"][0])}}()) {
+    this.value = value;
+  }
+
+  serialize(blob?: VariableBlob): VariableBlob {
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    let i: number;
+    {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (this.value instanceof {{typeref(arg)}}) i = {{loop.index - 1}};
+    {% endfor %}else throw new Error("Unknown variant type");
+    vb.serialize(new VarInt(i));
+    vb.serialize(this.value);
+    if (!blob) vb.resetCursor();
+    return vb;
+  }
+
+  static deserialize(vb: VariableBlob): {{className}} {
+    const i = vb.deserialize(VarInt).toNumber();
+    let value: {{className}}Value;
+    {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (i === {{loop.index -1}}) value = vb.deserialize({{typeref(arg)}});
+    {% endfor %}else throw new Error("Could not deserialize variant tag");
+    return new {{className}}(value);
+  }
+
+  calcSerializedSize(): number {
+    return 1 + this.value.calcSerializedSize();
+  }
+
+  typeToName(): string {
+    {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (this.value instanceof {{typeref(arg)}}) return "{{"::".join(arg["name"])}}";
+    {% endfor %}else throw new Error("Unknown variant type");
   }
 }
+
+export default {{className}};
