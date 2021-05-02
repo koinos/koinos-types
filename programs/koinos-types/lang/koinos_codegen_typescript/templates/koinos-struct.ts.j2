@@ -8,10 +8,9 @@ export class {{className}} {
   {% for field in decl["fields"]%}public {{camelCase(field["name"])}}: {{typeref(field["tref"])}};
   
   {% endfor %}constructor(
-    {% if len(decl["fields"]) > 0 %}
     json: Json{{className}} = { {% for field in decl["fields"]%}
       {{camelCase(field["name"])}}: undefined,{% endfor %}
-    } {% endif %}
+    }
   ) { {% for field in decl["fields"] %}
     this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}json.{{camelCase(field["name"])}});{% endfor %}
   }

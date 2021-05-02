@@ -1,4 +1,16 @@
-{% set className = ts_name(decl["name"]) %}{% set rName = typeref(decl["tref"]) %}import { {{rName}} } from "./basetypes";
+{% set className = ts_name(decl["name"]) %}{%- set rName = typeref(decl["tref"])-%}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
+{% endfor %}
 
-export class {{className}} extends {{rName}} {}
+export class {{className}} extends {{rName}} {
+  constructor(value: {{typereflike(decl["tref"])}}) {
+    super(value{{", " + str(decl["tref"]["targs"][0]["value"]) if rName == "FixedBlob"}});
+  }
+
+  static deserialize(vb: VariableBlob): {{className}}{
+    return {% if rName == "VariableBlob" %} vb.deserializeVariableBlob(); {% 
+            elif rName == "FixedBlob"    %} {{rName}}.deserialize(vb, {{decl["tref"]["targs"][0]["value"]}}); {%
+            else                         %} {{rName}}.deserialize(vb); {% endif %}
+  }
+}
+
 export default {{className}};

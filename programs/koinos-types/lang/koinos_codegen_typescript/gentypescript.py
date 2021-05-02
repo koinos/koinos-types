@@ -114,8 +114,8 @@ def typeref(tref):
         return tref["value"]
     if tref["name"][-1] == "vector":
         return "Vector<" + typeref(tref["targs"][0]) +">"
-    if tref["name"][-1] == "fixed_blob":
-        return "FixedBlob" + str(typeref(tref["targs"][0]))
+    #if tref["name"][-1] == "fixed_blob":
+    #    return "FixedBlob" + str(typeref(tref["targs"][0]))
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
@@ -208,7 +208,7 @@ def insertDependency(deps, className, tref, nameRef, insertJsonlike = True):
         deps = insertJsonlikeDependency(deps, className, tref, nameRef)
     return deps
 
-def get_dependencies(decl, nameRef):
+def get_dependencies_struct(decl, nameRef):
     dep = []
     dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     for field in decl["fields"]:
@@ -216,13 +216,20 @@ def get_dependencies(decl, nameRef):
         dep = insertDependency(dep, className, field["tref"], nameRef)
     return dep
 
-def get_dependencies2(decl, nameRef):
+def get_dependencies_variant(decl, nameRef):
     dep = []
     dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     dep = insertDependency(dep, "VarInt", { "name": ["koinos", "varint"]}, nameRef, False)
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
         dep = insertDependency(dep, className, arg, nameRef, False)
+    return dep
+
+def get_dependencies_typedef(decl, nameRef):
+    className = ts_name(decl["tref"]["name"][-1])
+    dep = []
+    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insertDependency(dep, className, decl["tref"], nameRef)
     return dep
 
 
@@ -435,7 +442,7 @@ def generate_typescript(schema):
     for name, decl in decls_by_name.items():
         if decl["info"]["type"] == "Struct":
             out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies(decl, out_filename)
+            dependencies = get_dependencies_struct(decl, out_filename)
             result_files[out_filename] = j2_template_struct.render({
                 "decl": decl,
                 "dependencies" : dependencies, 
@@ -449,7 +456,7 @@ def generate_typescript(schema):
             })
         elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
             out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies2(decl, out_filename)
+            dependencies = get_dependencies_variant(decl, out_filename)
             result_files[out_filename] = j2_template_variant.render({
                 "decl": decl,
                 "dependencies" : dependencies,
@@ -460,11 +467,14 @@ def generate_typescript(schema):
             #print(out_filename)
         elif decl["info"]["type"] == "Typedef":
             out_filename = path_ts_file(name) + ".ts"
+            dependencies = get_dependencies_typedef(decl, out_filename)
             result_files[out_filename] = j2_template_typedef.render({
                 "decl": decl,
+                "dependencies" : dependencies,
                 "ts_name" : ts_name,
                 "typeref": typeref,
                 "typereflike": typereflike,
+                "str": str,
             })
             # print(out_filename)
         #else:
