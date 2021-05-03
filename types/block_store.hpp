@@ -16,7 +16,7 @@ struct block_item
    /**
     * The block data.  If return_block_blob is false, block_blob will be empty.
     */
-   opaque< protocol::block >             block;
+   std::optional< protocol::block >      block;
 
    /**
     * The block data.  If return_receipt_blob is false, block_receipt_blob will be empty.
