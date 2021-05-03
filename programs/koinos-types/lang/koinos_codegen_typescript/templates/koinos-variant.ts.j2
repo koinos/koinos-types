@@ -4,11 +4,18 @@
 export type {{className}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
   {%- endfor %};
 
+export type {{className}}Like = {{className}} | {{className}}Value | {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}Like{{" |" if not loop.last}}
+  {%- endfor %};
+
 export class {{className}} {
   public value: {{className}}Value;
 
-  constructor( value: {{className}}Value = new {{typeref(decl["tref"]["targs"][0])}}()) {
-    this.value = value;
+  constructor( value: {{className}} | {{className}}Value = new {{typeref(decl["tref"]["targs"][0])}}()) {
+    if (value instanceof {{className}}) {
+      this.value = value.value;
+    } else {
+      this.value = value;
+    }
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -32,6 +39,10 @@ export class {{className}} {
 
   calcSerializedSize(): number {
     return 1 + this.value.calcSerializedSize();
+  }
+
+  toJSON(): {{className}}Like {
+    return this.value.toJSON();
   }
 
   typeToName(): string {

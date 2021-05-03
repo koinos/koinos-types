@@ -1,18 +1,22 @@
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
-export interface Json{{className}} { {% for field in decl["fields"]%}
+export type {{className}}Like = {{className}} | { {% for field in decl["fields"]%}
   {{camelCase(field["name"])}}: {{typereflike(field["tref"])}};{% endfor %}
-}
+};
 
 export class {{className}} {
   {% for field in decl["fields"]%}public {{camelCase(field["name"])}}: {{typeref(field["tref"])}};
   
   {% endfor %}constructor(
-    json: Json{{className}} = { {% for field in decl["fields"]%}
+    value: {{className}}Like = { {% for field in decl["fields"]%}
       {{camelCase(field["name"])}}: undefined,{% endfor %}
     }
-  ) { {% for field in decl["fields"] %}
-    this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}json.{{camelCase(field["name"])}});{% endfor %}
+  ) { 
+    if (value instanceof {{className}}) { {% for field in decl["fields"] %}
+      this.{{camelCase(field["name"])}} = value.{{camelCase(field["name"])}};{% endfor %}
+    } else { {% for field in decl["fields"] %}
+      this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}value.{{camelCase(field["name"])}});{% endfor %}
+    }
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
@@ -37,9 +41,9 @@ export class {{className}} {
     return {% for field in decl["fields"] %}this.{{camelCase(field["name"])}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
   {% endfor %}{{"0;" if len(decl["fields"]) == 0 }} }
 
-  toJSON(): Json{{className}} {
+  toJSON(): {{className}}Like {
     return { {% for field in decl["fields"] %}
-      {{camelCase(field["name"])}}: this.{{camelCase(field["name"])}}.toJSON(){{" as "+typereflike(field["tref"]) if field["tref"]["name"][-1] == "vector"}},{% endfor %}
+      {{camelCase(field["name"])}}: this.{{camelCase(field["name"])}}.toJSON(){{" as "+typereflike(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque"]}},{% endfor %}
     };
   }
 }

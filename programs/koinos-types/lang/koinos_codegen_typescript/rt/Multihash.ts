@@ -2,7 +2,7 @@ import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { VarInt } from "./VarInt";
 import { NumberLike } from "./Num";
 
-export interface JsonMultihash {
+export type MultihashLike = Multihash | {
   id: NumberLike;
   digest: VariableBlobLike;
 }
@@ -13,13 +13,18 @@ export class Multihash {
   public digest: VariableBlob;
 
   constructor(
-    json: JsonMultihash = {
+    value: MultihashLike = {
       id: undefined,
       digest: undefined,
     }
   ) {
-    this.id = new VarInt(json.id);
-    this.digest = new VariableBlob(json.digest);
+    if (value instanceof Multihash) {
+      this.id = value.id;
+      this.digest = value.digest;
+    } else {
+      this.id = new VarInt(value.id);
+      this.digest = new VariableBlob(value.digest);
+    }
   }
 
   equals(m: Multihash): boolean {
@@ -53,7 +58,7 @@ export class Multihash {
     return this.id.calcSerializedSize() + this.digest.calcSerializedSize();
   }
 
-  toJSON(): JsonMultihash {
+  toJSON(): MultihashLike {
     return {
       id: this.id.toJSON(),
       digest: this.digest.toJSON(),

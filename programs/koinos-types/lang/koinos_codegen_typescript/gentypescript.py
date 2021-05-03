@@ -161,7 +161,7 @@ def typereflike(tref):
         return typereflike(tref["targs"][0]) + "[]"
     if tref["name"][-1] == "opaque":
         return typereflike(tref["targs"][0])
-    return "Json" + ts_name(tref["name"][-1])
+    return ts_name(tref["name"][-1]) + "Like"
 
 def insertJsonlikeDependency(deps, className, tref, nameRef):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
@@ -183,7 +183,7 @@ def insertJsonlikeDependency(deps, className, tref, nameRef):
         className = ts_name(tref["targs"][0]["name"][-1])
         deps = insertJsonlikeDependency(deps, className, tref["targs"][0], nameRef)
     else:
-        deps = insertDependency(deps, "Json" + className, tref, nameRef, False)
+        deps = insertDependency(deps, className + "Like", tref, nameRef, False)
 
     return deps
 
@@ -222,7 +222,7 @@ def get_dependencies_variant(decl, nameRef):
     dep = insertDependency(dep, "VarInt", { "name": ["koinos", "varint"]}, nameRef, False)
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
-        dep = insertDependency(dep, className, arg, nameRef, False)
+        dep = insertDependency(dep, className, arg, nameRef)
     return dep
 
 def get_dependencies_typedef(decl, nameRef):
