@@ -3,6 +3,11 @@
 Vector{{v_type}}{{decl_vector(v_type)}}
 {%- endmacro -%}
 
+{%- macro optional(tref) -%}
+{%- set o_type = typeref(tref["targs"][0]) -%}
+Optional{{o_type}}{{decl_optional(o_type)}}
+{%- endmacro -%}
+
 {%- macro template(targs) -%}
 <
 {%- for arg in targs -%}
@@ -665,6 +670,45 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 
 {% endfor %}
 {% endmacro -%}
+
+{%- macro generate_optionals() -%}
+{% for v_type in get_optionals() -%}
+{%- set o_type = "Optional" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+// {{o_type}} type
+type {{o_type}} struct {
+	Value *{{v_type}}
+}
+
+// New{{o_type}} factory
+func New{{o_type}}() *{{o_type}} {
+	o := {{o_type}}{}
+	return &o
+}
+
+func (n {{o_type}}) HasValue() bool {
+	return n.Value != nil
+}
+
+// Serialize {{o_type}}
+func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+	v byte = 0
+	if n.HasValue() {
+		v = 1
+	}
+
+	ovb := append(*vb, v)
+	vb = &ovb
+	
+	vb = n.Value.Serialize(vb)
+	return vb
+}
+
+{% endfor -%}
+{% endmacro %}
 
 //   ____                           _           _    ____          _
 //  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| |  / ___|___   __| | ___

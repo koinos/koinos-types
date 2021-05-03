@@ -16,6 +16,7 @@ import re
 fixed_blobs = set()
 opaque = set()
 vectors = set()
+optionals = set()
 
 class RenderError(Exception):
     pass
@@ -87,6 +88,15 @@ def get_vectors():
     v_list = list(vectors)
     v_list.sort()
     return v_list
+
+def decl_optional(o_type):
+    optionals.add(o_type)
+    return ""
+
+def get_optionals():
+    o_list = list(optionals)
+    o_list.sort()
+    return o_list
 
 def is_struct(targ, decls_by_name):
     ns = "::"
