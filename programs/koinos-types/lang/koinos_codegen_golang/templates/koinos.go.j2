@@ -720,6 +720,23 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
 	return 1, &o, nil
 }
 
+func (n {{o_type}}) MarshalJSON() ([]byte, error) {
+	return json.Marshal(n.Value)
+}
+
+func (n *{{o_type}}) UnmarshalJSON(b []byte) error {
+	var v *{{v_type}}
+	err := json.Unmarshal(b, &v)
+	if err != nil {
+		return err
+	}
+
+	no := New{{o_type}}()
+	no.Value = v
+	*n = *no
+	return nil
+}
+
 {% endfor -%}
 {% endmacro %}
 
