@@ -33,6 +33,7 @@ Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 {%- macro typeref(tref) -%}
 {%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- elif tref["name"][-1] == "optional" -%}{{optional(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
 {%- elif tref["name"][-1] == "opaque" -%}{{opaque(tref)}}
 {%- elif tref["name"][-1] == "boolean" -%}Boolean
@@ -695,16 +696,28 @@ func (n {{o_type}}) HasValue() bool {
 
 // Serialize {{o_type}}
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
-	v byte = 0
 	if n.HasValue() {
-		v = 1
+		ovb := append(*vb, 1)
+		vb = &ovb
+		vb = n.Value.Serialize(vb)
+	} else {
+		ovb := append(*vb, 0)
+		vb = &ovb
 	}
 
-	ovb := append(*vb, v)
-	vb = &ovb
-	
-	vb = n.Value.Serialize(vb)
 	return vb
+}
+
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
+	o := {{o_type}}{}
+	if (*vb)[0] == 1 {
+		ovb := (*vb)[1:]
+		size, v, err := Deserialize{{v_type}}(&ovb)
+		o.Value = v
+		return size + 1, &o, err
+	}
+
+	return 1, &o, nil
 }
 
 {% endfor -%}
@@ -739,3 +752,4 @@ import (
 {{generate_fixed_blobs()}}
 {{generate_opaques()}}
 {{generate_vectors()}}
+{{generate_optionals()}}

@@ -187,6 +187,7 @@ good_bytes = {
     "std::vector" : "0x00",
     "std::variant" : "0x00",
     "std::string" : "0x00",
+    "std::optional" : "0x00",
     "koinos::boolean" : "0x00",
     "koinos::int8" : "0x00",
     "koinos::uint8" : "0x00",
@@ -257,6 +258,8 @@ def generate_golang(schema):
            "get_opaque" : get_opaque,
            "decl_vector": decl_vector,
            "get_vectors": get_vectors,
+           "decl_optional": decl_optional,
+           "get_optionals": get_optionals,
            "is_struct_impl" : is_struct,
            "get_bad_bytes_impl" : get_bad_bytes,
            "is_empty_struct_impl" : is_empty_struct
