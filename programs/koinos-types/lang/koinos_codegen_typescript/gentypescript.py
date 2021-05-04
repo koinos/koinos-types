@@ -232,6 +232,9 @@ def get_dependencies_typedef(decl, nameRef):
     dep = insertDependency(dep, className, decl["tref"], nameRef)
     return dep
 
+def get_dependencies_enum(decl, nameRef):
+    return get_dependencies_typedef(decl, nameRef)
+
 
 def decl_fixed_blob(length):
     fixed_blobs.add(length)
@@ -434,8 +437,9 @@ def generate_typescript(schema):
         # "koinos_test.ts.j2"
         ]
     j2_template_struct = env.get_template("koinos-struct.ts.j2")
-    j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
     j2_template_variant = env.get_template("koinos-variant.ts.j2")
+    j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
+    j2_template_enum = env.get_template("koinos-enum.ts.j2")
 
     #for template_name in template_names:
     #    j2_template = env.get_template(template_name)
@@ -469,6 +473,17 @@ def generate_typescript(schema):
             out_filename = path_ts_file(name) + ".ts"
             dependencies = get_dependencies_typedef(decl, out_filename)
             result_files[out_filename] = j2_template_typedef.render({
+                "decl": decl,
+                "dependencies" : dependencies,
+                "ts_name" : ts_name,
+                "typeref": typeref,
+                "typereflike": typereflike,
+                "str": str,
+            })
+        elif decl["info"]["type"] == "EnumClass":
+            out_filename = path_ts_file(name) + ".ts"
+            dependencies = get_dependencies_enum(decl, out_filename)
+            result_files[out_filename] = j2_template_enum.render({
                 "decl": decl,
                 "dependencies" : dependencies,
                 "ts_name" : ts_name,

@@ -1,8 +1,9 @@
 {% set className = ts_name(decl["name"]) %}{%- set rName = typeref(decl["tref"])-%}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor %}
+export type {{className}}Like = {{typereflike(decl["tref"])}};
 
 export class {{className}} extends {{rName}} {
-  constructor(value: {{typereflike(decl["tref"])}}) {
+  constructor(value: {{className}}Like) {
     super(value{{", " + str(decl["tref"]["targs"][0]["value"]) if rName == "FixedBlob"}});
   }
 

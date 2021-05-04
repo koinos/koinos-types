@@ -1,0 +1,31 @@
+{% set className = ts_name(decl["name"]) %}{%- set rName = typeref(decl["tref"])-%}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
+{% endfor %}
+
+{%- for entry in decl["entries"] %}export const {{ts_name(entry["name"])}} = {{entry["value"]}};
+{%- endfor %}
+
+export type {{className}}Like = {{typereflike(decl["tref"])}};
+
+export function isValid{{className}}(value: {{className}}Like): boolean {
+  return ({%- for entry in decl["entries"] %}value === {{entry["value"]}}{{" || " if not loop.last }}
+    {% endfor %});
+}
+
+export class {{className}} extends {{rName}} {
+  constructor(value: {{className}}Like = {{decl["entries"][0]["value"]}}) {
+    super(value);
+  }
+
+  serialize(blob?: VariableBlob): VariableBlob {
+    if (!isValid{{className}}(this.num))
+      throw new Error("Attempting to serialize an invalid value");
+    const vb = blob || new VariableBlob(this.calcSerializedSize());
+    vb.serialize(new {{rName}}(this.num));
+    if (!blob) vb.resetCursor();
+    return vb;
+  }
+
+  static deserialize(vb: VariableBlob): {{className}}{
+    return {{rName}}.deserialize(vb);
+  }
+}
