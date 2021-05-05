@@ -690,6 +690,7 @@ func New{{o_type}}() *{{o_type}} {
 	return &o
 }
 
+// HasValue returns whether or not this optional contains a value
 func (n {{o_type}}) HasValue() bool {
 	return n.Value != nil
 }
@@ -708,9 +709,10 @@ func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 	return vb
 }
 
+// Deserialize{{o_type}} function
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
 	if len(*vb) == 0 {
-		return 0, nil, errors.New("Could not parse {{o_type}}, not enough data.")
+		return 0, nil, errors.New("could not parse {{o_type}}, not enough data")
 	}
 
 	o := {{o_type}}{}
@@ -724,10 +726,12 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
 	return 1, &o, nil
 }
 
+// MarshalJSON {{o_type}}
 func (n {{o_type}}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(n.Value)
 }
 
+// UnmarshalJSON {{o_type}}
 func (n *{{o_type}}) UnmarshalJSON(b []byte) error {
 	var v *{{v_type}}
 	err := json.Unmarshal(b, &v)
