@@ -709,6 +709,10 @@ func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 }
 
 func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
+	if len(*vb) == 0 {
+		return 0, nil, errors.New("Could not parse {{o_type}}, not enough data.")
+	}
+
 	o := {{o_type}}{}
 	if (*vb)[0] == 1 {
 		ovb := (*vb)[1:]
