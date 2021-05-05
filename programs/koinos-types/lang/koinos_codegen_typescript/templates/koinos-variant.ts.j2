@@ -4,17 +4,29 @@
 export type {{className}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
   {%- endfor %};
 
-export type {{className}}Like = {{className}} | {{className}}Value | {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}Like{{" |" if not loop.last}}
-  {%- endfor %};
+export type {{className}}Like = {{className}} | {{className}}Value | {
+  type: string;
+  value: {%- for arg in decl["tref"]["targs"] %} {{typereflike(arg)}}{{" |" if not loop.last}}
+  {%- endfor %}
+}
 
 export class {{className}} {
   public value: {{className}}Value;
 
-  constructor( value: {{className}} | {{className}}Value = new {{typeref(decl["tref"]["targs"][0])}}()) {
+  constructor(
+    value: {{className}}Like = {
+      type: "{{"::".join(decl["tref"]["targs"][0]["name"])}}",
+      value: undefined
+    }
+  ) {
     if (value instanceof {{className}}) {
       this.value = value.value;
-    } else {
+    } else if ({%- for arg in decl["tref"]["targs"] %}value instanceof {{typeref(arg)}}{{" ||" if not loop.last}}
+  {%- endfor %}) {
       this.value = value;
+    } else {
+      {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if(value.type === "{{"::".join(arg["name"])}}") this.value = new {{typeref(arg)}}(value.value as {{typeref(arg)}}Like);
+      {% endfor %}else throw new Error(`Unknown variant type ${value.type}`);
     }
   }
 
@@ -41,13 +53,16 @@ export class {{className}} {
     return 1 + this.value.calcSerializedSize();
   }
 
-  toJSON(): {{className}}Like {
-    return this.value.toJSON();
-  }
-
   typeToName(): string {
     {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (this.value instanceof {{typeref(arg)}}) return "{{"::".join(arg["name"])}}";
     {% endfor %}else throw new Error("Unknown variant type");
+  }
+
+  toJSON(): {{className}}Like {
+    return {
+      type: this.typeToName(),
+      value: this.value.toJSON(),
+    };
   }
 }
 

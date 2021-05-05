@@ -466,6 +466,7 @@ def generate_typescript(schema):
                 "dependencies" : dependencies,
                 "ts_name" : ts_name,
                 "typeref": typeref,
+                "typereflike": typereflike,
                 "len": len,
             })
             #print(out_filename)
