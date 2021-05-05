@@ -1,7 +1,12 @@
+/* Auto generated code
+ *
+ * Changes to this file may cause incorrect behavior and will be lost if
+ * the code is regenerated
+ */
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export type {{className}}Like = {{className}} | { {% for field in decl["fields"]%}
-  {{camelCase(field["name"])}}: {{typereflike(field["tref"])}};{% endfor %}
+  {{field["name"]}}: {{typereflike(field["tref"])}};{% endfor %}
 };
 
 export class {{className}} {
@@ -9,13 +14,13 @@ export class {{className}} {
   
   {% endfor %}constructor(
     value: {{className}}Like = { {% for field in decl["fields"]%}
-      {{camelCase(field["name"])}}: undefined,{% endfor %}
+      {{field["name"]}}: undefined,{% endfor %}
     }
   ) { 
     if (value instanceof {{className}}) { {% for field in decl["fields"] %}
       this.{{camelCase(field["name"])}} = value.{{camelCase(field["name"])}};{% endfor %}
     } else { {% for field in decl["fields"] %}
-      this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}value.{{camelCase(field["name"])}});{% endfor %}
+      this.{{camelCase(field["name"])}} = new {{typeref_constructor(field["tref"])}}value.{{field["name"]}});{% endfor %}
     }
   }
 
@@ -31,7 +36,8 @@ export class {{className}} {
     {% endfor %}return new {{className}}(
       {% if len(decl["fields"]) > 0 %}
       { 
-        {% for field in decl["fields"] %}{{camelCase(field["name"])}}{% if not loop.last %},{% endif%} {% endfor %}
+        {% for field in decl["fields"] %}{{field["name"]}}: {{camelCase(field["name"])}},
+        {% endfor %}
       }
       {% endif %}
     );
@@ -43,7 +49,7 @@ export class {{className}} {
 
   toJSON(): {{className}}Like {
     return { {% for field in decl["fields"] %}
-      {{camelCase(field["name"])}}: this.{{camelCase(field["name"])}}.toJSON(){{" as "+typereflike(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque"]}},{% endfor %}
+      {{field["name"]}}: this.{{camelCase(field["name"])}}.toJSON(){{" as "+typereflike(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque"]}},{% endfor %}
     };
   }
 }

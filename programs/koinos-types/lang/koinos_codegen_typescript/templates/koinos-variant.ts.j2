@@ -1,3 +1,8 @@
+/* Auto generated code
+ *
+ * Changes to this file may cause incorrect behavior and will be lost if
+ * the code is regenerated
+ */
 {% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 
@@ -54,8 +59,9 @@ export class {{className}} {
   }
 
   typeToName(): string {
-    {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (this.value instanceof {{typeref(arg)}}) return "{{"::".join(arg["name"])}}";
-    {% endfor %}else throw new Error("Unknown variant type");
+    {%- for arg in decl["tref"]["targs"] %}if (this.value instanceof {{typeref(arg)}})
+      return "{{"::".join(arg["name"])}}";{% endfor %}
+    throw new Error("Unknown variant type");
   }
 
   toJSON(): {{className}}Like {
