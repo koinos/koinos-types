@@ -3,36 +3,36 @@
  * Changes to this file may cause incorrect behavior and will be lost if
  * the code is regenerated
  */
-{% set className = ts_name(decl["name"]) %}{%- set rName = typeref(decl["tref"])-%}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
+{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor %}
 
-{%- for entry in decl["entries"] %}export const {{ts_name(entry["name"])}} = {{entry["value"]}};
-{%- endfor %}
+export type {{class_name}}Like = {{typeref_like(decl["tref"])}};
 
-export type {{className}}Like = {{typereflike(decl["tref"])}};
-
-export function isValid{{className}}(value: {{className}}Like): boolean {
-  return ({%- for entry in decl["entries"] %}value === {{ts_name(entry["name"])}}{{" || " if not loop.last }}
+export function isValid{{class_name}}(value: {{class_name}}Like): boolean {
+  return ({%- for entry in decl["entries"] %}value === {{class_name}}.{{ts_name(entry["name"])}}{{" || " if not loop.last }}
     {% endfor %});
 }
 
-export class {{className}} extends {{rName}} {
-  constructor(value: {{className}}Like = {{ts_name(decl["entries"][0]["name"])}}) {
-    if (!isValid{{className}}(value))
-      throw new Error(`Invalid {{className}} value ${value}`);
+export class {{class_name}} extends {{ref_name}} {
+  {%- for entry in decl["entries"] %}static {{ts_name(entry["name"])}} = {{entry["value"]}};
+  {%- endfor %}
+
+  constructor(value: {{class_name}}Like = {{class_name}}.{{ts_name(decl["entries"][0]["name"])}}) {
+    if (!isValid{{class_name}}(value))
+      throw new Error(`Invalid {{class_name}} value ${value}`);
     super(value);
   }
 
   serialize(blob?: VariableBlob): VariableBlob {
-    if (!isValid{{className}}(this.num))
+    if (!isValid{{class_name}}(this.num))
       throw new Error("Attempting to serialize an invalid value");
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    vb.serialize(new {{rName}}(this.num));
+    vb.serialize(new {{ref_name}}(this.num));
     if (!blob) vb.resetCursor();
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): {{className}}{
-    return {{rName}}.deserialize(vb);
+  static deserialize(vb: VariableBlob): {{class_name}}{
+    return {{ref_name}}.deserialize(vb);
   }
 }

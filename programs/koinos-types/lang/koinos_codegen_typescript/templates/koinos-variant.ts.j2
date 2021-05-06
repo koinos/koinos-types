@@ -3,28 +3,28 @@
  * Changes to this file may cause incorrect behavior and will be lost if
  * the code is regenerated
  */
-{% set className = ts_name(decl["name"]) %}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
+{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 
-export type {{className}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
+export type {{class_name}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
   {%- endfor %};
 
-export type {{className}}Like = {{className}} | {{className}}Value | {
+export type {{class_name}}Like = {{class_name}} | {{class_name}}Value | {
   type: string;
-  value: {%- for arg in decl["tref"]["targs"] %} {{typereflike(arg)}}{{" |" if not loop.last}}
+  value: {%- for arg in decl["tref"]["targs"] %} {{typeref_like(arg)}}{{" |" if not loop.last}}
   {%- endfor %}
 }
 
-export class {{className}} {
-  public value: {{className}}Value;
+export class {{class_name}} {
+  public value: {{class_name}}Value;
 
   constructor(
-    value: {{className}}Like = {
+    value: {{class_name}}Like = {
       type: "{{"::".join(decl["tref"]["targs"][0]["name"])}}",
       value: undefined
     }
   ) {
-    if (value instanceof {{className}}) {
+    if (value instanceof {{class_name}}) {
       this.value = value.value;
     } else if ({%- for arg in decl["tref"]["targs"] %}value instanceof {{typeref(arg)}}{{" ||" if not loop.last}}
   {%- endfor %}) {
@@ -46,12 +46,12 @@ export class {{className}} {
     return vb;
   }
 
-  static deserialize(vb: VariableBlob): {{className}} {
+  static deserialize(vb: VariableBlob): {{class_name}} {
     const i = vb.deserialize(VarInt).toNumber();
-    let value: {{className}}Value;
+    let value: {{class_name}}Value;
     {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if (i === {{loop.index -1}}) value = vb.deserialize({{typeref(arg)}});
     {% endfor %}else throw new Error("Could not deserialize variant tag");
-    return new {{className}}(value);
+    return new {{class_name}}(value);
   }
 
   calcSerializedSize(): number {
@@ -64,7 +64,7 @@ export class {{className}} {
     throw new Error("Unknown variant type");
   }
 
-  toJSON(): {{className}}Like {
+  toJSON(): {{class_name}}Like {
     return {
       type: this.typeToName(),
       value: this.value.toJSON(),
@@ -72,4 +72,4 @@ export class {{className}} {
   }
 }
 
-export default {{className}};
+export default {{class_name}};

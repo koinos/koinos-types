@@ -27,7 +27,7 @@ def cpp_namespace(name):
         return ""
     return "::".join(u[:-1])
 
-def camelCase(name):
+def camel_case(name):
     u = name.replace("_", " ").title().replace(" ", "")
     return u[0].lower() + u[1:]
 
@@ -84,7 +84,7 @@ def path(decl, relativeTo = "."):
     filename = ts_name(decl["name"][-1])
     folders = decl["name"][1+i:-1]
     if len(folders) == 0 and i == 0:
-        if isBaseType(decl["name"][-1]):
+        if is_basetype(decl["name"][-1]):
             folders.insert(0, "basetypes")
         else:
             folders.insert(0, "common")
@@ -101,7 +101,7 @@ def path_ts_file(name):
     filename = ts_name(p[-1])
     folders = p[1:-1]
     if len(folders) == 0:
-        if isBaseType(p[-1]):
+        if is_basetype(p[-1]):
             folders.insert(0, "basetypes")
         else:
             folders.insert(0, "common")
@@ -114,37 +114,11 @@ def typeref(tref):
         return tref["value"]
     if tref["name"][-1] == "vector":
         return "Vector<" + typeref(tref["targs"][0]) +">"
-    #if tref["name"][-1] == "fixed_blob":
-    #    return "FixedBlob" + str(typeref(tref["targs"][0]))
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
 
-def typeref_constructor(tref):
-    if tref["name"][-1] == "opaque":
-        return "Opaque(" + typeref(tref["targs"][0]) +", "
-    if tref["name"][-1] == "vector":
-        return "Vector(" + typeref(tref["targs"][0]) +", "
-    return typeref(tref) + "("
-
-def deserializeType(tref):
-    if tref["name"][-1] == "opaque":
-        return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").getNative()"
-    if tref["name"][-1] == "vector":
-        return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").items"
-    return "deserialize(" + typeref(tref) + ")"
-
-def isBaseType(name):
-    if name in ['vector', 'variant', 'string', 'boolean',
-    'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32',
-    'int64', 'uint64', 'int128', 'uint128', 'int160', 'uint160',
-    'int256', 'uint256', 'multihash', 'variable_blob',
-    'fixed_blob', 'timestamp_type','block_height_type', 'opaque',
-    'number', 'varint']:
-      return True
-    return False
-
-def typereflike(tref):
+def typeref_like(tref):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
       'uint16', 'int32', 'uint32', 'int64', 'uint64',
       'int128', 'uint128', 'int160', 'uint160',
@@ -158,36 +132,60 @@ def typereflike(tref):
     if tref["name"][-1] in ['variable_blob', 'fixed_blob']:
         return "VariableBlobLike"
     if tref["name"][-1] == "vector":
-        return typereflike(tref["targs"][0]) + "[]"
+        return typeref_like(tref["targs"][0]) + "[]"
     if tref["name"][-1] == "opaque":
-        return typereflike(tref["targs"][0])
+        return typeref_like(tref["targs"][0])
     return ts_name(tref["name"][-1]) + "Like"
 
-def insertJsonlikeDependency(deps, className, tref, nameRef):
+def typeref_constructor(tref):
+    if tref["name"][-1] == "opaque":
+        return "Opaque(" + typeref(tref["targs"][0]) +", "
+    if tref["name"][-1] == "vector":
+        return "Vector(" + typeref(tref["targs"][0]) +", "
+    return typeref(tref) + "("
+
+def deserialize_type(tref):
+    if tref["name"][-1] == "opaque":
+        return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").getNative()"
+    if tref["name"][-1] == "vector":
+        return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").items"
+    return "deserialize(" + typeref(tref) + ")"
+
+def is_basetype(name):
+    if name in ['vector', 'variant', 'string', 'boolean',
+    'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32',
+    'int64', 'uint64', 'int128', 'uint128', 'int160', 'uint160',
+    'int256', 'uint256', 'multihash', 'variable_blob',
+    'fixed_blob', 'timestamp_type','block_height_type', 'opaque',
+    'number', 'varint']:
+      return True
+    return False
+
+def insert_type_like_dependency(deps, className, tref, nameRef):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
       'uint16', 'int32', 'uint32', 'int64', 'uint64',
       'int128', 'uint128', 'int160', 'uint160',
       'int256', 'uint256', 'block_height_type',
       'timestamp_type']:
-        deps = insertDependency(deps, "NumberLike", { "name": ["koinos", "number"]}, nameRef, False)
+        deps = insert_dependency(deps, "NumberLike", { "name": ["koinos", "number"]}, nameRef, False)
     elif tref["name"][-1] == "string":
-        deps = insertDependency(deps, "StringLike", { "name": ["koinos", "string"]}, nameRef, False)
+        deps = insert_dependency(deps, "StringLike", { "name": ["koinos", "string"]}, nameRef, False)
     elif tref["name"][-1] == "boolean":
-        deps = insertDependency(deps, "BooleanLike", { "name": ["koinos", "boolean"]}, nameRef, False)
+        deps = insert_dependency(deps, "BooleanLike", { "name": ["koinos", "boolean"]}, nameRef, False)
     elif tref["name"][-1] in ['variable_blob', 'fixed_blob']:
-        deps = insertDependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+        deps = insert_dependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     elif tref["name"][-1] == "opaque":
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insertJsonlikeDependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
     elif tref["name"][-1] == "vector":
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insertJsonlikeDependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
     else:
-        deps = insertDependency(deps, className + "Like", tref, nameRef, False)
+        deps = insert_dependency(deps, className + "Like", tref, nameRef, False)
 
     return deps
 
-def insertDependency(deps, className, tref, nameRef, insertJsonlike = True):
+def insert_dependency(deps, className, tref, nameRef, insertJsonlike = True):
     pathFile = path(tref, nameRef)
     newPathFile = True
     for i in range(len(deps)):
@@ -201,35 +199,35 @@ def insertDependency(deps, className, tref, nameRef, insertJsonlike = True):
         deps.append([d, pathFile])
     if tref["name"][-1] in ['vector', 'opaque']:
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insertDependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_dependency(deps, className, tref["targs"][0], nameRef)
     
-    # typereflike
+    # typeref_like
     if insertJsonlike:
-        deps = insertJsonlikeDependency(deps, className, tref, nameRef)
+        deps = insert_type_like_dependency(deps, className, tref, nameRef)
     return deps
 
 def get_dependencies_struct(decl, nameRef):
     dep = []
-    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insert_dependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     for field in decl["fields"]:
         className = ts_name(field["tref"]["name"][-1])
-        dep = insertDependency(dep, className, field["tref"], nameRef)
+        dep = insert_dependency(dep, className, field["tref"], nameRef)
     return dep
 
 def get_dependencies_variant(decl, nameRef):
     dep = []
-    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
-    dep = insertDependency(dep, "VarInt", { "name": ["koinos", "varint"]}, nameRef, False)
+    dep = insert_dependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insert_dependency(dep, "VarInt", { "name": ["koinos", "varint"]}, nameRef, False)
     for arg in decl["tref"]["targs"]:
         className = ts_name(arg["name"][-1])
-        dep = insertDependency(dep, className, arg, nameRef)
+        dep = insert_dependency(dep, className, arg, nameRef)
     return dep
 
 def get_dependencies_typedef(decl, nameRef):
     className = ts_name(decl["tref"]["name"][-1])
     dep = []
-    dep = insertDependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
-    dep = insertDependency(dep, className, decl["tref"], nameRef)
+    dep = insert_dependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    dep = insert_dependency(dep, className, decl["tref"], nameRef)
     return dep
 
 def get_dependencies_enum(decl, nameRef):
@@ -413,21 +411,6 @@ def generate_typescript(schema):
     decls_by_name = collections.OrderedDict(((fq_name(name), decl) for name, decl in schema["decls"]))
     decl_namespaces = sorted(set(cpp_namespace(name) for name in decls_by_name))
 
-    ctx = {"schema" : schema,
-           "decls_by_name" : decls_by_name,
-           "decl_namespaces" : decl_namespaces,
-           "ts_name" : ts_name,
-           "decl_fixed_blob" : decl_fixed_blob,
-           "get_fixed_blobs" : get_fixed_blobs,
-           "decl_opaque" : decl_opaque,
-           "get_opaque" : get_opaque,
-           "decl_vector": decl_vector,
-           "get_vectors": get_vectors,
-           "is_struct_impl" : is_struct,
-           "get_bad_bytes_impl" : get_bad_bytes,
-           "is_empty_struct_impl" : is_empty_struct
-          }
-
     result = collections.OrderedDict()
     result_files = collections.OrderedDict()
     result["files"] = result_files
@@ -444,57 +427,41 @@ def generate_typescript(schema):
     #for template_name in template_names:
     #    j2_template = env.get_template(template_name)
     for name, decl in decls_by_name.items():
+        ctx = {
+            "decl": decl,
+            "dependencies" : [], 
+            "ts_name" : ts_name,
+            "camel_case" : camel_case,
+            "typeref": typeref,
+            "typeref_constructor": typeref_constructor,
+            "typeref_like": typeref_like,
+            "deserialize_type": deserialize_type,
+            "len": len,
+            "str": str,
+        }
+
+        out_filename = path_ts_file(name) + ".ts"
+        
         if decl["info"]["type"] == "Struct":
-            out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies_struct(decl, out_filename)
-            result_files[out_filename] = j2_template_struct.render({
-                "decl": decl,
-                "dependencies" : dependencies, 
-                "ts_name" : ts_name,
-                "camelCase" : camelCase,
-                "typeref": typeref,
-                "typeref_constructor": typeref_constructor,
-                "typereflike": typereflike,
-                "deserializeType": deserializeType,
-                "len": len,
-            })
+            ctx["class_name"] = ts_name(decl["name"])
+            ctx["dependencies"] = get_dependencies_struct(decl, out_filename)
+            result_files[out_filename] = j2_template_struct.render(ctx)
         elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
-            out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies_variant(decl, out_filename)
-            result_files[out_filename] = j2_template_variant.render({
-                "decl": decl,
-                "dependencies" : dependencies,
-                "ts_name" : ts_name,
-                "typeref": typeref,
-                "typereflike": typereflike,
-                "len": len,
-            })
-            #print(out_filename)
+            ctx["class_name"] = ts_name(decl["name"])
+            ctx["dependencies"] = get_dependencies_variant(decl, out_filename)
+            result_files[out_filename] = j2_template_variant.render(ctx)
         elif decl["info"]["type"] == "Typedef":
-            out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies_typedef(decl, out_filename)
-            result_files[out_filename] = j2_template_typedef.render({
-                "decl": decl,
-                "dependencies" : dependencies,
-                "ts_name" : ts_name,
-                "typeref": typeref,
-                "typereflike": typereflike,
-                "str": str,
-            })
+            ctx["class_name"] = ts_name(decl["name"])
+            ctx["ref_name"] = typeref(decl["tref"])
+            ctx["dependencies"] = get_dependencies_typedef(decl, out_filename)
+            result_files[out_filename] = j2_template_typedef.render(ctx)
         elif decl["info"]["type"] == "EnumClass":
-            out_filename = path_ts_file(name) + ".ts"
-            dependencies = get_dependencies_enum(decl, out_filename)
-            result_files[out_filename] = j2_template_enum.render({
-                "decl": decl,
-                "dependencies" : dependencies,
-                "ts_name" : ts_name,
-                "typeref": typeref,
-                "typereflike": typereflike,
-                "str": str,
-            })
-            # print(out_filename)
-        #else:
-            # print(decl["info"]["type"])
+            ctx["class_name"] = ts_name(decl["name"])
+            ctx["ref_name"] = typeref(decl["tref"])
+            ctx["dependencies"] = get_dependencies_enum(decl, out_filename)
+            result_files[out_filename] = j2_template_enum.render(ctx)
+        else:
+            print(decl["info"]["type"])
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):

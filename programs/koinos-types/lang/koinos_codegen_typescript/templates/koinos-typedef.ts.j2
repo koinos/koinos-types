@@ -1,17 +1,22 @@
-{% set className = ts_name(decl["name"]) %}{%- set rName = typeref(decl["tref"])-%}{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
+/* Auto generated code
+ *
+ * Changes to this file may cause incorrect behavior and will be lost if
+ * the code is regenerated
+ */
+{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor %}
-export type {{className}}Like = {{typereflike(decl["tref"])}};
+export type {{class_name}}Like = {{typeref_like(decl["tref"])}};
 
-export class {{className}} extends {{rName}} {
-  constructor(value: {{className}}Like) {
-    super(value{{", " + str(decl["tref"]["targs"][0]["value"]) if rName == "FixedBlob"}});
+export class {{class_name}} extends {{ref_name}} {
+  constructor(value: {{class_name}}Like) {
+    super(value{{", " + str(decl["tref"]["targs"][0]["value"]) if ref_name == "FixedBlob"}});
   }
 
-  static deserialize(vb: VariableBlob): {{className}}{
-    return {% if rName == "VariableBlob" %} vb.deserializeVariableBlob(); {% 
-            elif rName == "FixedBlob"    %} {{rName}}.deserialize(vb, {{decl["tref"]["targs"][0]["value"]}}); {%
-            else                         %} {{rName}}.deserialize(vb); {% endif %}
+  static deserialize(vb: VariableBlob): {{class_name}}{
+    return {% if ref_name == "VariableBlob" %} vb.deserializeVariableBlob(); {% 
+            elif ref_name == "FixedBlob"    %} {{ref_name}}.deserialize(vb, {{decl["tref"]["targs"][0]["value"]}}); {%
+            else                         %} {{ref_name}}.deserialize(vb); {% endif %}
   }
 }
 
-export default {{className}};
+export default {{class_name}};
