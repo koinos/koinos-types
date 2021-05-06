@@ -14,6 +14,7 @@ import re
 fixed_blobs = set()
 opaque = set()
 vectors = set()
+indexes = []
 
 class RenderError(Exception):
     pass
@@ -70,6 +71,24 @@ def ts_name(name):
             u += m.group(2)
 
     return u
+
+def index_type(index, parts):
+    if len(parts) == 1:
+        index.append(parts[0])
+        return
+    inserted = False
+    for i in range(len(index)):
+        if type(index[i]) == str:
+            continue
+        if index[i]["folder"] == parts[0]:
+            index_type(index[i]["files"], parts[1:])
+            inserted = True
+    if not inserted:
+        index.append({
+            "folder": parts[0],
+            "files": []
+        })
+        index_type(index[-1]["files"], parts[1:])
 
 def path(decl, relativeTo = "."):
     relative = relativeTo.split("/")
@@ -401,6 +420,17 @@ def get_good_bytes(targ, decls_by_name):
         return get_good_bytes(decls_by_name[type_name], decls_by_name)
 
 
+def generate_index_template(index, prefix, result_files, template):
+    items = []
+    for i in range(len(index)):
+        if type(index[i]) == str:
+            items.append(index[i])
+            continue
+        folder = index[i]["folder"] + "/"
+        items.append(index[i]["folder"])
+        generate_index_template(index[i]["files"], prefix + folder, result_files, template)
+    result_files[prefix + "index.ts"] = template.render({"items": items})
+
 def generate_typescript(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -415,17 +445,12 @@ def generate_typescript(schema):
     result_files = collections.OrderedDict()
     result["files"] = result_files
 
-    template_names = [
-        "koinos.ts.j2",
-        # "koinos_test.ts.j2"
-        ]
     j2_template_struct = env.get_template("koinos-struct.ts.j2")
     j2_template_variant = env.get_template("koinos-variant.ts.j2")
     j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
     j2_template_enum = env.get_template("koinos-enum.ts.j2")
+    j2_template_index = env.get_template("koinos-index.ts.j2")
 
-    #for template_name in template_names:
-    #    j2_template = env.get_template(template_name)
     for name, decl in decls_by_name.items():
         ctx = {
             "decl": decl,
@@ -441,6 +466,7 @@ def generate_typescript(schema):
         }
 
         out_filename = path_ts_file(name) + ".ts"
+        index_type(indexes, path_ts_file(name).split("/"))
         
         if decl["info"]["type"] == "Struct":
             ctx["class_name"] = ts_name(decl["name"])
@@ -462,6 +488,8 @@ def generate_typescript(schema):
             result_files[out_filename] = j2_template_enum.render(ctx)
         else:
             print(decl["info"]["type"])
+
+    generate_index_template(indexes, "", result_files, j2_template_index)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
