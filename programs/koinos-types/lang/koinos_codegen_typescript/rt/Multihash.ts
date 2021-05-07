@@ -2,10 +2,13 @@ import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { VarInt } from "./VarInt";
 import { NumberLike } from "./Num";
 
-export type MultihashLike = Multihash | {
-  id: NumberLike;
-  digest: VariableBlobLike;
-}
+export type MultihashLike =
+  | Multihash
+  | VariableBlobLike
+  | {
+      id: NumberLike;
+      digest: VariableBlobLike;
+    };
 
 export class Multihash {
   public id: VarInt;
@@ -14,16 +17,30 @@ export class Multihash {
 
   constructor(
     value: MultihashLike = {
-      id: undefined,
-      digest: undefined,
+      id: 0,
+      digest: "z",
     }
   ) {
+    const valueObj = value as {
+      id: NumberLike;
+      digest: VariableBlobLike;
+    };
+
     if (value instanceof Multihash) {
       this.id = value.id;
       this.digest = value.digest;
+    } else if (
+      typeof valueObj.id !== "undefined" &&
+      typeof valueObj.digest !== "undefined"
+    ) {
+      this.id = new VarInt(valueObj.id);
+      this.digest = new VariableBlob(valueObj.digest);
     } else {
-      this.id = new VarInt(value.id);
-      this.digest = new VariableBlob(value.digest);
+      const multihash = new VariableBlob(value as VariableBlobLike).deserialize(
+        Multihash
+      );
+      this.id = multihash.id;
+      this.digest = multihash.digest;
     }
   }
 
@@ -58,11 +75,8 @@ export class Multihash {
     return this.id.calcSerializedSize() + this.digest.calcSerializedSize();
   }
 
-  toJSON(): MultihashLike {
-    return {
-      id: this.id.toJSON(),
-      digest: this.digest.toJSON(),
-    };
+  toJSON(): string {
+    return this.serialize().toJSON();
   }
 }
 

@@ -46,10 +46,7 @@ describe("Koinos Types - Typescript", () => {
   it("Serialize and desearialize", () => {
     expect.assertions(29);
     const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
-    const multihash = new Multihash({
-      id: 123,
-      digest: "z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS",
-    });
+    const multihash = new Multihash("zHdxh1kBNvtADThNaTBNvDqyMwzJYi8x1Do7Vg");
     const jsonMultihashVector = {
       id: BigInt(1234),
       digests: [
@@ -123,9 +120,7 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
 
-    expect(JSONbig.stringify(multihash.toJSON())).toBe(
-      '{"id":123,"digest":"z36UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS"}'
-    );
+    expect(multihash.toJSON()).toBe("zHdxh1kBNvtADThNaTBNvDqyMwzJYi8x1Do7Vg");
   });
 
   it("should transform integers to json as number or string depending on value", () => {
