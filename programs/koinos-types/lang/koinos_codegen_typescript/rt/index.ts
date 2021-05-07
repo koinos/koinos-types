@@ -1,5 +1,4 @@
 export * from "./VariableBlob";
-export * from "./Variant";
 export * from "./FixedBlob";
 export * from "./Bool";
 export * from "./Str";
