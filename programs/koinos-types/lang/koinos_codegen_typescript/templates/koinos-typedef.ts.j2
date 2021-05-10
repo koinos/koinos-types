@@ -8,7 +8,7 @@
 export type {{class_name}}Like = {{typeref_like(decl["tref"])}};
 
 export class {{class_name}} extends {{ref_name}} {
-  constructor(value: {{class_name}}Like) {
+  constructor(value?: {{class_name}}Like) {
     super(value{{", " + str(decl["tref"]["targs"][0]["value"]) if ref_name == "FixedBlob"}});
   }
 

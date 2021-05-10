@@ -1,0 +1,14 @@
+import * as JSONbig from "json-bigint";
+import * as Koinos from "../koinos_protocol";
+
+describe("Koinos Types - Typedefs - Typescript", () => {
+  {% for type in types_typedef %}it("should serialize and deserialize {{type}}", () => {
+    expect.assertions(1);
+    const instance = new Koinos.{{type}}();
+    const vb = instance.serialize();
+    const json1 = instance.toJSON();
+    const json2 = vb.deserialize(Koinos.{{type}}).toJSON();
+    expect(JSONbig.stringify(json1)).toBe(JSONbig.stringify(json2));
+  });
+  {% endfor %}
+});

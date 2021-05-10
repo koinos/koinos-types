@@ -431,6 +431,11 @@ def generate_index_template(index, prefix, result_files, template):
         generate_index_template(index[i]["files"], prefix + folder, result_files, template)
     result_files[prefix + "index.ts"] = template.render({"items": items})
 
+def generate_basic_tests(types_typedef, result_files, template):
+    result_files["../tests/basic-tests.spec.ts"] = template.render({
+      "types_typedef": types_typedef
+    })
+
 def generate_typescript(schema):
     env = jinja2.Environment(
             loader=jinja2.PackageLoader(__package__, "templates"),
@@ -450,6 +455,9 @@ def generate_typescript(schema):
     j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
     j2_template_enum = env.get_template("koinos-enum.ts.j2")
     j2_template_index = env.get_template("koinos-index.ts.j2")
+    j2_template_basic_tests = env.get_template("koinos-basic-tests.ts.j2")
+
+    types_typedef = set()
 
     for name, decl in decls_by_name.items():
         ctx = {
@@ -469,27 +477,36 @@ def generate_typescript(schema):
         index_type(indexes, path_ts_file(name).split("/"))
         
         if decl["info"]["type"] == "Struct":
-            ctx["class_name"] = ts_name(decl["name"])
+            class_name = ts_name(decl["name"])
+            ctx["class_name"] = class_name
             ctx["dependencies"] = get_dependencies_struct(decl, out_filename)
             result_files[out_filename] = j2_template_struct.render(ctx)
+            types_typedef.add(class_name)
         elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
-            ctx["class_name"] = ts_name(decl["name"])
+            class_name = ts_name(decl["name"])
+            ctx["class_name"] = class_name
             ctx["dependencies"] = get_dependencies_variant(decl, out_filename)
             result_files[out_filename] = j2_template_variant.render(ctx)
+            types_typedef.add(class_name)
         elif decl["info"]["type"] == "Typedef":
-            ctx["class_name"] = ts_name(decl["name"])
+            class_name = ts_name(decl["name"])
+            ctx["class_name"] = class_name
             ctx["ref_name"] = typeref(decl["tref"])
             ctx["dependencies"] = get_dependencies_typedef(decl, out_filename)
             result_files[out_filename] = j2_template_typedef.render(ctx)
+            types_typedef.add(class_name)
         elif decl["info"]["type"] == "EnumClass":
-            ctx["class_name"] = ts_name(decl["name"])
+            class_name = ts_name(decl["name"])
+            ctx["class_name"] = class_name
             ctx["ref_name"] = typeref(decl["tref"])
             ctx["dependencies"] = get_dependencies_enum(decl, out_filename)
             result_files[out_filename] = j2_template_enum.render(ctx)
+            types_typedef.add(class_name)
         else:
             print(decl["info"]["type"])
 
     generate_index_template(indexes, "", result_files, j2_template_index)
+    generate_basic_tests(types_typedef, result_files, j2_template_basic_tests)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
