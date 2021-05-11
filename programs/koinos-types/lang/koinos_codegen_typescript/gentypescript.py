@@ -518,14 +518,10 @@ def generate_typescript(schema):
             result_files[relpath] = content
     return result
 
-def escape_json(obj):
-   import json
-   return json.dumps(obj).replace('"', '\\"')
-
 def generate_tests(test_data):
     import json
     env = jinja2.Environment(
-        loader=jinja2.PackageLoader(__package__, "templates"),
+        loader=jinja2.PackageLoader(__package__, "test"),
         keep_trailing_newline=True
     )
     test_cases = []
@@ -539,7 +535,7 @@ def generate_tests(test_data):
         else:
             typename = split_ns[0]
 
-        test_cases.append({"typename": typename, "json": escape_json(test['json'])})
+        test_cases.append({"typename": typename, "json": json.dumps(test['json'])})
 
     ctx = {"test_cases" : test_cases,
            "ts_name" : ts_name

@@ -7,6 +7,7 @@
 {% endfor%}
 export type {{class_name}}Like = {{class_name}} | { {% for field in decl["fields"]%}
   {{field["name"]}}?: {{typeref_like(field["tref"])}};{% endfor %}
+  [x: string]: unknown;
 };
 
 export class {{class_name}} {
