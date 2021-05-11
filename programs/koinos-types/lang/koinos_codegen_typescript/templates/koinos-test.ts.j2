@@ -1,0 +1,8 @@
+import * as JSONbig from "json-bigint";
+import * as Koinos from "../koinos_protocol";
+
+let t: unknown;
+
+{% for test in test_cases %}
+t = new Koinos.{{ts_name(test.typename)}}({{ test.json | replace('\\"', '"')}});
+{% endfor %}

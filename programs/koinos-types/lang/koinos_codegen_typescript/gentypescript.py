@@ -525,7 +525,7 @@ def escape_json(obj):
 def generate_tests(test_data):
     import json
     env = jinja2.Environment(
-        loader=jinja2.PackageLoader(__package__, "test"),
+        loader=jinja2.PackageLoader(__package__, "templates"),
         keep_trailing_newline=True
     )
     test_cases = []
@@ -542,11 +542,11 @@ def generate_tests(test_data):
         test_cases.append({"typename": typename, "json": escape_json(test['json'])})
 
     ctx = {"test_cases" : test_cases,
-           "go_name" : go_name
+           "ts_name" : ts_name
           }
 
-    return env.get_template("main.ts.j2").render(ctx), "test.ts"
+    return env.get_template("koinos-test.ts.j2").render(ctx), "tests/test.ts"
 
 def setup(app):
     app.register_target("typescript", generate_typescript)
-    # app.register_target("typescript_test", generate_tests)
+    app.register_target("typescript_test", generate_tests)

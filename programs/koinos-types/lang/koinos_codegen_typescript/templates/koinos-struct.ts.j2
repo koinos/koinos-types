@@ -6,7 +6,7 @@
 {% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
 export type {{class_name}}Like = {{class_name}} | { {% for field in decl["fields"]%}
-  {{field["name"]}}: {{typeref_like(field["tref"])}};{% endfor %}
+  {{field["name"]}}?: {{typeref_like(field["tref"])}};{% endfor %}
 };
 
 export class {{class_name}} {
