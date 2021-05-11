@@ -45,7 +45,7 @@
       }
    },
    {
-      "type": "protocol::contract_call_operation",
+      "type": "protocol::call_contract_operation",
       "json": {
          "contract_id": "ziDB9JN4o4N4w6QLNw8Y5iAHeHEf",
          "entry_point": 500,
