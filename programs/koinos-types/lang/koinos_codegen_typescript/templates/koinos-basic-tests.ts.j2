@@ -3,12 +3,14 @@ import * as Koinos from "../koinos_protocol";
 
 describe("Koinos Types - Typedefs - Typescript", () => {
   {% for type in types_typedef %}it("should serialize and deserialize {{type}}", () => {
-    expect.assertions(1);
+    expect.assertions(2);
     const instance = new Koinos.{{type}}();
     const vb = instance.serialize();
     const json1 = instance.toJSON();
     const json2 = vb.deserialize(Koinos.{{type}}).toJSON();
+    const json3 = new Koinos.{{type}}(JSON.parse(JSONbig.stringify(json1))).toJSON();
     expect(JSONbig.stringify(json1)).toBe(JSONbig.stringify(json2));
+    expect(JSONbig.stringify(json1)).toBe(JSONbig.stringify(json3));
   });
   {% endfor %}
 });
