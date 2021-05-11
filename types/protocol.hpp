@@ -24,7 +24,7 @@ struct set_system_call_operation
    unused_extensions_type         extensions;
 };
 
-struct contract_call_operation
+struct call_contract_operation
 {
    contract_id_type               contract_id;
    uint32                         entry_point;
@@ -36,7 +36,7 @@ typedef std::variant<
    reserved_operation,
    nop_operation,
    create_system_contract_operation,
-   contract_call_operation,
+   call_contract_operation,
    set_system_call_operation
    > operation;
 
