@@ -15,6 +15,7 @@ enum class system_call_id : uint32
    db_get_next_object = 0x99a398e8,
    db_get_prev_object = 0x9bd3767c,
    execute_contract = 0x98c12cfe,
+   get_entry_point = 0x9ff207dd,
    get_contract_args_size = 0x9b0d8fd9,
    get_contract_args = 0x9fbba198,
    set_contract_return = 0x9f49cdea,
@@ -48,6 +49,7 @@ enum class thunk_id : uint32
    db_get_next_object = 0x86e45047,
    db_get_prev_object = 0x8d57e8fd,
    execute_contract = 0x8a43fe83,
+   get_entry_point = 0x807eb765,
    get_contract_args_size = 0x83378e86,
    get_contract_args = 0x8e189d86,
    set_contract_return = 0x86b86275,
@@ -191,6 +193,10 @@ struct execute_contract_args
 };
 
 typedef variable_blob execute_contract_return;
+
+typedef void_type get_entry_point_args;
+
+typedef uint32 get_entry_point_return;
 
 typedef void_type get_contract_args_size_args;
 
