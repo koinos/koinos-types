@@ -129,40 +129,40 @@ class opaque
        */
       T& get_native()
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( !_blob, pack::opaque_locked, "Opaque type is not mutable." );
          return *_native;
       }
 
       const T& get_const_native() const
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
          return *_native;
       }
 
       T& operator*()
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( !_blob, pack::opaque_locked, "Opaque type is not mutable." );
          return *_native;
       }
 
       constexpr const T& operator*() const
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
          return *_native;
       }
 
       T* operator->()
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
-         if( _blob ) throw pack::opaque_locked( "Opaque type is not mutable." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( !_blob, pack::opaque_locked, "Opaque type is not mutable." );
          return &(*_native);
       }
 
       constexpr const T* operator->() const
       {
-         if( !_native ) throw pack::opaque_not_unboxed( "Opaque type not unboxed." );
+         KOINOS_PACK_ASSERT( _native, pack::opaque_not_unboxed, "Opaque type not unboxed." );
          return &(*_native);
       }
 

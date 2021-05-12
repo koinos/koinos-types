@@ -23,25 +23,21 @@ inline void to_json( json& j, const multihash& v )
 
 inline void from_json( const json& j, multihash& v, uint32_t depth )
 {
-   if( !(j.is_string()) ) throw json_type_mismatch( "Unexpected JSON type: string exptected" );
+   KOINOS_PACK_ASSERT( j.is_string(), json_type_mismatch, "Unexpected JSON type: string exptected" );
    std::string s = j.get<std::string>();
-   if( s.size() < 2 ) throw json_type_mismatch( "Multihash contains too few characters" );
+   KOINOS_PACK_ASSERT( !(s.size() < 2), json_type_mismatch, "Multihash contains too few characters" );
    // TODO:  Accept multicodecs other than 'z'
-   if( s[0] != 'z' ) throw json_type_mismatch( "Only z multicodec is supported for multihash" );
+   KOINOS_PACK_ASSERT( s[0] == 'z', json_type_mismatch, "Only z multicodec is supported for multihash" );
 
    std::vector<char> serialized_bytes;
 
-   if( !util::decode_base58( s.c_str()+1, serialized_bytes ) )
-      throw json_type_mismatch( "Multihash could not deserialize base58" );
+   KOINOS_PACK_ASSERT( util::decode_base58( s.c_str()+1, serialized_bytes ), json_type_mismatch, "Multihash could not deserialize base58" );
 
    std::string serialized_bytes_str( serialized_bytes.begin(), serialized_bytes.end() );
    std::stringstream ss(serialized_bytes_str);
 
    from_binary( ss, v );
-   if( ss.tellg() != serialized_bytes_str.size() )
-   {
-      throw json_type_mismatch( "Multihash JSON had extra bytes" );
-   }
+   KOINOS_PACK_ASSERT( ss.tellg() == serialized_bytes_str.size(), json_type_mismatch, "Multihash JSON had extra bytes" );
 }
 
 }

@@ -58,7 +58,12 @@ set(KOINOS_LIB_PKGCONFIG_INSTALL_DIR      "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 option(BUILD_TESTS "Build Tests" ON)
 option(JSON_ENABLED "Build C++ with JSON support" ON)
+option(EXCEPTIONS_ENABLED "Build Koinos Types with exception support" ON)
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
+
+if (EXCEPTIONS_ENABLED)
+  add_compile_definitions(EXCEPTIONS_ENABLED)
+endif()
 
 # This is to force color output when using ccache with Unix Makefiles
 if( ${FORCE_COLORED_OUTPUT} )

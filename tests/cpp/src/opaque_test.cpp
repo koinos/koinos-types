@@ -62,12 +62,16 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
+#ifdef EXCEPTIONS_ENABLED
    BOOST_CHECK_THROW( o.get_const_native(), opaque_not_unboxed );
+#endif
 
    o.unbox();
    BOOST_CHECK( o.is_unboxed() );
    BOOST_CHECK( !o.is_mutable() );
+#ifdef EXCEPTIONS_ENABLED
    BOOST_CHECK_THROW( o.get_native(), opaque_locked );
+#endif
    o.get_const_native();
 
    {
@@ -83,6 +87,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
 
 #ifdef JSON_ENABLED
+#ifdef EXCEPTIONS_ENABLED
    BOOST_TEST_MESSAGE( "Serialize binary and json" );
 
    auto to_blob = to_variable_blob( o );
@@ -98,6 +103,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    nlohmann::json actual_json;
    to_json( actual_json, o );
+   BOOST_TEST_MESSAGE( actual_json );
    BOOST_CHECK( actual_json == expected_json );
 
    expected_json["opaque"]["value"] = "z1111";
@@ -115,6 +121,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    from_json( expected_json, o );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), good_bin.begin(), good_bin.end() ) );
+#endif
 #endif
    BOOST_TEST_MESSAGE( "Check state transitions between boxed, unboxed, and mutable" );
 
@@ -196,7 +203,9 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
    o = bad_bin;
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( !o.is_mutable() );
+#ifdef EXCEPTIONS_ENABLED
    BOOST_CHECK_THROW( o.unbox(), std::runtime_error );
+#endif
    BOOST_CHECK( !o.is_unboxed() );
    BOOST_CHECK( std::equal( o.get_blob().begin(), o.get_blob().end(), bad_bin.begin(), bad_bin.end() ) );
 

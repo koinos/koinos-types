@@ -200,12 +200,14 @@ BOOST_AUTO_TEST_CASE( vector_test )
       to_binary( ss, int64_t(0) );
    }
 
+#ifdef EXCEPTIONS_ENABLED
    try
    {
       from_binary( ss, from_bin );
       BOOST_FAIL( "allocation_violation not thrown" );
    }
    catch( allocation_violation& ) {}
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( array_test )
@@ -235,11 +237,12 @@ BOOST_AUTO_TEST_CASE( array_test )
    }
 
    // Array alloction failure is checked statically, so it does not require a runtime test
-
+#ifdef EXCEPTIONS_ENABLED
    ss = std::stringstream();
    to_binary( ss, unsigned_int( 100 ) ); // Purposeful buffer overflow
    std::array< int16_t, 100 > large_array;
    BOOST_REQUIRE_THROW( from_binary( ss, large_array ), stream_error );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( variant_test )
@@ -290,12 +293,14 @@ BOOST_AUTO_TEST_CASE( variant_test )
    to_binary( ss, tag );
    to_binary( ss, int16_t( 10 ) );
 
+#ifdef EXCEPTIONS_ENABLED
    try
    {
       from_binary( ss, from_bin );
       BOOST_FAIL( "Unexpected tag did not throw exception" );
    }
    catch( parse_error& ) {}
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( optional_test )

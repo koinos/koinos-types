@@ -1,19 +1,43 @@
 #pragma once
 
-#include <stdexcept>
+#ifdef EXCEPTIONS_ENABLED
+   #include <stdexcept>
+#else
+   #include <cassert>
+#endif
 
 #define KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE (1024*1024*10)
 #define KOINOS_PACK_MAX_RECURSION_DEPTH  (20)
 
 namespace koinos::pack {
 
-#define KOINOS_PACK_DECLARE_EXCEPTION( exception ) \
-struct exception final : std::runtime_error        \
-{                                                  \
-   exception( const char* what_arg ) :             \
-      std::runtime_error( what_arg ) {};           \
-   virtual ~exception() override {}                \
-}
+#ifdef EXCEPTIONS_ENABLED
+   #define KOINOS_PACK_DECLARE_EXCEPTION( exception ) \
+   struct exception final : std::runtime_error        \
+   {                                                  \
+      exception( const char* what_arg ) :             \
+         std::runtime_error( what_arg ) {};           \
+      virtual ~exception() override {}                \
+   }
+
+   #define KOINOS_PACK_ASSERT( cond, exc_name, msg )  \
+   do {                                               \
+      if( !(cond) )                                   \
+      {                                               \
+         throw exc_name( msg );                       \
+      }                                               \
+   } while (0)
+#else
+   #define KOINOS_PACK_DECLARE_EXCEPTION( assertion )
+
+   #define KOINOS_PACK_ASSERT( cond, name, msg )      \
+   do {                                               \
+      if( !(cond) )                                   \
+      {                                               \
+         assert( #name ": " msg );                    \
+      }                                               \
+   } while (0)
+#endif
 
 /*
  * Generic serialization error. Any uses should consider being replaced

@@ -14,19 +14,19 @@
 #include <type_traits>
 #include <utility>
 
-#define KOINOS_DEFINE_NATIVE_INT_SERIALIZER( int_type )               \
-template< typename Stream >                                           \
-inline void to_binary( Stream& s, int_type t )                        \
-{                                                                     \
-   boost::endian::native_to_big_inplace( t );                         \
-   s.write( (const char*)&t, sizeof(t) );                             \
-}                                                                     \
-template< typename Stream >                                           \
-inline void from_binary( Stream& s, int_type& t, uint32_t depth )     \
-{                                                                     \
-   s.read( (char*)&t, sizeof(t) );                                    \
-   if( !(s.good()) ) throw stream_error( "Error reading from stream" );\
-   boost::endian::big_to_native_inplace( t );                         \
+#define KOINOS_DEFINE_NATIVE_INT_SERIALIZER( int_type )                       \
+template< typename Stream >                                                   \
+inline void to_binary( Stream& s, int_type t )                                \
+{                                                                             \
+   boost::endian::native_to_big_inplace( t );                                 \
+   s.write( (const char*)&t, sizeof(t) );                                     \
+}                                                                             \
+template< typename Stream >                                                   \
+inline void from_binary( Stream& s, int_type& t, uint32_t depth )             \
+{                                                                             \
+   s.read( (char*)&t, sizeof(t) );                                            \
+   KOINOS_PACK_ASSERT( s.good(), stream_error, "Error reading from stream" ); \
+   boost::endian::big_to_native_inplace( t );                                 \
 }
 
 #define KOINOS_DEFINE_BOOST_INT_SERIALIZER( int_type, hi_type, low_type, low_size ) \
@@ -113,7 +113,7 @@ inline void from_binary( Stream& s, bool& b, uint32_t depth )
 {
    uint8_t v;
    from_binary( s, v );
-   if( !(!(v&0xFE)) ) throw parse_error( "Bool value must only be 0 or 1" );
+   KOINOS_PACK_ASSERT( !(v&0xFE), parse_error, "Bool value must only be 0 or 1" );
 
    b = bool(v);
 }
@@ -164,7 +164,7 @@ inline void from_binary( Stream& s, unsigned_int& v,  uint32_t depth )
    do
    {
       s.get(chData);
-      if( !(s.good()) ) throw stream_error( "Error reading from stream" );
+      KOINOS_PACK_ASSERT( s.good(), stream_error, "Error reading from stream" );
       v.value |= (chData & 0x7f) << i;
       i += 7;
    } while( chData & 0x80 );
@@ -204,11 +204,11 @@ template< typename Stream, typename T >
 inline void from_binary( Stream& s, std::vector< T >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    unsigned_int size;
    from_binary( s, size );
-   if( !(size.value*sizeof(T) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Vector allocation exceeded" );
+   KOINOS_PACK_ASSERT( size.value * sizeof(T) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, allocation_violation, "Vector allocation exceeded" );
 
    v.clear();
    v.reserve( size.value );
@@ -234,11 +234,11 @@ template< typename Stream, typename T, typename Compare >
 inline void from_binary( Stream& s, std::set< T, Compare >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    unsigned_int size;
    from_binary( s, size );
-   if( !(size.value*sizeof(T) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Vector allocation exceeded" );
+   KOINOS_PACK_ASSERT( size.value * sizeof(T) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, allocation_violation, "Vector allocation exceeded" );
 
    v.clear();
    for( size_t i = 0; i < size.value; ++i )
@@ -246,7 +246,7 @@ inline void from_binary( Stream& s, std::set< T, Compare >& v, uint32_t depth )
       T tmp;
       from_binary( s, tmp, depth );
       auto res = v.emplace( std::move( tmp ) );
-      if( !(res.second) ) throw parse_error( "Duplicate value detected unpacking set" );
+      KOINOS_PACK_ASSERT( res.second, parse_error, "Duplicate value detected unpacking set" );
    }
 }
 */
@@ -265,11 +265,11 @@ inline void from_binary( Stream& s, variable_blob& v, uint32_t depth )
 {
    unsigned_int size;
    from_binary( s, size );
-   if( !(size.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Vector allocation exceeded" );
+   KOINOS_PACK_ASSERT( size.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, allocation_violation, "Vector allocation exceeded" );
 
    v.resize( size.value );
    s.read( v.data(), size.value );
-   if( !(s.good()) ) throw stream_error( "Error reading from stream" );
+   KOINOS_PACK_ASSERT( s.good(), stream_error, "Error reading from stream" );
 }
 
 // std::string serializes identically to vector< char >
@@ -285,11 +285,11 @@ inline void from_binary( Stream& s, std::string& v, uint32_t depth )
 {
    unsigned_int size;
    from_binary( s, size );
-   if( !(size.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Vector allocation exceeded" );
+   KOINOS_PACK_ASSERT( size.value < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, allocation_violation, "Vector allocation exceeded" );
 
    v.resize( size.value );
    s.read( v.data(), size.value );
-   if( !(s.good()) ) throw stream_error( "Error reading from stream" );
+   KOINOS_PACK_ASSERT( s.good(), stream_error, "Error reading from stream" );
 }
 
 /* Array< T, N >:
@@ -309,7 +309,7 @@ template< typename Stream, typename T, size_t N >
 inline void from_binary( Stream& s, std::array< T, N >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
    static_assert( N*sizeof(T) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, "Array allocation exceeded" );
 
    for( size_t i = 0; i < N; ++i )
@@ -330,7 +330,7 @@ template< typename Stream, size_t N >
 inline void from_binary( Stream& s, fixed_blob< N >& v, uint32_t depth )
 {
    s.read( v.data(), N );
-   if( !(s.good()) ) throw stream_error( "Error reading from stream" );
+   KOINOS_PACK_ASSERT( s.good(), stream_error, "Error reading from stream" );
 }
 
 /* Map< K, V >:
@@ -349,7 +349,7 @@ template< typename Stream, typename K, typename V >
 inline void from_binary( Stream& s, std::pair< K, V >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
    from_binary( s, v.first );
    from_binary( s, v.second );
 }
@@ -365,11 +365,11 @@ template< typename Stream, typename K, typename V >
 inline void from_binary( Stream& s, std::map< K, V >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    unsigned_int size;
    from_binary( s, size );
-   if( !(size.value*sizeof(std::pair<K,V>) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE) ) throw allocation_violation( "Vector allocation exceeded" );
+   KOINOS_PACK_ASSERT( size.value * sizeof( std::pair< K,V > ) < KOINOS_PACK_MAX_ARRAY_ALLOC_SIZE, allocation_violation, "Vector allocation exceeded" );
 
    v.clear();
    v.reserve( size.value );
@@ -397,7 +397,7 @@ template< typename Stream, typename... T >
 inline void from_binary( Stream& s, std::variant< T... >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    unsigned_int index;
    from_binary( s, index, depth );
@@ -422,7 +422,7 @@ template< typename Stream, typename T >
 inline void from_binary( Stream& s, std::optional< T >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    bool b;
    from_binary( s, b, depth );
@@ -443,7 +443,7 @@ template< typename Stream, typename T >
 inline void from_binary( Stream& s, opaque< T >& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
 
    variable_blob blob;
    from_binary( s, blob, depth );
@@ -539,8 +539,7 @@ namespace detail
 
          output_stringstream& write( const char* s, size_t n )
          {
-            if( !(_write_pos + n <= _length) )
-               throw stream_error( "Buffer overflow when serializing to a c string." );
+            KOINOS_PACK_ASSERT( _write_pos + n <= _length, stream_error, "Buffer overflow when serializing to a c string." );
 
             memcpy( _buffer + _write_pos, s, n );
             _write_pos += n;
@@ -565,7 +564,8 @@ namespace detail
             _error = false;
 
             size_t to_read = std::min( n, _length - _read_pos );
-            if( to_read < n ) _error = true;
+            if( to_read < n )
+               _error = true;
 
             memcpy( s, _buffer + _read_pos, to_read );
             _read_pos += to_read;
@@ -682,7 +682,7 @@ namespace detail
          static inline void from_binary( Stream& s, T& v, uint32_t depth )
          {
             depth++;
-            if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+            KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
             typename reflector< T >::enum_type temp;
             pack::from_binary(s, temp, depth);
             v = (T)temp;
@@ -701,7 +701,7 @@ template< typename Stream, typename T >
 inline void from_binary( Stream& s, T& v, uint32_t depth )
 {
    depth++;
-   if( !(depth <= KOINOS_PACK_MAX_RECURSION_DEPTH) ) throw depth_violation( "Unpack depth exceeded" );
+   KOINOS_PACK_ASSERT( depth <= KOINOS_PACK_MAX_RECURSION_DEPTH, depth_violation, "Unpack depth exceeded" );
    detail::binary::if_enum< typename reflector< T >::is_enum >::from_binary( s, v, depth );
 }
 

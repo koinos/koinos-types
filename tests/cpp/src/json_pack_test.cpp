@@ -29,8 +29,10 @@ BOOST_AUTO_TEST_CASE( integer_bounds )
    json j;
    j = json::parse( "4294967296" ); // 2^32
 
+#ifdef EXCEPTIONS_ENABLED
    int32_t from_j;
    BOOST_REQUIRE_THROW( from_json( j, from_j ), json_int_out_of_bounds );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( json_integer_bounds )
@@ -143,8 +145,10 @@ BOOST_AUTO_TEST_CASE( vector_test )
       BOOST_REQUIRE_EQUAL( to_j[i], from_j[i] );
    }
 
+#ifdef EXCEPTIONS_ENABLED
    j = json::parse( "[\"foo\",\"bar\"]" );
    BOOST_REQUIRE_THROW( from_json( j, from_j ), std::exception );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( array_test )
@@ -165,11 +169,13 @@ BOOST_AUTO_TEST_CASE( array_test )
       BOOST_REQUIRE_EQUAL( to_j[i], from_j[i] );
    }
 
+#ifdef EXCEPTIONS_ENABLED
    j = json::parse( "[4,8,15,16,23,42,108]") ;
    BOOST_REQUIRE_THROW( from_json( j, from_j ), json_type_mismatch );
 
    j = json::parse( "[\"foo\",\"bar\",\"a\",\"b\",\"c\",\"d\"]" );
    BOOST_REQUIRE_THROW( from_json( j, from_j ), std::exception );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( variant_test )
@@ -225,11 +231,13 @@ BOOST_AUTO_TEST_CASE( variant_test )
       []( auto& v ){ BOOST_FAIL( "variant contains unexpected type" ); }
    }, from_j );
 
+#ifdef EXCEPTIONS_ENABLED
    j["type"] = 2;
    BOOST_REQUIRE_THROW( from_json( j, from_j ), parse_error );
 
    j["type"] = "uint64_t";
    BOOST_REQUIRE_THROW( from_json( j, from_j ), json_type_mismatch );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE( optional_test )
@@ -325,6 +333,7 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    BOOST_REQUIRE_EQUAL( to_j.digest.size(), from_j.digest.size() );
 
    j = std::string("zkpt6ajQywrZ");
+#ifdef EXCEPTIONS_ENABLED
    try
    {
       from_json( j, from_j );
@@ -334,6 +343,7 @@ BOOST_AUTO_TEST_CASE( multihash_test )
    {
       BOOST_REQUIRE_EQUAL( e.what(), "Multihash JSON had extra bytes" );
    }
+#endif
 
    for( size_t i = 0; i < to_j.digest.size(); ++i )
    {
@@ -417,8 +427,10 @@ BOOST_AUTO_TEST_CASE( empty_case_test )
       vector< vector< vector< vector< vector< vector< vector< vector< vector< vector< uint8_t >
    > > > > > > > > > > > > > > > > > > > > from_j;
 
+#ifdef EXCEPTIONS_ENABLED
    json j = json::parse( "[[[[[[[[[[[[[[[[[[[[[1]]]]]]]]]]]]]]]]]]]]]" );
    BOOST_REQUIRE_THROW( from_json( j, from_j ), depth_violation );
+#endif
 }
 */
 
