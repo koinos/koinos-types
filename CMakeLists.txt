@@ -63,6 +63,8 @@ option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)
 
 if (EXCEPTIONS_ENABLED)
   add_compile_definitions(EXCEPTIONS_ENABLED)
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
 endif()
 
 # This is to force color output when using ccache with Unix Makefiles

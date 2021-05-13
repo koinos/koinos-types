@@ -187,14 +187,8 @@ template<> struct reflector<ENUM> { \
     static ENUM from_string( const char* s ) { \
         BOOST_PP_SEQ_FOR_EACH( KOINOS_REFLECT_ENUM_FROM_STRING, ENUM, FIELDS ) \
         int64_t i = 0; \
-        try \
-        { \
-           i = boost::lexical_cast<int64_t>(s); \
-        } \
-        catch( const boost::bad_lexical_cast& e ) \
-        { \
-           koinos::pack::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
-        } \
+        if ( !boost::conversion::try_lexical_convert( s, i ) ) \
+           KOINOS_PACK_ASSERT( false, bad_cast_exception, "Unable to convert string to enum" ); \
         return from_int(i); \
     } \
     template< typename Visitor > \
