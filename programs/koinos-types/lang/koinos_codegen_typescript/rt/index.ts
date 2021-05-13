@@ -24,4 +24,5 @@ export * from "./BlockHeightType";
 export * from "./Multihash";
 export * from "./MultihashVector";
 export * from "./Opaque";
+export * from "./Optional";
 export * from "./Vector";

@@ -1,6 +1,7 @@
 import * as bs58 from "bs58";
 import { FixedBlob } from "./FixedBlob";
 import { Opaque } from "./Opaque";
+import { Optional } from "./Optional";
 import { VarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
@@ -103,6 +104,12 @@ export class VariableBlob {
     ClassT: KoinosClassBuilder<T>
   ): Opaque<T> {
     return Opaque.deserialize(ClassT, this);
+  }
+
+  deserializeOptional<T extends KoinosClass>(
+    ClassT: KoinosClassBuilder<T>
+  ): Optional<T> {
+    return Optional.deserialize(ClassT, this);
   }
 
   calcSerializedSize(): number {

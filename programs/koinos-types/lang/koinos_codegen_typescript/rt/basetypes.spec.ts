@@ -23,6 +23,7 @@ import {
   Multihash,
   MultihashVector,
   Opaque,
+  Optional,
   VarInt,
   Vector,
   MAX_INT64,
@@ -44,7 +45,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("Serialize and desearialize", () => {
-    expect.assertions(29);
+    expect.assertions(31);
     const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
     const multihash = new Multihash("zHdxh1kBNvtADThNaTBNvDqyMwzJYi8x1Do7Vg");
     const jsonMultihashVector = {
@@ -85,6 +86,8 @@ describe("Koinos Types - Typescript", () => {
       .serialize(multihash)
       .serialize(multihashVector)
       .serialize(new Opaque(Str, "test opaque"))
+      .serialize(new Optional(Str))
+      .serialize(new Optional(Str, "optional with value"))
       .serialize(new Vector(Int8, [2, 4, 6]))
       .serialize(new FixedBlob("z36UjcYNBG9", 7))
       .resetCursor();
@@ -117,6 +120,8 @@ describe("Koinos Types - Typescript", () => {
       jsonMultihashVector
     );
     expect(vb.deserializeOpaque(Str).toJSON()).toBe("test opaque");
+    expect(vb.deserializeOptional(Str).toJSON()).not.toBeDefined();
+    expect(vb.deserializeOptional(Str).toJSON()).toBe("optional with value");
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
     expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
 
@@ -162,7 +167,7 @@ describe("Koinos Types - Typescript", () => {
   });
 
   it("should calculate the size required for serialization", () => {
-    expect.assertions(23);
+    expect.assertions(25);
 
     const vb = new VariableBlob("zABCDEF1234567");
     expect(vb.calcSerializedSize()).toBe(vb.serialize().length());
@@ -245,5 +250,13 @@ describe("Koinos Types - Typescript", () => {
 
     const opaque = new Opaque(Str, "test!$^#🙂🍻");
     expect(opaque.calcSerializedSize()).toBe(opaque.serialize().length());
+
+    const optional = new Optional(Uint8, 0);
+    expect(optional.calcSerializedSize()).toBe(optional.serialize().length());
+
+    const optionalEmpty = new Optional(Uint8);
+    expect(optionalEmpty.calcSerializedSize()).toBe(
+      optionalEmpty.serialize().length()
+    );
   });
 });
