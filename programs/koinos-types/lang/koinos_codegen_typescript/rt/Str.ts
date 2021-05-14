@@ -1,5 +1,5 @@
 import { VariableBlob } from "./VariableBlob";
-import { VarInt } from "./VarInt";
+import { VarInt, sizeVarInt } from "./VarInt";
 
 export type StringLike = string | Str;
 
@@ -28,7 +28,7 @@ export class Str {
 
   calcSerializedSize(): number {
     const size = new TextEncoder().encode(this.str).length;
-    const header = Math.ceil(Math.log2(size + 1) / 7);
+    const header = sizeVarInt(size);
     return header + size;
   }
 

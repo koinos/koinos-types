@@ -33,6 +33,6 @@ export class {{class_name}} extends {{ref_name}} {
   }
 
   static deserialize(vb: VariableBlob): {{class_name}}{
-    return {{ref_name}}.deserialize(vb);
+    return new {{class_name}}({{ref_name}}.deserialize(vb).num);
   }
 }

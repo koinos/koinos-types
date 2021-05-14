@@ -135,6 +135,8 @@ def typeref(tref):
         return "Vector<" + typeref(tref["targs"][0]) +">"
     if tref["name"][-1] == "opaque":
         return "Opaque<" + typeref(tref["targs"][0]) +">"
+    if tref["name"][-1] == "optional":
+        return "Optional<" + typeref(tref["targs"][0]) +">"
     return ts_name(tref["name"][-1])
 
 def typeref_like(tref):
@@ -154,11 +156,15 @@ def typeref_like(tref):
         return typeref_like(tref["targs"][0]) + "[]"
     if tref["name"][-1] == "opaque":
         return typeref_like(tref["targs"][0])
+    if tref["name"][-1] == "optional":
+        return typeref_like(tref["targs"][0])
     return ts_name(tref["name"][-1]) + "Like"
 
 def typeref_constructor(tref):
     if tref["name"][-1] == "opaque":
         return "Opaque(" + typeref(tref["targs"][0]) +", "
+    if tref["name"][-1] == "optional":
+        return "Optional(" + typeref(tref["targs"][0]) +", "
     if tref["name"][-1] == "vector":
         return "Vector(" + typeref(tref["targs"][0]) +", "
     return typeref(tref) + "("
@@ -166,6 +172,8 @@ def typeref_constructor(tref):
 def deserialize_type(tref):
     if tref["name"][-1] == "opaque":
         return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").getNative()"
+    if tref["name"][-1] == "optional":
+        return "deserializeOptional<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").value"
     if tref["name"][-1] == "vector":
         return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").items"
     return "deserialize(" + typeref(tref) + ")"
@@ -176,7 +184,7 @@ def is_basetype(name):
     'int64', 'uint64', 'int128', 'uint128', 'int160', 'uint160',
     'int256', 'uint256', 'multihash', 'variable_blob',
     'fixed_blob', 'timestamp_type','block_height_type', 'opaque',
-    'number', 'varint']:
+    'optional', 'number', 'varint']:
       return True
     return False
 
@@ -194,6 +202,9 @@ def insert_type_like_dependency(deps, className, tref, nameRef):
     elif tref["name"][-1] in ['variable_blob', 'fixed_blob']:
         deps = insert_dependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
     elif tref["name"][-1] == "opaque":
+        className = ts_name(tref["targs"][0]["name"][-1])
+        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
+    elif tref["name"][-1] == "optional":
         className = ts_name(tref["targs"][0]["name"][-1])
         deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
     elif tref["name"][-1] == "vector":
@@ -216,7 +227,7 @@ def insert_dependency(deps, className, tref, nameRef, insertJsonlike = True):
         d = set()
         d.add(className)
         deps.append([d, pathFile])
-    if tref["name"][-1] in ['vector', 'opaque']:
+    if tref["name"][-1] in ['vector', 'opaque', 'optional']:
         className = ts_name(tref["targs"][0]["name"][-1])
         deps = insert_dependency(deps, className, tref["targs"][0], nameRef)
     

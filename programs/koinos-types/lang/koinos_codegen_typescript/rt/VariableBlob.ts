@@ -2,7 +2,7 @@ import * as bs58 from "bs58";
 import { FixedBlob } from "./FixedBlob";
 import { Opaque } from "./Opaque";
 import { Optional } from "./Optional";
-import { VarInt } from "./VarInt";
+import { VarInt, sizeVarInt } from "./VarInt";
 import { Vector } from "./Vector";
 
 export type VariableBlobLike = string | Uint8Array | VariableBlob | FixedBlob;
@@ -113,7 +113,7 @@ export class VariableBlob {
   }
 
   calcSerializedSize(): number {
-    const header = Math.ceil(Math.log2(this.length() + 1) / 7);
+    const header = sizeVarInt(this.length());
     return header + this.length();
   }
 

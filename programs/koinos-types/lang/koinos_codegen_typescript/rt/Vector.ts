@@ -1,5 +1,5 @@
 import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
-import { VarInt } from "./VarInt";
+import { VarInt, sizeVarInt } from "./VarInt";
 import { FixedBlob } from "./FixedBlob";
 
 export class Vector<T extends KoinosClass> {
@@ -40,7 +40,7 @@ export class Vector<T extends KoinosClass> {
   }
 
   calcSerializedSize(): number {
-    const header = Math.ceil(Math.log2(this.items.length + 1) / 7);
+    const header = sizeVarInt(this.items.length);
     const sizes = this.items.map((item) => item.calcSerializedSize());
     const dataSize = sizes.reduce((t, v) => t + v, 0);
     return header + dataSize;
