@@ -8,10 +8,8 @@ const SEVEN = BigInt(7);
 const MSB_ONE = BigInt(128);
 const MAX_SAFE_INTEGER = BigInt(Number.MAX_SAFE_INTEGER);
 
-export function sizeVarInt(n: number) {
-  return n === 0
-    ? 1
-    : Math.ceil(Math.log2(n + 1) / 7);
+export function sizeVarInt(n: number): number {
+  return n === 0 ? 1 : Math.ceil(Math.log2(n + 1) / 7);
 }
 
 export class VarInt {
@@ -61,8 +59,7 @@ export class VarInt {
   }
 
   calcSerializedSize(): number {
-    if (this.num + ONE <= MAX_SAFE_INTEGER)
-      return sizeVarInt(Number(this.num));
+    if (this.num + ONE <= MAX_SAFE_INTEGER) return sizeVarInt(Number(this.num));
     return Math.ceil(this.num.toString(2).length / 7);
   }
 
