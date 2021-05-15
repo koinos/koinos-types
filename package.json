@@ -1,6 +1,8 @@
 {
   "scripts": {
     "audit": "audit-ci --moderate",
+    "build": "npm run clean && tsc -p tsconfig-build.json",
+    "clean": "rimraf ./dist",
     "lint": "npm run lint:eslint && npm run lint:tsc && npm run lint:prettier",
     "lint:eslint": "eslint ./programs/koinos-types/lang/koinos_codegen_typescript --ext .js,.ts",
     "lint:prettier": "prettier ./programs/koinos-types/lang/koinos_codegen_typescript --check",

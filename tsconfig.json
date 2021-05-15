@@ -1,12 +1,12 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
-    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": false,
+    "declaration": true,
     "module": "CommonJS",
+    "moduleResolution": "node",
     "sourceMap": true,
     "lib": ["ES6", "DOM"],
     "incremental": true,
