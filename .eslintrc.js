@@ -10,7 +10,7 @@ module.exports = {
   ],
   parserOptions: {
     project: "./tsconfig.eslint.json",
-    "ecmaVersion": 2018,
+    ecmaVersion: 2018,
   },
   rules: {
     "class-methods-use-this": "off",
