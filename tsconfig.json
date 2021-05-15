@@ -14,6 +14,6 @@
     "outDir": "./dist",
     "baseUrl": "./"
   },
-  "include": ["programs/koinos-types/lang/koinos_codegen_typescript/rt/*"],
+  "include": ["programs/koinos-types/build/koinos_protocol/*"],
   "exclude": ["node_modules", "dist"]
 }
