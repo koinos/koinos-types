@@ -65,6 +65,15 @@ enum class {{ decl["name"]|simple_name|classname_case }} : {{ typeref(decl["tref
 };
 {% endmacro -%}
 
+{%- macro reflect_enum_decl(name, decl) -%}
+KOINOS_REFLECT_ENUM( {{ name|cpp_namespace }}::{{ decl["name"]|simple_name|classname_case }}, {{ typeref(decl["tref"]) }},
+{%- if decl["entries"]|length > 0 %}
+{% for entry in decl["entries"] %}   ({{ entry.name }})
+{% endfor -%}
+{% endif -%}
+)
+{% endmacro -%}
+
 {%- macro update_ns( new_ns ) -%}
 {%- if ns.current_ns != new_ns -%}
 {%- if ns.current_ns != "" -%}
