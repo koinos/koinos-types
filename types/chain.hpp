@@ -67,6 +67,12 @@ enum class thunk_id : uint32
    get_transaction_signature = 0x83441b23
 };
 
+enum class privilege : uint8
+{
+   kernel_mode,
+   user_mode
+};
+
 struct head_info
 {
    block_topology    head_topology;
@@ -260,7 +266,11 @@ typedef block_height_type get_last_irreversible_block_return;
 
 struct get_caller_args {};
 
-typedef account_type get_caller_return;
+struct get_caller_return
+{
+   account_type caller;
+   privilege    caller_privilege;
+};
 
 struct require_authority_args
 {
