@@ -244,6 +244,10 @@ def get_dependencies_struct(decl, nameRef):
         dep = insert_dependency(dep, className, field["tref"], nameRef)
     return dep
 
+def get_dependencies_parse(decl, nameRef):
+    dep = []
+    
+
 def get_dependencies_variant(decl, nameRef):
     dep = []
     dep = insert_dependency(dep, "VariableBlob", { "name": ["koinos", "variable_blob"]}, nameRef, False)
@@ -466,9 +470,13 @@ def generate_typescript(schema):
     j2_template_typedef = env.get_template("koinos-typedef.ts.j2")
     j2_template_enum = env.get_template("koinos-enum.ts.j2")
     j2_template_index = env.get_template("koinos-index.ts.j2")
+    j2_template_parser = env.get_template("koinos-parser.ts.j2")
     j2_template_basic_tests = env.get_template("koinos-basic-tests.ts.j2")
 
     types_typedef = set()
+    dep_parser = []
+    decls_parser = []
+    parser_file = "parser.ts"
 
     for name, decl in decls_by_name.items():
         ctx = {
@@ -493,12 +501,16 @@ def generate_typescript(schema):
             ctx["dependencies"] = get_dependencies_struct(decl, out_filename)
             result_files[out_filename] = j2_template_struct.render(ctx)
             types_typedef.add(class_name)
+            dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
+            decls_parser.append({ "name": name.split("::")})
         elif decl["info"]["type"] == "Typedef" and decl["tref"]["name"][-1] == "variant":
             class_name = ts_name(decl["name"])
             ctx["class_name"] = class_name
             ctx["dependencies"] = get_dependencies_variant(decl, out_filename)
             result_files[out_filename] = j2_template_variant.render(ctx)
             types_typedef.add(class_name)
+            dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
+            decls_parser.append({ "name": name.split("::")})
         elif decl["info"]["type"] == "Typedef":
             class_name = ts_name(decl["name"])
             ctx["class_name"] = class_name
@@ -506,6 +518,8 @@ def generate_typescript(schema):
             ctx["dependencies"] = get_dependencies_typedef(decl, out_filename)
             result_files[out_filename] = j2_template_typedef.render(ctx)
             types_typedef.add(class_name)
+            dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
+            decls_parser.append({ "name": name.split("::")})
         elif decl["info"]["type"] == "EnumClass":
             class_name = ts_name(decl["name"])
             ctx["class_name"] = class_name
@@ -513,11 +527,27 @@ def generate_typescript(schema):
             ctx["dependencies"] = get_dependencies_enum(decl, out_filename)
             result_files[out_filename] = j2_template_enum.render(ctx)
             types_typedef.add(class_name)
+            dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
+            decls_parser.append({ "name": name.split("::")})
         else:
-            print(decl["info"]["type"])
+            if decl["name"][-1] in ['vector', 'opaque', 'optional', 'variant']:
+                continue
+            class_name = ts_name(decl["name"][-1])
+            dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
+            decls_parser.append({ "name": name.split("::")})
+        print(decl["name"])
 
+    index_type(indexes, ["parser"])
     generate_index_template(indexes, "", result_files, j2_template_index)
     generate_basic_tests(types_typedef, result_files, j2_template_basic_tests)
+
+    ctx = {
+        "decls": decls_parser,
+        "dependencies" : dep_parser, 
+        "ts_name" : ts_name,
+        "typeref_like": typeref_like,
+    }
+    result_files[parser_file] = j2_template_parser.render(ctx)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
