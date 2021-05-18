@@ -721,9 +721,11 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
 		size, v, err := Deserialize{{v_type}}(&ovb)
 		o.Value = v
 		return size + 1, &o, err
+	} else if (*vb)[0] == 0 {
+		return 1, &o, nil
 	}
 
-	return 1, &o, nil
+	return 0, nil, errors.New("invalid header byte in optional")
 }
 
 // MarshalJSON {{o_type}}

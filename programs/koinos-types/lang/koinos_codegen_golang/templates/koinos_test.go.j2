@@ -759,6 +759,13 @@ func Test{{o_type}}(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	// Test invalid header
+	nvb := koinos.VariableBlob([]byte{4, 5, 6})
+	_, _, err = koinos.Deserialize{{o_type}}(&nvb)
+	if err == nil {
+		t.Errorf("Invalid optional header byte did not return an error.")
+	}
 }
 
 {% endfor -%}
