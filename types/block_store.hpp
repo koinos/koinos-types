@@ -6,22 +6,22 @@ struct block_item
    /**
     * The hash of the block.
     */
-   multihash                      block_id;
+   multihash                                block_id;
 
    /**
     * The height of the block.
     */
-   block_height_type              block_height;
+   block_height_type                        block_height;
 
    /**
-    * The block data.  If return_block_blob is false, block_blob will be empty.
+    * The block data.  If return_block_blob is false, block will be empty.
     */
-   std::optional< protocol::block >      block;
+   std::optional< protocol::block >         block;
 
    /**
-    * The block data.  If return_receipt_blob is false, block_receipt_blob will be empty.
+    * The block receipt data.  If return_receipt_blob is false, block_receipt will be empty.
     */
-   opaque< protocol::block_receipt >     block_receipt;
+   std::optional< protocol::block_receipt > block_receipt;
 };
 
 struct block_record
