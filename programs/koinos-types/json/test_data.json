@@ -475,5 +475,9 @@
    {
       "type": "rpc::chain::submit_transaction_response",
       "json": {}
+   },
+   {
+      "type": "koinos::block_store::block_item",
+      "json": {"block_id":"zDQePGgMRmMPgwyu","block_height":100,"block":null,"block_receipt":{}}
    }
 ]
