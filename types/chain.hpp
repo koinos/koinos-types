@@ -22,10 +22,11 @@ enum class system_call_id : uint32
    exit_contract = 0x98df75b0,
    get_head_info = 0x956fb22d,
    hash = 0x99770e04,
-   verify_block_signature = 0x8fb9a59b,
+   recover_public_key = 0x95724a88,
+   verify_block_signature = 0x9d1c3c89,
    verify_merkle_root = 0x996e24b9,
-   get_transaction_payer = 0x86a87bf5,
-   get_max_account_resources = 0x842c6c81,
+   get_transaction_payer = 0x9db35086,
+   get_max_account_resources = 0x90f14f8d,
    get_transaction_resource_limit = 0x9940f685,
    get_last_irreversible_block = 0x953d2e37,
    get_caller = 0x94176c5f,
@@ -56,10 +57,11 @@ enum class thunk_id : uint32
    exit_contract = 0x81f61f9f,
    get_head_info = 0x89df34c4,
    hash = 0x8aaaf547,
-   verify_block_signature = 0x9d1c3c89,
+   recover_public_key = 0x804f5450,
+   verify_block_signature = 0x8fb9a59b,
    verify_merkle_root = 0x8ed9ddcb,
-   get_transaction_payer = 0x9db35086,
-   get_max_account_resources = 0x90f14f8d,
+   get_transaction_payer = 0x86a87bf5,
+   get_max_account_resources = 0x842c6c81,
    get_transaction_resource_limit = 0x8bdf81a1,
    get_last_irreversible_block = 0x80c3b893,
    get_caller = 0x82312501,
@@ -238,6 +240,17 @@ struct hash_args
 };
 
 typedef multihash hash_return;
+
+struct recover_public_key_args
+{
+   variable_blob signature_data;
+   multihash     digest;
+};
+
+struct recover_public_key_return
+{
+   account_type account;
+};
 
 struct get_transaction_payer_args
 {
