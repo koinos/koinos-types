@@ -247,10 +247,7 @@ struct recover_public_key_args
    multihash     digest;
 };
 
-struct recover_public_key_return
-{
-   account_type account;
-};
+typedef account_type recover_public_key_return;
 
 struct get_transaction_payer_args
 {
