@@ -36,6 +36,9 @@
 {{ mac.reflect_decl( name, decl ) }}
 {% elif decl["info"]["type"] == "Typedef" -%}
 {% elif decl["info"]["type"] == "EnumClass" -%}
+{%- if not decl["name"].endswith("_id"): -%}
+{{ mac.reflect_enum_decl( name, decl ) }}
+{%- endif -%}
 {%- endif -%}
 {% endfor %}
 
