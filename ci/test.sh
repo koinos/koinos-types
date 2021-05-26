@@ -5,7 +5,7 @@ set -x
 
 if [ "$RUN_TYPE" = "test" ]; then
    # Check the ID headers were properly generated
-   python3 programs/generate-ids/codegen_ids.py -t programs/generate-ids/templates -o types -c types/system_call_names.json
+   python3 programs/generate-ids/codegen_ids.py -t programs/generate-ids/templates -o types -c system_call_names.json
 
    # C++ tests
    pushd build/tests/cpp
