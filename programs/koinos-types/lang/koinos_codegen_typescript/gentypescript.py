@@ -444,10 +444,10 @@ def generate_index_template(index, prefix, result_files, template):
         folder = index[i]["folder"] + "/"
         items.append(index[i]["folder"])
         generate_index_template(index[i]["files"], prefix + folder, result_files, template)
-    result_files[prefix + "index.ts"] = template.render({"items": items})
+    result_files["src/" + prefix + "index.ts"] = template.render({"items": items})
 
 def generate_basic_tests(types_typedef, result_files, template):
-    result_files["../tests/basic-tests.spec.ts"] = template.render({
+    result_files["tests/basic-tests.spec.ts"] = template.render({
       "types_typedef": types_typedef
     })
 
@@ -499,7 +499,7 @@ def generate_typescript(schema):
             class_name = ts_name(decl["name"])
             ctx["class_name"] = class_name
             ctx["dependencies"] = get_dependencies_struct(decl, out_filename)
-            result_files[out_filename] = j2_template_struct.render(ctx)
+            result_files["src/" + out_filename] = j2_template_struct.render(ctx)
             types_typedef.add(class_name)
             dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
             decls_parser.append({ "name": name.split("::")})
@@ -507,7 +507,7 @@ def generate_typescript(schema):
             class_name = ts_name(decl["name"])
             ctx["class_name"] = class_name
             ctx["dependencies"] = get_dependencies_variant(decl, out_filename)
-            result_files[out_filename] = j2_template_variant.render(ctx)
+            result_files["src/" + out_filename] = j2_template_variant.render(ctx)
             types_typedef.add(class_name)
             dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
             decls_parser.append({ "name": name.split("::")})
@@ -516,7 +516,7 @@ def generate_typescript(schema):
             ctx["class_name"] = class_name
             ctx["ref_name"] = typeref(decl["tref"])
             ctx["dependencies"] = get_dependencies_typedef(decl, out_filename)
-            result_files[out_filename] = j2_template_typedef.render(ctx)
+            result_files["src/" + out_filename] = j2_template_typedef.render(ctx)
             types_typedef.add(class_name)
             dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
             decls_parser.append({ "name": name.split("::")})
@@ -525,7 +525,7 @@ def generate_typescript(schema):
             ctx["class_name"] = class_name
             ctx["ref_name"] = typeref(decl["tref"])
             ctx["dependencies"] = get_dependencies_enum(decl, out_filename)
-            result_files[out_filename] = j2_template_enum.render(ctx)
+            result_files["src/" + out_filename] = j2_template_enum.render(ctx)
             types_typedef.add(class_name)
             dep_parser = insert_dependency(dep_parser, class_name, { "name": name.split("::")}, parser_file)
             decls_parser.append({ "name": name.split("::")})
@@ -547,7 +547,7 @@ def generate_typescript(schema):
         "ts_name" : ts_name,
         "typeref_like": typeref_like,
     }
-    result_files[parser_file] = j2_template_parser.render(ctx)
+    result_files["src/" + parser_file] = j2_template_parser.render(ctx)
 
     rt_path = os.path.join(os.path.dirname(__file__), "rt")
     for root, dirs, files in os.walk(rt_path):
@@ -556,7 +556,7 @@ def generate_typescript(schema):
             relpath = "basetypes/" + os.path.relpath(filepath, rt_path)
             with open(filepath, "r") as f:
                 content = f.read()
-            result_files[relpath] = content
+            result_files["src/" + relpath] = content
     return result
 
 def generate_tests(test_data):
