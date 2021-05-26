@@ -1,7 +1,7 @@
 
 namespace koinos { namespace chain {
 
-// Use generate_ids.py to generate the system call id
+// Do not edit this list directly, edit system_call_names.json and run codegen_thunk_ids.py to update
 enum class system_call_id : uint32
 {
    prints = 0x9b229941,
