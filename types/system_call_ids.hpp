@@ -34,7 +34,9 @@ enum class system_call_id : uint32
    require_authority = 0x9491e528,
    get_transaction_signature = 0x9dc3ec34,
    get_contract_id = 0x95e30f50,
-   get_head_block_time = 0x941d5ab9
+   get_head_block_time = 0x941d5ab9,
+   set_resource_limits = 0x99a38904,
+   use_resource = 0x95d2d7a0
 };
 
 } } // koinos::chain

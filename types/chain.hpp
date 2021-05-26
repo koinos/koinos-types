@@ -192,14 +192,14 @@ struct get_max_account_resources_args
    account_type account;
 };
 
-typedef uint128 get_max_account_resources_return;
+typedef int128 get_max_account_resources_return;
 
 struct get_transaction_resource_limit_args
 {
    protocol::transaction transaction;
 };
 
-typedef uint128 get_transaction_resource_limit_return;
+typedef int128 get_transaction_resource_limit_return;
 
 struct get_last_irreversible_block_args {};
 
@@ -231,5 +231,60 @@ typedef contract_id_type get_contract_id_return;
 typedef void_type get_head_block_time_args;
 
 typedef timestamp_type get_head_block_time_return;
+
+/**
+ * Represents limits on a single resource.
+ */
+struct resource_limit
+{
+   /**
+    * Max number of resources that can be used per transaction.
+    */
+   int128 max_usage;
+
+   /**
+    * Minimum number of resources that can be used per transaction.
+    *
+    * Usually will be zero or negative.  Setting a negative value here
+    * will allow transactions to get credit by freeing resources.
+    */
+   int128 min_usage;
+
+   /**
+    * Price of the resource in mana.
+    *
+    * If zero, consuming the resource does not consume mana.
+    * If negative, consuming the resource gives mana.
+    */
+   int64 price;
+
+   /**
+    * Price is multiplied by quantity, then divided by 10**price_shift.
+    */
+   uint8 price_shift;
+};
+
+/**
+ * A numerical identifier for resources.
+ *
+ * We can't call it resource_id because _id suffix is special-cased in the code generator.
+ * Resource 0 is always mana.
+ */
+typedef uint16 resource_num;
+
+struct set_resource_limits_args
+{
+   std::vector< resource_limit > resource_limits;
+};
+
+typedef void_type set_resource_limits_return;
+
+struct use_resource_args
+{
+   resource_num resource;
+   int128 amount;
+};
+
+typedef void_type use_resource_return;
 
 } } // koinos::chain

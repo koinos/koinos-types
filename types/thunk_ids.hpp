@@ -35,7 +35,9 @@ enum class thunk_id : uint32
    require_authority = 0x8a06717d,
    get_transaction_signature = 0x83441b23,
    get_contract_id = 0x8df4ad21,
-   get_head_block_time = 0x8e76d5b4
+   get_head_block_time = 0x8e76d5b4,
+   set_resource_limits = 0x8396dae7,
+   use_resource = 0x83ace874
 };
 
 } } // koinos::thunks

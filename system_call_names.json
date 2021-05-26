@@ -30,7 +30,9 @@
       "require_authority",
       "get_transaction_signature",
       "get_contract_id",
-      "get_head_block_time"
+      "get_head_block_time",
+      "set_resource_limits",
+      "use_resource"
    ],
    "thunks" : [
       "prints",
@@ -64,6 +66,8 @@
       "require_authority",
       "get_transaction_signature",
       "get_contract_id",
-      "get_head_block_time"
+      "get_head_block_time",
+      "set_resource_limits",
+      "use_resource"
    ]
 }
