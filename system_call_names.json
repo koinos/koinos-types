@@ -19,6 +19,7 @@
       "exit_contract",
       "get_head_info",
       "hash",
+      "recover_public_key",
       "verify_block_signature",
       "verify_merkle_root",
       "get_transaction_payer",
@@ -27,7 +28,9 @@
       "get_last_irreversible_block",
       "get_caller",
       "require_authority",
-      "get_transaction_signature"
+      "get_transaction_signature",
+      "get_contract_id",
+      "get_head_block_time"
    ],
    "thunks" : [
       "prints",
@@ -50,6 +53,7 @@
       "exit_contract",
       "get_head_info",
       "hash",
+      "recover_public_key",
       "verify_block_signature",
       "verify_merkle_root",
       "get_transaction_payer",
@@ -58,6 +62,8 @@
       "get_last_irreversible_block",
       "get_caller",
       "require_authority",
-      "get_transaction_signature"
+      "get_transaction_signature",
+      "get_contract_id",
+      "get_head_block_time"
    ]
 }
