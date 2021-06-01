@@ -471,28 +471,28 @@ type opaqueJSON struct {
 
 // {{o_type}} type
 type {{o_type}} struct {
-	blob *VariableBlob
-	native *{{v_type[0]}}
+	Blob *VariableBlob
+	Native *{{v_type[0]}}
 }
 
 // New{{o_type}} factory
 func New{{o_type}}() *{{o_type}} {
 	o := {{o_type}}{}
-	o.native = New{{v_type[0]}}()
+	o.Native = New{{v_type[0]}}()
 	return &o
 }
 
 // New{{o_type}}FromBlob factory
 func New{{o_type}}FromBlob(vb *VariableBlob) *{{o_type}} {
 	o := {{o_type}}{}
-	o.blob = vb
+	o.Blob = vb
 	return &o
 }
 
 // New{{o_type}}FromNative factory
 func New{{o_type}}FromNative(n {{v_type[0]}}) *{{o_type}} {
 	o := {{o_type}}{}
-	o.native = &n
+	o.Native = &n
 	return &o
 }
 
@@ -502,53 +502,53 @@ func (n *{{o_type}}) GetBlob() *VariableBlob {
 		n.Box()
 	}
 
-	return n.blob
+	return n.Blob
 }
 
 // GetNative *{{o_type}}
 func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
-	if( n.native == nil ) {
+	if( n.Native == nil ) {
 		return nil,errors.New("opaque type not unboxed")
 	}
 
-	return n.native,nil;
+	return n.Native,nil;
 }
 
 // Box *{{o_type}}
 func (n *{{o_type}}) Box() {
-	if (n.native != nil) {
+	if (n.Native != nil) {
 		n.serializeNative()
-		n.native = nil
+		n.Native = nil
 	}
 }
 
 // Unbox *{{o_type}}
 func (n *{{o_type}}) Unbox() {
-	if (n.native == nil && n.blob != nil) {
+	if (n.Native == nil && n.Blob != nil) {
 		var err error
 		var b uint64
-		b,n.native,err = Deserialize{{v_type[0]}}(n.blob)
+		b,n.Native,err = Deserialize{{v_type[0]}}(n.Blob)
 
-		if err != nil || b != uint64(len(*n.blob)) {
-			n.native = nil
+		if err != nil || b != uint64(len(*n.Blob)) {
+			n.Native = nil
 		}
 	}
 }
 
 // IsBoxed *{{o_type}}
 func (n *{{o_type}}) IsBoxed() bool {
-	return n.native == nil;
+	return n.Native == nil;
 }
 
 func (n *{{o_type}}) serializeNative() {
 	vb := NewVariableBlob()
-	n.blob = n.native.Serialize(vb)
+	n.Blob = n.Native.Serialize(vb)
 }
 
 // Serialize {{o_type}}
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 	n.Box()
-	return n.blob.Serialize(vb)
+	return n.Blob.Serialize(vb)
 }
 
 // Deserialize{{o_type}} function
@@ -558,7 +558,7 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 	if err != nil {
 		return 0, &o, err
 	}
-	o = {{o_type}}{blob:nv, native:nil}
+	o = {{o_type}}{Blob:nv, Native:nil}
 	return size,&o,nil
 }
 
@@ -567,12 +567,12 @@ func (n {{o_type}}) MarshalJSON() ([]byte, error) {
 	n.Unbox()
 
 	if !n.IsBoxed() {
-		return json.Marshal(&n.native)
+		return json.Marshal(&n.Native)
 	}
 
 	v := opaqueJSON{}
 	v.Opaque.Type = "{{v_type[1]}}"
-	v.Opaque.Value = *n.blob
+	v.Opaque.Value = *n.Blob
 
 	return json.Marshal(&v)
 }
@@ -594,10 +594,10 @@ func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
 		if strings.Compare(obj.Opaque.Type, "{{v_type[1]}}") != 0 {
 			return errors.New("unexpected opaque type name")
 		}
-		n.blob = &obj.Opaque.Value
-		n.native = nil
+		n.Blob = &obj.Opaque.Value
+		n.Native = nil
 	} else {
-		if err := json.Unmarshal(data, &n.native); err != nil {
+		if err := json.Unmarshal(data, &n.Native); err != nil {
 			return err
 		}
 	}
