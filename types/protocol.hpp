@@ -61,7 +61,7 @@ struct active_block_data
 {
    multihash                      transaction_merkle_root;
    multihash                      passive_data_merkle_root;
-   multihash                      signer_address;
+   variable_blob                  signer;
 };
 
 struct passive_block_data {};
