@@ -85,8 +85,6 @@ struct head_info
    block_height_type last_irreversible_height;
 };
 
-typedef variable_blob account_type;
-
 struct system_call_target_reserved {};
 
 struct contract_call_bundle
@@ -251,18 +249,18 @@ struct recover_public_key_args
    multihash     digest;
 };
 
-typedef account_type recover_public_key_return;
+typedef protocol::account_type recover_public_key_return;
 
 struct get_transaction_payer_args
 {
    protocol::transaction transaction;
 };
 
-typedef account_type get_transaction_payer_return;
+typedef protocol::account_type get_transaction_payer_return;
 
 struct get_max_account_resources_args
 {
-   account_type account;
+   protocol::account_type account;
 };
 
 typedef uint128 get_max_account_resources_return;
@@ -282,13 +280,13 @@ struct get_caller_args {};
 
 struct get_caller_return
 {
-   account_type caller;
-   privilege    caller_privilege;
+   protocol::account_type caller;
+   privilege              caller_privilege;
 };
 
 struct require_authority_args
 {
-   account_type account;
+   protocol::account_type account;
 };
 
 typedef void_type require_authority_return;
