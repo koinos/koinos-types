@@ -110,8 +110,9 @@ typedef void_type prints_return;
 
 struct verify_block_signature_args
 {
-   variable_blob signature_data;
-   multihash     digest;
+   multihash                             digest;
+   opaque< protocol::active_block_data > active_block_data;
+   variable_blob                         signature_data;
 };
 
 typedef boolean verify_block_signature_return;
