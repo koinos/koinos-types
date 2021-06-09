@@ -196,7 +196,22 @@
       "type": "chain::verify_block_signature_args",
       "json": {
          "signature_data": "zQT2iJXiFShP1KGPeeeet",
-         "digest": "z3396kz2ywyU8s"
+         "digest": "z3396kz2ywyU8s",
+         "active_data": {
+            "type": "protocol::active_block_data",
+            "json": {
+               "header_hashes": {
+                  "hash": 70,
+                  "digests": [
+                     "z2EiQdzYMa2t",
+                     "z2EiQdzYMa2u",
+                     "z2EiQdzYMa2v"
+                  ]
+               },
+               "height": 30,
+               "timestamp": 40
+            }
+         }
       }
    },
    {

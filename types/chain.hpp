@@ -111,7 +111,7 @@ typedef void_type prints_return;
 struct verify_block_signature_args
 {
    multihash                             digest;
-   opaque< protocol::active_block_data > active_block_data;
+   opaque< protocol::active_block_data > active_data;
    variable_blob                         signature_data;
 };
 
