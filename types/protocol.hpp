@@ -1,5 +1,7 @@
 namespace koinos { namespace protocol {
 
+typedef variable_blob account_type;
+
 struct reserved_operation
 {
    unused_extensions_type         extensions;
@@ -61,7 +63,7 @@ struct active_block_data
 {
    multihash                      transaction_merkle_root;
    multihash                      passive_data_merkle_root;
-   multihash                      signer_address;
+   account_type                   signer;
 };
 
 struct passive_block_data {};
