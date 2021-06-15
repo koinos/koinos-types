@@ -1105,7 +1105,7 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	db, err := DecodeBytes(s)
+	db, err := DecodeBytes(s, Base58)
 	if err != nil {
 		return err
 	}
@@ -1235,7 +1235,10 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 func (m0 Multihash) MarshalJSON() ([]byte, error) {
 	vb := NewVariableBlob()
 	s := m0.Serialize(vb)
-	b58str := "z" + base58.Encode(*s)
+	b58str, err :=  EncodeBytes(*s, Base58)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(b58str)
 }
 
@@ -1267,9 +1270,30 @@ func (m0 *Multihash) UnmarshalJSON(b []byte) error {
 //  Utility Functions
 // --------------------------------
 
+type Encoding rune
+
+const (
+	Base64 Encoding = 'm'
+	Base58 Encoding = 'z'
+)
+
 // EncodeBytes utility function
-func EncodeBytes(b []byte) string {
-	return "z" + base58.Encode(b)
+func EncodeBytes(b []byte, encodingOptional ...Encoding) string, error {
+	// Defaults to base64 encoding
+	encoding := Base64
+
+	if len(encodingOptional) > 0 {
+		encoding = encodingOptional[0]
+	}
+
+	switch encoding {
+	case Base58:
+		return Base58 + base58.Encode(b), nil
+	case Base64:
+		return Base64 + base64.Encode(b), nil
+	default:
+		return nil, errors.New("Unknown encoding: " + string(encoding))
+	}
 }
 
 // DecodeBytes utility function
@@ -1279,8 +1303,10 @@ func DecodeBytes(s string) ([]byte, error) {
 	}
 
 	switch s[0] {
-	case 'z':
+	case Base58:
 		return base58.Decode(s[1:]), nil
+	case Base64:
+		return base64.Decode(s[1:]), nil
 	default:
 		return nil, errors.New("Unknown encoding: " + string(s[0]))
 	}
