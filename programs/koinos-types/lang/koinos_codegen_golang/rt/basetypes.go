@@ -1094,7 +1094,10 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64, *VariableBlob, error) {
 
 // MarshalJSON VariableBlob
 func (n VariableBlob) MarshalJSON() ([]byte, error) {
-	s := EncodeBytes(n)
+	s, err := EncodeBytes(n, Base64)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(s)
 }
 
@@ -1105,7 +1108,7 @@ func (n *VariableBlob) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	db, err := DecodeBytes(s, Base58)
+	db, err := DecodeBytes(s)
 	if err != nil {
 		return err
 	}
@@ -1235,7 +1238,7 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 func (m0 Multihash) MarshalJSON() ([]byte, error) {
 	vb := NewVariableBlob()
 	s := m0.Serialize(vb)
-	b58str, err :=  EncodeBytes(*s, Base58)
+	b58str, err := EncodeBytes(*s, Base58)
 	if err != nil {
 		return nil, err
 	}
@@ -1278,7 +1281,7 @@ const (
 )
 
 // EncodeBytes utility function
-func EncodeBytes(b []byte, encodingOptional ...Encoding) string, error {
+func EncodeBytes(b []byte, encodingOptional ...Encoding) (string, error) {
 	// Defaults to base64 encoding
 	encoding := Base64
 
