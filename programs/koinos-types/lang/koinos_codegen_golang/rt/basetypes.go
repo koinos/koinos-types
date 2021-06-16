@@ -2,6 +2,7 @@ package koinos
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -1291,11 +1292,11 @@ func EncodeBytes(b []byte, encodingOptional ...Encoding) (string, error) {
 
 	switch encoding {
 	case Base58:
-		return Base58 + base58.Encode(b), nil
+		return string(Base58) + base58.Encode(b), nil
 	case Base64:
-		return Base64 + base64.Encode(b), nil
+		return string(Base64) + base64.StdEncoding.EncodeToString(b), nil
 	default:
-		return nil, errors.New("Unknown encoding: " + string(encoding))
+		return "", errors.New("Unknown encoding: " + string(encoding))
 	}
 }
 
@@ -1305,11 +1306,11 @@ func DecodeBytes(s string) ([]byte, error) {
 		return make([]byte, 0), nil
 	}
 
-	switch s[0] {
+	switch Encoding(s[0]) {
 	case Base58:
 		return base58.Decode(s[1:]), nil
 	case Base64:
-		return base64.Decode(s[1:]), nil
+		return base64.StdEncoding.DecodeString(s[1:])
 	default:
 		return nil, errors.New("Unknown encoding: " + string(s[0]))
 	}
