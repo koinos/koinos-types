@@ -671,7 +671,10 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}+1; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s := koinos.EncodeBytes(wfb)
+	s, err := koinos.EncodeBytes(wfb)
+	if err == nil {
+		t.Errorf("Encoding fixed blob unexpectedly failed: %s", err)
+	}
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
 		t.Errorf("deserialized JSON from a string which was not the proper size.")
@@ -682,7 +685,10 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s = koinos.EncodeBytes(wfb)
+	s, err = koinos.EncodeBytes(wfb)
+	if err == nil {
+		t.Errorf("Encoding fixed blob unexpectedly failed: %s", err)
+	}
 	s = "0" + s[1:]
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
