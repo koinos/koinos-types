@@ -1,6 +1,9 @@
 #pragma once
 
 #include <array>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -9,7 +12,7 @@
 // Distributed under the MIT software license
 // http://www.opensource.org/licenses/mit-license.php.
 
-namespace koinos::pack::util {
+namespace koinos::pack::util::impl {
 
 #define MAX_ARRAY_SIZE (1024*1024*10)
 
