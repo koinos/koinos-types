@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include <koinos/pack/rt/util/base16.hpp>
 #include <koinos/pack/rt/util/base58.hpp>
 #include <koinos/pack/rt/util/base64.hpp>
 
@@ -18,6 +19,9 @@ inline void decode_multibase( const char* begin, size_t count, std::vector<char>
 
    switch( begin[0] )
    {
+      case 'f':
+         decode_base16( begin+1, count-1, dest );
+         break;
       case 'm':
          decode_base64( begin+1, count-1, dest );
          break;
@@ -43,6 +47,9 @@ inline void encode_multibase( const char* begin, size_t count, std::vector<char>
    std::vector<char> temp;
    switch(base)
    {
+      case 'f':
+         encode_base16( begin, count, temp );
+         break;
       case 'm':
          encode_base64( begin, count, temp );
          break;
