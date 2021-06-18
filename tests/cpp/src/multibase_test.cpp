@@ -42,7 +42,6 @@ void dump_str( const std::vector< char >& s )
 BOOST_AUTO_TEST_CASE( multibase_test )
 {
    std::vector< std::vector< std::string > > test_cases = {
-      {"f", "z", "m", "u"},                        // n.b. Python base58 fails this case
       {"f61", "z2g", "mYQ", "uYQ"},
       {"f6161", "z8Qp", "mYWE", "uYWE"},
       {"f616161", "zZi88", "mYWFh", "uYWFh"},
@@ -52,15 +51,19 @@ BOOST_AUTO_TEST_CASE( multibase_test )
       {"f61616161616161", "z4h36zcadPW", "mYWFhYWFhYQ", "uYWFhYWFhYQ"},
       {"f6161616161616161", "zHHiHTJ3RcLg", "mYWFhYWFhYWE", "uYWFhYWFhYWE"},
       {"f616161616161616161", "z2EtmDd4Dhcyrp", "mYWFhYWFhYWFh", "uYWFhYWFhYWFh"},
+      // n.b. Python multibase fails the following cases, see more discussion here:
+      // https://github.com/multiformats/py-multibase/issues/11
+      // https://github.com/multiformats/multibase/issues/34
+      {"f", "z", "m", "u"},
       {"f00", "z1", "mAA", "uAA"},
-      {"f0000", "z1", "mAAA", "uAAA"},
-      {"f000000", "z1", "mAAAA", "uAAAA"},
-      {"f00000000", "z1", "mAAAAAA", "uAAAAAA"},
-      {"f0000000000", "z1", "mAAAAAAA", "uAAAAAAA"},
-      {"f000000000000", "z1", "mAAAAAAAA", "uAAAAAAAA"},
-      {"f00000000000000", "z1", "mAAAAAAAAAA", "uAAAAAAAAAA"},
-      {"f0000000000000000", "z1", "mAAAAAAAAAAA", "uAAAAAAAAAAA"},
-      {"f000000000000000000", "z1", "mAAAAAAAAAAAA", "uAAAAAAAAAAAA"},
+      {"f0000", "z11", "mAAA", "uAAA"},
+      {"f000000", "z111", "mAAAA", "uAAAA"},
+      {"f00000000", "z1111", "mAAAAAA", "uAAAAAA"},
+      {"f0000000000", "z11111", "mAAAAAAA", "uAAAAAAA"},
+      {"f000000000000", "z111111", "mAAAAAAAA", "uAAAAAAAA"},
+      {"f00000000000000", "z1111111", "mAAAAAAAAAA", "uAAAAAAAAAA"},
+      {"f0000000000000000", "z11111111", "mAAAAAAAAAAA", "uAAAAAAAAAAA"},
+      {"f000000000000000000", "z111111111", "mAAAAAAAAAAAA", "uAAAAAAAAAAAA"},
       {"f7468697320697320612074657374", "zjo91waLQA1NNeBmZKUF", "mdGhpcyBpcyBhIHRlc3Q", "udGhpcyBpcyBhIHRlc3Q"},
       {"f6d756c74696261736520656e636f64696e67", "z5YKdSgATEwQMG3eWyqWvhjEhL", "mbXVsdGliYXNlIGVuY29kaW5n", "ubXVsdGliYXNlIGVuY29kaW5n"},
       {"fe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "zGKot5hBsd81kMupNCXHaqbhv3huEbxAFMLnpcX2hniwn", "m47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU", "u47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"}
