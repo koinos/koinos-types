@@ -188,7 +188,7 @@ inline void decode_base64_table( const char* begin, size_t count, std::vector<ch
       }
 
       // 4 bytes turns to 3 bytes
-      dest[j  ] = table[uint8_t((a << 2) | (b >> 6))];
+      dest[j  ] = table[uint8_t((a << 2) | (b >> 4))];
       dest[j+1] = table[uint8_t((b << 4) | (c >> 2))];
       dest[j+2] = table[uint8_t((c << 6) |  d      )];
    }
@@ -201,7 +201,7 @@ inline void decode_base64_table( const char* begin, size_t count, std::vector<ch
          a = uint8_t(table[begin[i  ]]);
          b = uint8_t(table[begin[i+1]]);
 
-         dest[j  ] = table[uint8_t((a << 2) | (b >> 6))];
+         dest[j  ] = table[uint8_t((a << 2) | (b >> 4))];
 
          if( (a|b) & 0xc0 )
          {
@@ -217,7 +217,7 @@ inline void decode_base64_table( const char* begin, size_t count, std::vector<ch
          b = uint8_t(table[begin[i+1]]);
          c = uint8_t(table[begin[i+2]]);
 
-         dest[j  ] = table[uint8_t((a << 2) | (b >> 6))];
+         dest[j  ] = table[uint8_t((a << 2) | (b >> 4))];
          dest[j+1] = table[uint8_t((b << 4) | (c >> 2))];
 
          if( (a|b|c) & 0xc0 )
