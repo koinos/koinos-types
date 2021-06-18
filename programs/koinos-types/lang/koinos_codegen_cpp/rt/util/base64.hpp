@@ -52,9 +52,9 @@ inline void encode_base64_table( const char* begin, size_t count, std::vector<ch
 {
    size_t num_groups = count / 3;
    size_t odd_bytes = count % 3;
-   size_t odd_out_bytes[] = {0, 2, 3};
+   size_t odd_out_bytes[2][3] = {{0, 2, 3}, {0, 4, 4}};
 
-   dest.resize(num_groups * 4 + odd_out_bytes[odd_bytes]);
+   dest.resize(num_groups * 4 + odd_out_bytes[pad ? 1 : 0][odd_bytes]);
    size_t i = 0, j = 0;
    uint8_t a, b, c;
 
