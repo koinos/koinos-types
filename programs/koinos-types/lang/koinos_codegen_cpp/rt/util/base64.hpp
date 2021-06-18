@@ -141,7 +141,7 @@ inline void decode_base64_table( const char* begin, size_t count, std::vector<ch
       }
 
       // Count up to 3 padding characters at the end.
-      char pad_char = table[0x40];
+      char pad_char = '=';    // We can't read pad_char from the inverse table
       size_t pad_bytes = 0;
       for( size_t i=count-1; i>=0; i-- )
       {
