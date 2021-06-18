@@ -171,7 +171,7 @@ inline void decode_base64_table( const char* begin, size_t count, std::vector<ch
       odd_out_bytes = odd_bytes-1;
    }
 
-   dest.resize(num_groups * 4 + odd_out_bytes);
+   dest.resize(num_groups * 3 + odd_out_bytes);
    size_t i = 0, j = 0;
    uint8_t a, b, c, d;
 
