@@ -42,31 +42,28 @@ void dump_str( const std::vector< char >& s )
 BOOST_AUTO_TEST_CASE( multibase_test )
 {
    std::vector< std::vector< std::string > > test_cases = {
-      {"f61", "z2g", "mYQ", "uYQ"},
-      {"f6161", "z8Qp", "mYWE", "uYWE"},
-      {"f616161", "zZi88", "mYWFh", "uYWFh"},
-      {"f61616161", "z3VNWTa", "mYWFhYQ", "uYWFhYQ"},
-      {"f6161616161", "zBzDw2JL", "mYWFhYWE", "uYWFhYWE"},
-      {"f616161616161", "zqVa5SjWY", "mYWFhYWFh", "uYWFhYWFh"},
-      {"f61616161616161", "z4h36zcadPW", "mYWFhYWFhYQ", "uYWFhYWFhYQ"},
-      {"f6161616161616161", "zHHiHTJ3RcLg", "mYWFhYWFhYWE", "uYWFhYWFhYWE"},
-      {"f616161616161616161", "z2EtmDd4Dhcyrp", "mYWFhYWFhYWFh", "uYWFhYWFhYWFh"},
-      // n.b. Python multibase fails the following cases, see more discussion here:
-      // https://github.com/multiformats/py-multibase/issues/11
-      // https://github.com/multiformats/multibase/issues/34
-      {"f", "z", "m", "u"},
-      {"f00", "z1", "mAA", "uAA"},
-      {"f0000", "z11", "mAAA", "uAAA"},
-      {"f000000", "z111", "mAAAA", "uAAAA"},
-      {"f00000000", "z1111", "mAAAAAA", "uAAAAAA"},
-      {"f0000000000", "z11111", "mAAAAAAA", "uAAAAAAA"},
-      {"f000000000000", "z111111", "mAAAAAAAA", "uAAAAAAAA"},
-      {"f00000000000000", "z1111111", "mAAAAAAAAAA", "uAAAAAAAAAA"},
-      {"f0000000000000000", "z11111111", "mAAAAAAAAAAA", "uAAAAAAAAAAA"},
-      {"f000000000000000000", "z111111111", "mAAAAAAAAAAAA", "uAAAAAAAAAAAA"},
-      {"f7468697320697320612074657374", "zjo91waLQA1NNeBmZKUF", "mdGhpcyBpcyBhIHRlc3Q", "udGhpcyBpcyBhIHRlc3Q"},
-      {"f6d756c74696261736520656e636f64696e67", "z5YKdSgATEwQMG3eWyqWvhjEhL", "mbXVsdGliYXNlIGVuY29kaW5n", "ubXVsdGliYXNlIGVuY29kaW5n"},
-      {"fe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "zGKot5hBsd81kMupNCXHaqbhv3huEbxAFMLnpcX2hniwn", "m47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU", "u47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"}
+        {"f", "z", "m", "M", "u", "U"},
+        {"f61", "z2g", "mYQ", "MYQ==", "uYQ", "UYQ=="},
+        {"f6161", "z8Qp", "mYWE", "MYWE=", "uYWE", "UYWE="},
+        {"f616161", "zZi88", "mYWFh", "MYWFh", "uYWFh", "UYWFh"},
+        {"f61616161", "z3VNWTa", "mYWFhYQ", "MYWFhYQ==", "uYWFhYQ", "UYWFhYQ=="},
+        {"f6161616161", "zBzDw2JL", "mYWFhYWE", "MYWFhYWE=", "uYWFhYWE", "UYWFhYWE="},
+        {"f616161616161", "zqVa5SjWY", "mYWFhYWFh", "MYWFhYWFh", "uYWFhYWFh", "UYWFhYWFh"},
+        {"f61616161616161", "z4h36zcadPW", "mYWFhYWFhYQ", "MYWFhYWFhYQ==", "uYWFhYWFhYQ", "UYWFhYWFhYQ=="},
+        {"f6161616161616161", "zHHiHTJ3RcLg", "mYWFhYWFhYWE", "MYWFhYWFhYWE=", "uYWFhYWFhYWE", "UYWFhYWFhYWE="},
+        {"f616161616161616161", "z2EtmDd4Dhcyrp", "mYWFhYWFhYWFh", "MYWFhYWFhYWFh", "uYWFhYWFhYWFh", "UYWFhYWFhYWFh"},
+        {"f00", "z1", "mAA", "MAA==", "uAA", "UAA=="},
+        {"f0000", "z11", "mAAA", "MAAA=", "uAAA", "UAAA="},
+        {"f000000", "z111", "mAAAA", "MAAAA", "uAAAA", "UAAAA"},
+        {"f00000000", "z1111", "mAAAAAA", "MAAAAAA==", "uAAAAAA", "UAAAAAA=="},
+        {"f0000000000", "z11111", "mAAAAAAA", "MAAAAAAA=", "uAAAAAAA", "UAAAAAAA="},
+        {"f000000000000", "z111111", "mAAAAAAAA", "MAAAAAAAA", "uAAAAAAAA", "UAAAAAAAA"},
+        {"f00000000000000", "z1111111", "mAAAAAAAAAA", "MAAAAAAAAAA==", "uAAAAAAAAAA", "UAAAAAAAAAA=="},
+        {"f0000000000000000", "z11111111", "mAAAAAAAAAAA", "MAAAAAAAAAAA=", "uAAAAAAAAAAA", "UAAAAAAAAAAA="},
+        {"f000000000000000000", "z111111111", "mAAAAAAAAAAAA", "MAAAAAAAAAAAA", "uAAAAAAAAAAAA", "UAAAAAAAAAAAA"},
+        {"f7468697320697320612074657374", "zjo91waLQA1NNeBmZKUF", "mdGhpcyBpcyBhIHRlc3Q", "MdGhpcyBpcyBhIHRlc3Q=", "udGhpcyBpcyBhIHRlc3Q", "UdGhpcyBpcyBhIHRlc3Q="},
+        {"f6d756c74696261736520656e636f64696e67", "z5YKdSgATEwQMG3eWyqWvhjEhL", "mbXVsdGliYXNlIGVuY29kaW5n", "MbXVsdGliYXNlIGVuY29kaW5n", "ubXVsdGliYXNlIGVuY29kaW5n", "UbXVsdGliYXNlIGVuY29kaW5n"},
+        {"fe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "zGKot5hBsd81kMupNCXHaqbhv3huEbxAFMLnpcX2hniwn", "m47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU", "M47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=", "u47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU", "U47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU="}
    };
 
    for( size_t case_num=0; case_num < test_cases.size(); case_num++ )

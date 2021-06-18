@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+import base58
+import base64
 import hashlib
 import multibase
+import random
 
 # pip install py-multibase
 
@@ -13,20 +16,46 @@ def get_test_strings():
     test_strings += [hashlib.sha256(b"").digest()]
     return test_strings
 
+def mbencode(base, s):
+    #
+    # We use base58 because py-multibase is known to fail cases with leading zeros
+    #
+    # See:
+    # - https://github.com/multiformats/py-multibase/issues/11
+    # - https://github.com/multiformats/multibase/issues/34
+    #
+    if base == "base58btc":
+        return b"z"+base58.b58encode(s)
+    if base == "base64pad":
+        return b"M"+base64.b64encode(s)
+    if base == "base64urlpad":
+        return b"U"+base64.urlsafe_b64encode(s)
+    return multibase.encode(base, s)
+
 def build_test_case(s):
+    #
+    # We use base64 from Python stdlib because base64pad is not supported
     result = [
-       multibase.encode("base16", s),
-       multibase.encode("base58btc", s),
-       multibase.encode("base64", s),
-       multibase.encode("base64url", s),
+       mbencode("base16", s),
+       mbencode("base58btc", s),
+       mbencode("base64", s),
+       mbencode("base64pad", s),
+       mbencode("base64url", s),
+       mbencode("base64urlpad", s),
        ]
     result = [e.decode("ascii") for e in result]
     return result
 
 def main():
+    first = True
     for s in get_test_strings():
+        if first:
+            first = False
+        else:
+            print(",")
         encodings = build_test_case(s)
-        print("{" + ", ".join(['"{}"'.format(e) for e in encodings]) + "},")
+        print("{" + ", ".join(['"{}"'.format(e) for e in encodings]) + "}", end="")
+    print("")
 
     '''
     with open("test.txt", "r") as f:
