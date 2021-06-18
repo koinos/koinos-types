@@ -38,10 +38,21 @@ void dump_str( const std::vector< char >& s )
 
 int main(int argc, char** argv, char** envp)
 {
+   uint64_t num_cases = 0;
    while(true)
    {
       std::string line;
       std::getline(std::cin, line);
+      if( std::cin.bad() )
+      {
+         std::cerr << "Error reading from stdin" << std::endl;
+         return 1;
+      }
+      else if( std::cin.eof() )
+      {
+         std::cerr << "Successfully handled " << num_cases << " test cases from stdin" << std::endl;
+         break;
+      }
 
       nlohmann::json j = nlohmann::json::parse(line);
 
@@ -129,6 +140,7 @@ int main(int argc, char** argv, char** envp)
             return 1;
          }
       }
+      ++num_cases;
    }
-   return 0;   // unreachable
+   return 0;
 }

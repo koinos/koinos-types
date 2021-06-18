@@ -5,6 +5,7 @@ import base64
 import json
 import multibase
 import random
+import sys
 
 def mbencode(base, s):
     #
@@ -52,9 +53,10 @@ def main():
     while True:
         c = generate_case(runid, i)
         u = [mbencode(b, c).decode("ascii") for b in bases]
-        print(json.dumps(u))
-        #line = b",".join(b"\""+mbencode(b, c)+b"\"" for b in bases)
-        #print(line.decode("ascii"))
+        try:
+            sys.stdout.write(json.dumps(u)+"\n")
+        except BrokenPipeError as e:
+            break
         i += 1
 
 if __name__ == "__main__":
