@@ -20,7 +20,7 @@ template< class T >
 void append( const std::string& input, json& arr, std::ofstream& bin )
 {
    T t;
-   koinos::pack::from_json< T >( json::parse(input), t );
+   koinos::pack::from_json( json::parse(input), t );
 
    std::stringstream ss;
    koinos::pack::to_binary( ss, t );
