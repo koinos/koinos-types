@@ -1,7 +1,8 @@
 
-namespace koinos { namespace thunk {
+namespace koinos { namespace chain {
 
-enum class thunk_id
+// Do not edit this list directly, edit system_call_names.json and run codegen_thunk_ids.py to update
+enum class thunk_id : uint32
 {
 {%- for thunk in thunks %}
    {{ thunk.name }} = {{ thunk.thunk_id }}
