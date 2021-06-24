@@ -126,6 +126,64 @@ BOOST_AUTO_TEST_CASE( multibase_test )
       }
    }
 
-   // koinos::pack::util::encode_multibase(msg.c_str(), msg.size(), dest, 'z');
+
+   std::vector< std::string > invalid_multibase {
+      // base16
+      "f^",
+      "fA",
+      "fA^",
+      "fAA=",
+      "fAA===",
+      "fAA=x",
+      "fAAA^",
+      "fAB==",
+      "fAAB=",
+
+      // base58
+      "z^",
+      "zA^",
+      "zAA=",
+      "zAA===",
+      "zAA=x",
+      "zAAA^",
+      "zAB==",
+      "zAAB=",
+
+      // base64
+      "m^",
+      "mA",
+      "mA^",
+      "mAA=",
+      "mAA===",
+      "mAA=x",
+      "mAAA^",
+      "mAB==",
+      "mAAB=",
+
+      // base64pad
+      "MAA",
+      "MAAA",
+
+      // base64url
+      "u^",
+      "uA",
+      "uA^",
+      "uAA=",
+      "uAA===",
+      "uAA=x",
+      "uAAA^",
+      "uAB==",
+      "uAAB=",
+
+      // base64urlpad
+      "UAA",
+      "UAAA"
+   };
+
+   for ( auto& mb : invalid_multibase )
+   {
+      std::vector< char > decoded;
+      BOOST_CHECK_THROW( koinos::pack::util::decode_multibase( mb.c_str(), mb.size(), decoded ), koinos::pack::base_decode_error );
+   }
 }
 #endif

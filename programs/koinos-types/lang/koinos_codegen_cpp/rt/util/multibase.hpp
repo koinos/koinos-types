@@ -74,36 +74,4 @@ inline void encode_multibase( const char* begin, size_t count, std::vector<char>
    memcpy( dest.data()+1, temp.data(), temp.size() );
 }
 
-/*
-template< size_t N >
-bool decode_base58( const std::string& src, std::array<char,N>& dest )
-{
-   static_assert( N < MAX_ARRAY_SIZE );
-   std::vector<char> v;
-   // TODO: This is inefficient. Consider ways to optimize base58 for an array
-   if( !decode_base58( src.c_str(), v, N ) || v.size() != N ) return false;
-   memcpy( dest.data(), v.data(), N );
-   return true;
-}
-
-inline void encode_base58( std::string& s, const std::vector<char>& v )
-{
-   unsigned char* begin = (unsigned char*) v.data();
-   s = encode_base58( begin, begin + v.size() );
-}
-
-template< size_t N >
-inline void encode_base58( std::string& s, const std::array<char,N>& v )
-{
-   unsigned char* begin = (unsigned char*) v.data();
-   s = encode_base58( begin, begin + N );
-}
-
-inline void encode_base58( std::string& s, const std::string& v )
-{
-   unsigned char* begin = (unsigned char*) v.c_str();
-   s = encode_base58( begin, begin + v.size() );
-}
-*/
-
 }

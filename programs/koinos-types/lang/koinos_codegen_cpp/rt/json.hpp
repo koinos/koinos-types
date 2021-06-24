@@ -211,7 +211,7 @@ inline void from_json( const json& j, vector< T >& v, uint32_t depth )
 inline void to_json( json& j, const variable_blob& v )
 {
    std::vector<char> dest;
-   util::encode_multibase( v.data(), v.size(), dest );
+   util::encode_multibase( v.data(), v.size(), dest, 'm' );
    j = std::string( dest.begin(), dest.end() );
 }
 
@@ -294,7 +294,7 @@ template< size_t N >
 inline void to_json( json& j, const fixed_blob< N >& v )
 {
    std::vector<char> dest;
-   util::encode_multibase( v.data(), v.size(), dest );
+   util::encode_multibase( v.data(), v.size(), dest, 'm' );
    j = std::string( dest.begin(), dest.end() );
 }
 

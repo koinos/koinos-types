@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE( variable_blob_test )
    json j;
    to_json( j, to_j );
 
-   std::string expected = "\"z31SRtpx1\"";
+   std::string expected = "\"mBAgPEBcq\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    variable_blob from_j;
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE( fixed_blob_test )
    json j;
    to_json( j, to_j );
 
-   std::string expected = "\"z31SRtpx1\"";
+   std::string expected = "\"mBAgPEBcq\"";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    fixed_blob< 6 > from_j;
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
    to_json( j, to_j );
    // Expected string generated using Python base58 (pip install base58) as follows:
    // echo -n z; echo -ne '\x01\x06foobar' | base58; echo
-   std::string expected = "{\"ext\":{},\"id\":\"z19rwEskdm1\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
+   std::string expected = "{\"ext\":{},\"id\":\"mAAQIDxAXKgA\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    test_object from_j;

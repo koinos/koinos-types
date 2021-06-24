@@ -20,7 +20,7 @@ inline void to_json( json& j, const multihash& v )
    std::string serialized_bytes = ss.str();
 
    std::vector<char> encoded;
-   util::encode_multibase( serialized_bytes.c_str(), serialized_bytes.size(), encoded );
+   util::encode_multibase( serialized_bytes.c_str(), serialized_bytes.size(), encoded, 'z' );
    j = std::string(encoded.begin(), encoded.end());
 }
 
