@@ -33,7 +33,8 @@ enum class system_call_id : uint32
    require_authority = 0x9491e528,
    get_transaction_signature = 0x9dc3ec34,
    get_contract_id = 0x95e30f50,
-   get_head_block_time = 0x941d5ab9
+   get_head_block_time = 0x941d5ab9,
+   get_account_nonce = 0x98017d70
 };
 
 // Use generate_ids.py to generate the thunk id
@@ -70,7 +71,8 @@ enum class thunk_id : uint32
    require_authority = 0x8a06717d,
    get_transaction_signature = 0x83441b23,
    get_contract_id = 0x8df4ad21,
-   get_head_block_time = 0x8e76d5b4
+   get_head_block_time = 0x8e76d5b4,
+   get_account_nonce = 0x86b76a2f
 };
 
 enum class privilege : uint8
@@ -303,5 +305,15 @@ typedef contract_id_type get_contract_id_return;
 typedef void_type get_head_block_time_args;
 
 typedef timestamp_type get_head_block_time_return;
+
+struct get_account_nonce_args
+{
+   protocol::account_type account;
+};
+
+struct get_account_nonce_return
+{
+   uint64 nonce;
+};
 
 } } // koinos::chain
