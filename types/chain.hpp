@@ -200,6 +200,7 @@ struct execute_contract_args
 {
    contract_id_type contract_id;
    uint32           entry_point;
+   int64            max_ticks;
    variable_blob    args;
 };
 
