@@ -1286,7 +1286,7 @@ const (
 )
 
 // EncodeBytes utility function
-func EncodeBytes(b []byte, encodingOptional ...Encoding) (string, error) {
+func EncodeBytes(b []byte, encodingOptional ...MultibaseEncoding) (string, error) {
 	// Defaults to base64 encoding
 	encoding := Base64
 
@@ -1310,7 +1310,7 @@ func DecodeBytes(s string) ([]byte, error) {
 		return make([]byte, 0), nil
 	}
 
-	switch Encoding(s[0]) {
+	switch MultibaseEncoding(s[0]) {
 	case Base58:
 		return base58.Decode(s[1:]), nil
 	case Base64:
