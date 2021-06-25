@@ -1274,11 +1274,15 @@ func (m0 *Multihash) UnmarshalJSON(b []byte) error {
 //  Utility Functions
 // --------------------------------
 
-type Encoding rune
+// MultibaseEncoding is the multibase prefix for supported multibase encodings
+type MultibaseEncoding rune
 
 const (
-	Base64 Encoding = 'M'
-	Base58 Encoding = 'z'
+	// Base64 is the base 64 multibase encoding
+	Base64 MultibaseEncoding = 'M'
+
+	// Base58 is the base58 multibase encoding
+	Base58 MultibaseEncoding = 'z'
 )
 
 // EncodeBytes utility function
