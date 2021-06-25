@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE( reflect_test )
    to_json( j, to_j );
    // Expected string generated using Python base58 (pip install base58) as follows:
    // echo -n z; echo -ne '\x01\x06foobar' | base58; echo
-   std::string expected = "{\"ext\":{},\"id\":\"MAAQIDxAXKgA\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
+   std::string expected = "{\"ext\":{},\"id\":\"MAAQIDxAXKgA=\",\"key\":\"zAwjubcV5mT\",\"vals\":[108]}";
    BOOST_REQUIRE_EQUAL( j.dump(), expected );
 
    test_object from_j;
