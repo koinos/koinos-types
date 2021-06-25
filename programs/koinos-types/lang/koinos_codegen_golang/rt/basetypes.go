@@ -1277,7 +1277,7 @@ func (m0 *Multihash) UnmarshalJSON(b []byte) error {
 type Encoding rune
 
 const (
-	Base64 Encoding = 'm'
+	Base64 Encoding = 'M'
 	Base58 Encoding = 'z'
 )
 

@@ -540,7 +540,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Unmarshaling nonsense JSON did not give error.")
 	}
 
-	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"mZm9vYmFy\"}}"), jo)
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"MZm9vYmFy\"}}"), jo)
 	if jerr != nil {
 		t.Error(jerr)
 	}
@@ -550,7 +550,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Unboxed incompatible serialization")
 	}
 
-	expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"mZm9vYmFy\"}}")
+	expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"MZm9vYmFy\"}}")
 	v, jerr = json.Marshal(jo)
 	if jerr != nil {
 		t.Error(jerr)
@@ -559,7 +559,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
 	}
 
-	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"mZm9vYmFy\"}}"), jo)
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"MZm9vYmFy\"}}"), jo)
 	if jerr == nil {
 		t.Errorf("jerr == nil")
 	}
