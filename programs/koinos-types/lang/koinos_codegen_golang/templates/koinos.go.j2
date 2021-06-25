@@ -644,7 +644,10 @@ func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
 func (n {{fbname}}) MarshalJSON() ([]byte, error) {
 	nfb := NewVariableBlob()
 	nfb = n.Serialize(nfb)
-	s := EncodeBytes(*nfb)
+	s, err := EncodeBytes(*nfb)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(s)
 }
 

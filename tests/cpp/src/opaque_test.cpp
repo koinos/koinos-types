@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( opaque_boxing )
 
    nlohmann::json expected_json;
    expected_json["opaque"]["type"] = "opaque_test_object";
-   expected_json["opaque"]["value"] = "z31SRtpx1";
+   expected_json["opaque"]["value"] = "MBAgPEBcq";
    o = variable_blob{ 0x04, 0x08, 0x0F, 0x10, 0x17, 0x2A };
 
    nlohmann::json actual_json;

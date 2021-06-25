@@ -540,7 +540,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Unmarshaling nonsense JSON did not give error.")
 	}
 
-	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"MZm9vYmFy\"}}"), jo)
 	if jerr != nil {
 		t.Error(jerr)
 	}
@@ -550,7 +550,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Unboxed incompatible serialization")
 	}
 
-	expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"zt1Zv2yaZ\"}}")
+	expected := []byte("{\"opaque\":{\"type\":\"{{v_type[1]}}\",\"value\":\"MZm9vYmFy\"}}")
 	v, jerr = json.Marshal(jo)
 	if jerr != nil {
 		t.Error(jerr)
@@ -559,7 +559,7 @@ func Test{{o_type}}(t *testing.T) {
 		t.Errorf("Marshal unknown data to json failed. Expected: %s, Was: %s", expected, v)
 	}
 
-	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"zt1Zv2yaZ\"}}"), jo)
+	jerr = json.Unmarshal([]byte("{\"opaque\":{\"type\":\"foobar\",\"value\":\"MZm9vYmFy\"}}"), jo)
 	if jerr == nil {
 		t.Errorf("jerr == nil")
 	}
@@ -671,7 +671,10 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}+1; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s := koinos.EncodeBytes(wfb)
+	s, err := koinos.EncodeBytes(wfb)
+	if err != nil {
+		t.Errorf("Encoding fixed blob unexpectedly failed: %s", err)
+	}
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
 		t.Errorf("deserialized JSON from a string which was not the proper size.")
@@ -682,7 +685,10 @@ func Test{{fbname}}(t *testing.T) {
 	for i := 0; i < {{length}}; i++ {
 		wfb[i] = byte(({{length}} + i) % 256)
 	}
-	s = koinos.EncodeBytes(wfb)
+	s, err = koinos.EncodeBytes(wfb)
+	if err != nil {
+		t.Errorf("Encoding fixed blob unexpectedly failed: %s", err)
+	}
 	s = "0" + s[1:]
 	err = json.Unmarshal([]byte("\""+s+"\""), &jfb)
 	if err == nil {
