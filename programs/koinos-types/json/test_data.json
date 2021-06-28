@@ -20,7 +20,7 @@
       }
    },
    {
-      "type": "protocol::create_system_contract_operation",
+      "type": "protocol::upload_contract_operation",
       "json": {
          "contract_id": "zgbSfgRniygaM8Ty9Zg5qsvGzRhR",
          "bytecode": "zHUKsUCuPZRe",
@@ -91,7 +91,7 @@
                }
             },
             {
-               "type": "koinos::protocol::create_system_contract_operation",
+               "type": "koinos::protocol::upload_contract_operation",
                "value": {
                   "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                   "bytecode": "z7C2VTyPuYsLx",
@@ -152,7 +152,7 @@
                         }
                      },
                      {
-                        "type": "koinos::protocol::create_system_contract_operation",
+                        "type": "koinos::protocol::upload_contract_operation",
                         "value": {
                            "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                            "bytecode": "z7C2VTyPuYsLx",
@@ -261,7 +261,7 @@
                            }
                         },
                         {
-                           "type": "koinos::protocol::create_system_contract_operation",
+                           "type": "koinos::protocol::upload_contract_operation",
                            "value": {
                               "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                               "bytecode": "z7C2VTyPuYsLx",
@@ -301,7 +301,7 @@
                      }
                   },
                   {
-                     "type": "koinos::protocol::create_system_contract_operation",
+                     "type": "koinos::protocol::upload_contract_operation",
                      "value": {
                         "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                         "bytecode": "z7C2VTyPuYsLx",
@@ -431,7 +431,7 @@
                            }
                         },
                         {
-                           "type": "koinos::protocol::create_system_contract_operation",
+                           "type": "koinos::protocol::upload_contract_operation",
                            "value": {
                               "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                               "bytecode": "z7C2VTyPuYsLx",
@@ -471,7 +471,7 @@
                      }
                   },
                   {
-                     "type": "koinos::protocol::create_system_contract_operation",
+                     "type": "koinos::protocol::upload_contract_operation",
                      "value": {
                         "contract_id": "zj23P7LCq6hpE5NWzcrmCdHHyD1H",
                         "bytecode": "z7C2VTyPuYsLx",
