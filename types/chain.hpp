@@ -146,7 +146,7 @@ typedef void_type apply_transaction_return;
 
 struct apply_upload_contract_operation_args
 {
-   protocol::create_system_contract_operation op;
+   protocol::upload_contract_operation op;
 };
 
 typedef void_type apply_upload_contract_operation_return;
