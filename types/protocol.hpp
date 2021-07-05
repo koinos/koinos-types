@@ -1,5 +1,7 @@
 namespace koinos { namespace protocol {
 
+typedef variable_blob account_type;
+
 struct reserved_operation
 {
    unused_extensions_type         extensions;
@@ -10,7 +12,7 @@ struct nop_operation
    unused_extensions_type         extensions;
 };
 
-struct create_system_contract_operation
+struct upload_contract_operation
 {
    contract_id_type               contract_id;
    variable_blob                  bytecode;
@@ -35,7 +37,7 @@ struct call_contract_operation
 typedef std::variant<
    reserved_operation,
    nop_operation,
-   create_system_contract_operation,
+   upload_contract_operation,
    call_contract_operation,
    set_system_call_operation
    > operation;
@@ -61,7 +63,7 @@ struct active_block_data
 {
    multihash                      transaction_merkle_root;
    multihash                      passive_data_merkle_root;
-   multihash                      signer_address;
+   account_type                   signer;
 };
 
 struct passive_block_data {};

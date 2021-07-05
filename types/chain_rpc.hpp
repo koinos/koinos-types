@@ -30,6 +30,11 @@ struct read_contract_request
    variable_blob    args;
 };
 
+struct get_account_nonce_request
+{
+   protocol::account_type account;
+};
+
 typedef std::variant<
    chain_reserved_request,
    submit_block_request,
@@ -37,7 +42,8 @@ typedef std::variant<
    get_head_info_request,
    get_chain_id_request,
    get_fork_heads_request,
-   read_contract_request > chain_rpc_request;
+   read_contract_request,
+   get_account_nonce_request > chain_rpc_request;
 
 struct chain_reserved_response {};
 
@@ -74,6 +80,11 @@ struct read_contract_response
    std::string   logs;
 };
 
+struct get_account_nonce_response
+{
+   uint64 nonce;
+};
+
 typedef std::variant<
    chain_reserved_response,
    chain_error_response,
@@ -82,6 +93,7 @@ typedef std::variant<
    get_head_info_response,
    get_chain_id_response,
    get_fork_heads_response,
-   read_contract_response > chain_rpc_response;
+   read_contract_response,
+   get_account_nonce_response > chain_rpc_response;
 
 } } } // koinos::rpc::chain

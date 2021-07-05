@@ -2,6 +2,7 @@ package koinos
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -1094,7 +1095,10 @@ func DeserializeVariableBlob(vb *VariableBlob) (uint64, *VariableBlob, error) {
 
 // MarshalJSON VariableBlob
 func (n VariableBlob) MarshalJSON() ([]byte, error) {
-	s := EncodeBytes(n)
+	s, err := EncodeBytes(n, Base64)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(s)
 }
 
@@ -1235,7 +1239,10 @@ func DeserializeMultihash(vb *VariableBlob) (uint64, *Multihash, error) {
 func (m0 Multihash) MarshalJSON() ([]byte, error) {
 	vb := NewVariableBlob()
 	s := m0.Serialize(vb)
-	b58str := "z" + base58.Encode(*s)
+	b58str, err := EncodeBytes(*s, Base58)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(b58str)
 }
 
@@ -1267,9 +1274,34 @@ func (m0 *Multihash) UnmarshalJSON(b []byte) error {
 //  Utility Functions
 // --------------------------------
 
+// MultibaseEncoding is the multibase prefix for supported multibase encodings
+type MultibaseEncoding rune
+
+const (
+	// Base64 is the base 64 multibase encoding
+	Base64 MultibaseEncoding = 'M'
+
+	// Base58 is the base58 multibase encoding
+	Base58 MultibaseEncoding = 'z'
+)
+
 // EncodeBytes utility function
-func EncodeBytes(b []byte) string {
-	return "z" + base58.Encode(b)
+func EncodeBytes(b []byte, encodingOptional ...MultibaseEncoding) (string, error) {
+	// Defaults to base64 encoding
+	encoding := Base64
+
+	if len(encodingOptional) > 0 {
+		encoding = encodingOptional[0]
+	}
+
+	switch encoding {
+	case Base58:
+		return string(Base58) + base58.Encode(b), nil
+	case Base64:
+		return string(Base64) + base64.StdEncoding.EncodeToString(b), nil
+	default:
+		return "", errors.New("Unknown encoding: " + string(encoding))
+	}
 }
 
 // DecodeBytes utility function
@@ -1278,9 +1310,11 @@ func DecodeBytes(s string) ([]byte, error) {
 		return make([]byte, 0), nil
 	}
 
-	switch s[0] {
-	case 'z':
+	switch MultibaseEncoding(s[0]) {
+	case Base58:
 		return base58.Decode(s[1:]), nil
+	case Base64:
+		return base64.StdEncoding.DecodeString(s[1:])
 	default:
 		return nil, errors.New("Unknown encoding: " + string(s[0]))
 	}

@@ -3,6 +3,11 @@
 Vector{{v_type}}{{decl_vector(v_type)}}
 {%- endmacro -%}
 
+{%- macro optional(tref) -%}
+{%- set o_type = typeref(tref["targs"][0]) -%}
+Optional{{o_type}}{{decl_optional(o_type)}}
+{%- endmacro -%}
+
 {%- macro template(targs) -%}
 <
 {%- for arg in targs -%}
@@ -28,6 +33,7 @@ Opaque{{v_type}}{{decl_opaque(v_type, namespaced_typeref(tref["targs"][0]))}}
 {%- macro typeref(tref) -%}
 {%- if tref["info"]["type"] == "IntLiteral" %}{{tref["value"]}}
 {%- elif tref["name"][-1] == "vector" -%}{{vector(tref)}}
+{%- elif tref["name"][-1] == "optional" -%}{{optional(tref)}}
 {%- elif tref["name"][-1] == "fixed_blob" -%}{{fixed_blob(tref)}}
 {%- elif tref["name"][-1] == "opaque" -%}{{opaque(tref)}}
 {%- elif tref["name"][-1] == "boolean" -%}Boolean
@@ -465,28 +471,28 @@ type opaqueJSON struct {
 
 // {{o_type}} type
 type {{o_type}} struct {
-	blob *VariableBlob
-	native *{{v_type[0]}}
+	Blob *VariableBlob
+	Native *{{v_type[0]}}
 }
 
 // New{{o_type}} factory
 func New{{o_type}}() *{{o_type}} {
 	o := {{o_type}}{}
-	o.native = New{{v_type[0]}}()
+	o.Native = New{{v_type[0]}}()
 	return &o
 }
 
 // New{{o_type}}FromBlob factory
 func New{{o_type}}FromBlob(vb *VariableBlob) *{{o_type}} {
 	o := {{o_type}}{}
-	o.blob = vb
+	o.Blob = vb
 	return &o
 }
 
 // New{{o_type}}FromNative factory
 func New{{o_type}}FromNative(n {{v_type[0]}}) *{{o_type}} {
 	o := {{o_type}}{}
-	o.native = &n
+	o.Native = &n
 	return &o
 }
 
@@ -496,53 +502,53 @@ func (n *{{o_type}}) GetBlob() *VariableBlob {
 		n.Box()
 	}
 
-	return n.blob
+	return n.Blob
 }
 
 // GetNative *{{o_type}}
 func (n *{{o_type}}) GetNative() (*{{v_type[0]}},error) {
-	if( n.native == nil ) {
+	if( n.Native == nil ) {
 		return nil,errors.New("opaque type not unboxed")
 	}
 
-	return n.native,nil;
+	return n.Native,nil;
 }
 
 // Box *{{o_type}}
 func (n *{{o_type}}) Box() {
-	if (n.native != nil) {
+	if (n.Native != nil) {
 		n.serializeNative()
-		n.native = nil
+		n.Native = nil
 	}
 }
 
 // Unbox *{{o_type}}
 func (n *{{o_type}}) Unbox() {
-	if (n.native == nil && n.blob != nil) {
+	if (n.Native == nil && n.Blob != nil) {
 		var err error
 		var b uint64
-		b,n.native,err = Deserialize{{v_type[0]}}(n.blob)
+		b,n.Native,err = Deserialize{{v_type[0]}}(n.Blob)
 
-		if err != nil || b != uint64(len(*n.blob)) {
-			n.native = nil
+		if err != nil || b != uint64(len(*n.Blob)) {
+			n.Native = nil
 		}
 	}
 }
 
 // IsBoxed *{{o_type}}
 func (n *{{o_type}}) IsBoxed() bool {
-	return n.native == nil;
+	return n.Native == nil;
 }
 
 func (n *{{o_type}}) serializeNative() {
 	vb := NewVariableBlob()
-	n.blob = n.native.Serialize(vb)
+	n.Blob = n.Native.Serialize(vb)
 }
 
 // Serialize {{o_type}}
 func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
 	n.Box()
-	return n.blob.Serialize(vb)
+	return n.Blob.Serialize(vb)
 }
 
 // Deserialize{{o_type}} function
@@ -552,7 +558,7 @@ func Deserialize{{o_type}}(vb *VariableBlob) (uint64,*{{o_type}},error) {
 	if err != nil {
 		return 0, &o, err
 	}
-	o = {{o_type}}{blob:nv, native:nil}
+	o = {{o_type}}{Blob:nv, Native:nil}
 	return size,&o,nil
 }
 
@@ -561,12 +567,12 @@ func (n {{o_type}}) MarshalJSON() ([]byte, error) {
 	n.Unbox()
 
 	if !n.IsBoxed() {
-		return json.Marshal(&n.native)
+		return json.Marshal(&n.Native)
 	}
 
 	v := opaqueJSON{}
 	v.Opaque.Type = "{{v_type[1]}}"
-	v.Opaque.Value = *n.blob
+	v.Opaque.Value = *n.Blob
 
 	return json.Marshal(&v)
 }
@@ -588,10 +594,10 @@ func (n *{{o_type}}) UnmarshalJSON(data []byte) (error) {
 		if strings.Compare(obj.Opaque.Type, "{{v_type[1]}}") != 0 {
 			return errors.New("unexpected opaque type name")
 		}
-		n.blob = &obj.Opaque.Value
-		n.native = nil
+		n.Blob = &obj.Opaque.Value
+		n.Native = nil
 	} else {
-		if err := json.Unmarshal(data, &n.native); err != nil {
+		if err := json.Unmarshal(data, &n.Native); err != nil {
 			return err
 		}
 	}
@@ -638,7 +644,10 @@ func Deserialize{{fbname}}(vb *VariableBlob) (uint64, *{{fbname}},error) {
 func (n {{fbname}}) MarshalJSON() ([]byte, error) {
 	nfb := NewVariableBlob()
 	nfb = n.Serialize(nfb)
-	s := EncodeBytes(*nfb)
+	s, err := EncodeBytes(*nfb)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal(s)
 }
 
@@ -665,6 +674,84 @@ func (n *{{fbname}}) UnmarshalJSON(b []byte) error {
 
 {% endfor %}
 {% endmacro -%}
+
+{%- macro generate_optionals() -%}
+{% for v_type in get_optionals() -%}
+{%- set o_type = "Optional" + v_type -%}
+// ----------------------------------------
+//  {{o_type}}
+// ----------------------------------------
+
+// {{o_type}} type
+type {{o_type}} struct {
+	Value *{{v_type}}
+}
+
+// New{{o_type}} factory
+func New{{o_type}}() *{{o_type}} {
+	o := {{o_type}}{}
+	return &o
+}
+
+// HasValue returns whether or not this optional contains a value
+func (n {{o_type}}) HasValue() bool {
+	return n.Value != nil
+}
+
+// Serialize {{o_type}}
+func (n {{o_type}}) Serialize(vb *VariableBlob) *VariableBlob {
+	if n.HasValue() {
+		ovb := append(*vb, 1)
+		vb = &ovb
+		vb = n.Value.Serialize(vb)
+	} else {
+		ovb := append(*vb, 0)
+		vb = &ovb
+	}
+
+	return vb
+}
+
+// Deserialize{{o_type}} function
+func Deserialize{{o_type}}(vb *VariableBlob) (uint64, *{{o_type}}, error) {
+	if len(*vb) == 0 {
+		return 0, nil, errors.New("could not parse {{o_type}}, not enough data")
+	}
+
+	o := {{o_type}}{}
+	if (*vb)[0] == 1 {
+		ovb := (*vb)[1:]
+		size, v, err := Deserialize{{v_type}}(&ovb)
+		o.Value = v
+		return size + 1, &o, err
+	} else if (*vb)[0] == 0 {
+		return 1, &o, nil
+	}
+
+	return 0, nil, errors.New("invalid header byte in optional")
+}
+
+// MarshalJSON {{o_type}}
+func (n {{o_type}}) MarshalJSON() ([]byte, error) {
+	return json.Marshal(n.Value)
+}
+
+// UnmarshalJSON {{o_type}}
+func (n *{{o_type}}) UnmarshalJSON(b []byte) error {
+	var v *{{v_type}}
+	err := json.Unmarshal(b, &v)
+	if err != nil {
+		return err
+	}
+
+	no := New{{o_type}}()
+	no.Value = v
+	*n = *no
+	return nil
+}
+
+{% endfor -%}
+{% endmacro %}
 
 //   ____                           _           _    ____          _
 //  / ___| ___ _ __   ___ _ __ __ _| |_ ___  __| |  / ___|___   __| | ___
@@ -695,3 +782,4 @@ import (
 {{generate_fixed_blobs()}}
 {{generate_opaques()}}
 {{generate_vectors()}}
+{{generate_optionals()}}

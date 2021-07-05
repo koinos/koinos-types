@@ -4,9 +4,9 @@ struct mempool_reserved_request {};
 
 struct check_pending_account_resources_request
 {
-   chain::account_type payer;
-   uint128             max_payer_resources;
-   uint128             trx_resource_limit;
+   protocol::account_type payer;
+   uint128                max_payer_resources;
+   uint128                trx_resource_limit;
 };
 
 struct get_pending_transactions_request

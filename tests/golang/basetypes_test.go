@@ -2146,7 +2146,7 @@ func TestFixedBlobJson(t *testing.T) {
 	if err != nil {
 		t.Errorf("An error occurred while encoding to JSON")
 	}
-	if string(b) != "\"zpEbmSWqJdBuR5GAyhdJxAcGKAf\"" {
+	if string(b) != "\"MAQIDBAUGBwgJEBESExQVFhcYGSA=\"" {
 		t.Errorf("Unexpected JSON output")
 	}
 	var result koinos.FixedBlob20
@@ -2184,7 +2184,7 @@ func TestVariableBlobJson(t *testing.T) {
 	if err != nil {
 		t.Errorf("An error occurred while encoding to JSON")
 	}
-	if string(b) != "\"zW7LcTy7\"" {
+	if string(b) != "\"MAQIDBAUG\"" {
 		t.Errorf("Unexpected JSON output")
 	}
 	var result koinos.VariableBlob

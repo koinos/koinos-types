@@ -2,11 +2,11 @@ namespace koinos { namespace broadcast {
 
 struct transaction_accepted
 {
-   protocol::transaction transaction;
-   chain::account_type   payer;
-   uint128               max_payer_resources;
-   uint128               trx_resource_limit;
-   block_height_type     height;
+   protocol::transaction  transaction;
+   protocol::account_type payer;
+   uint128                max_payer_resources;
+   uint128                trx_resource_limit;
+   block_height_type      height;
 };
 
 struct block_accepted
