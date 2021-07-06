@@ -1,3 +1,4 @@
+import multibase from "multibase";
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { VarInt } from "./VarInt";
 import { NumberLike } from "./Num";
@@ -36,8 +37,12 @@ export class Multihash {
       this.id = new VarInt(valueObj.id);
       this.digest = new VariableBlob(valueObj.digest);
     } else {
-      const multihash = new VariableBlob(value as VariableBlobLike).deserialize(
-        Multihash
+      // Although VariableBlob and Multihash use different
+      // multibase encoding we can use the constructor of
+      // VariableBlob because it uses a general function to decode
+      // into bytes
+      const multihash = Multihash.deserialize(
+        new VariableBlob(value as VariableBlobLike)
       );
       this.id = multihash.id;
       this.digest = multihash.digest;
@@ -76,7 +81,7 @@ export class Multihash {
   }
 
   toJSON(): string {
-    return this.serialize().toJSON();
+    return this.serialize().toJSON("z");
   }
 }
 

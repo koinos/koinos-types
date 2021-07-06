@@ -1,4 +1,4 @@
-import * as bs58 from "bs58";
+import multibase from "multibase";
 import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 
 export class FixedBlob {
@@ -14,8 +14,7 @@ export class FixedBlob {
     } else if (b instanceof Uint8Array) {
       buffer = b;
     } else if (typeof b === "string") {
-      if (b[0] !== "z") throw new Error(`Unknown encoding: ${b[0]}`);
-      buffer = new Uint8Array(bs58.decode(b.slice(1)));
+      buffer = multibase.decode(b);
     } else if (typeof b === "number") {
       buffer = new Uint8Array(b);
     } else {
@@ -56,8 +55,8 @@ export class FixedBlob {
     return this.size;
   }
 
-  toJSON(): string {
-    return "z" + bs58.encode(this.buffer);
+  toJSON(nameOrCode: multibase.BaseNameOrCode = "M"): string {
+    return new TextDecoder().decode(multibase.encode(nameOrCode, this.buffer));
   }
 }
 

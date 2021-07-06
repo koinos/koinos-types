@@ -46,7 +46,7 @@ describe("Koinos Types - Typescript", () => {
 
   it("Serialize and desearialize", () => {
     expect.assertions(31);
-    const vb1 = new VariableBlob("z26UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS");
+    const vb1 = new VariableBlob("Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=");
     const multihash = new Multihash("zHdxh1kBNvtADThNaTBNvDqyMwzJYi8x1Do7Vg");
     const jsonMultihashVector = {
       id: BigInt(1234),
