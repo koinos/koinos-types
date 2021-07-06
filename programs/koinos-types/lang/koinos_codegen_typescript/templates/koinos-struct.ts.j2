@@ -50,7 +50,7 @@ export class {{class_name}} {
 
   toJSON(): {{class_name}}Like {
     return { {% for field in decl["fields"] %}
-      {{field["name"]}}: this.{{camel_case(field["name"])}}.toJSON(){{" as "+typeref_like(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque"]}},{% endfor %}
+      {{field["name"]}}: this.{{camel_case(field["name"])}}.toJSON(){{" as "+typeref_like(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque", "optional"]}},{% endfor %}
     };
   }
 }
