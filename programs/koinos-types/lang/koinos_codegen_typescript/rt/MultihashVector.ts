@@ -59,7 +59,7 @@ export class MultihashVector {
   toJSON(): JsonMultihashVector {
     return {
       id: this.id.toJSON(),
-      digests: this.digests.toJSON() as string[],
+      digests: this.digests.toJSON("z") as string[],
     };
   }
 }

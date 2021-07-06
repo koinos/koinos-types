@@ -12,7 +12,7 @@ export interface KoinosClass {
 
   calcSerializedSize(): number;
 
-  toJSON(): unknown;
+  toJSON(nameOrCode?: multibase.BaseNameOrCode): unknown;
 }
 
 export interface KoinosClassBuilder<T extends KoinosClass> {

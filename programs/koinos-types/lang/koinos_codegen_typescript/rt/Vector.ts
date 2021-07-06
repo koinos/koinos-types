@@ -1,6 +1,7 @@
 import { VariableBlob, KoinosClass, KoinosClassBuilder } from "./VariableBlob";
 import { VarInt, sizeVarInt } from "./VarInt";
 import { FixedBlob } from "./FixedBlob";
+import multibase from "multibase";
 
 export class Vector<T extends KoinosClass> {
   public items: T[];
@@ -46,8 +47,8 @@ export class Vector<T extends KoinosClass> {
     return header + dataSize;
   }
 
-  toJSON(): unknown[] {
-    return this.items.map((item) => item.toJSON());
+  toJSON(nameOrCode?: multibase.BaseNameOrCode): unknown[] {
+    return this.items.map((item) => item.toJSON(nameOrCode));
   }
 }
 

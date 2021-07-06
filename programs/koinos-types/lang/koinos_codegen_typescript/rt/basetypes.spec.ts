@@ -89,7 +89,7 @@ describe("Koinos Types - Typescript", () => {
       .serialize(new Optional(Str))
       .serialize(new Optional(Str, "optional with value"))
       .serialize(new Vector(Int8, [2, 4, 6]))
-      .serialize(new FixedBlob("z36UjcYNBG9", 7))
+      .serialize(new FixedBlob("MN0TkNkaw7g==", 7))
       .resetCursor();
 
     expect(vb.deserialize(VariableBlob).equals(vb1)).toBe(true);
@@ -123,7 +123,7 @@ describe("Koinos Types - Typescript", () => {
     expect(vb.deserializeOptional(Str).toJSON()).not.toBeDefined();
     expect(vb.deserializeOptional(Str).toJSON()).toBe("optional with value");
     expect(vb.deserializeVector(Int8).toJSON()).toStrictEqual([2, 4, 6]);
-    expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("z36UjcYNBG9");
+    expect(vb.deserialize(FixedBlob, 7).toJSON()).toBe("MN0TkNkaw7g==");
 
     expect(multihash.toJSON()).toBe("zHdxh1kBNvtADThNaTBNvDqyMwzJYi8x1Do7Vg");
   });
