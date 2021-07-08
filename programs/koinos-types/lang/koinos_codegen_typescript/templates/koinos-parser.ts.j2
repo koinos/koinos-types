@@ -9,7 +9,7 @@
 export function parse(type: string, value: unknown) {
   switch(type) {
     {% for decl in decls %}case "{{"::".join(decl["name"])}}":
-      return new {{ts_name(decl["name"][-1])}}(value as {{typeref_like(decl)}});
+      return new {{ts_name(decl["name"][-1])}}(value as {{typeref_json(decl)}});
     {% endfor %}default:
       throw new Error(`Unknown type ${type}`);
   }

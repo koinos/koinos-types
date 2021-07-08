@@ -40,10 +40,11 @@ export class MultihashVector {
   }
 
   static deserialize(vb: VariableBlob): MultihashVector {
-    const id = vb.deserialize(VarInt);
+    const multihashVector = new MultihashVector();
+    multihashVector.id = vb.deserialize(VarInt);
     const sizeDigest = vb.deserialize(VarInt).toNumber();
-    const digests = vb.deserializeVector(FixedBlob, sizeDigest).items;
-    return new MultihashVector({ id, digests });
+    multihashVector.digests = vb.deserializeVector(FixedBlob, sizeDigest);
+    return multihashVector;
   }
 
   calcSerializedSize(): number {
