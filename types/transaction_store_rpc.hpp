@@ -9,9 +9,11 @@ struct get_transactions_by_id_request
    std::vector< multihash >  transaction_ids;
 };
 
+typedef std::optional< protocol::transaction > opt_transaction;
+
 struct get_transactions_by_id_response
 {
-   std::vector< std::optional< protocol::transaction > > transaction_items;
+   std::vector< opt_transaction > transaction_items;
 };
 
 struct transaction_store_error_response
