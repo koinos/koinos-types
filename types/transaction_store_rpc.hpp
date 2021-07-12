@@ -6,14 +6,14 @@ struct transaction_store_reserved_response {};
 
 struct get_transactions_by_id_request
 {
-   std::vector< multihash >  transaction_ids;
+   std::vector< multihash > transaction_ids;
 };
 
-typedef std::optional< protocol::transaction > opt_transaction;
+typedef std::optional< transaction_store::transaction_record > opt_transaction_record;
 
 struct get_transactions_by_id_response
 {
-   std::vector< opt_transaction > transaction_items;
+   std::vector< opt_transaction_record > transactions;
 };
 
 struct transaction_store_error_response
