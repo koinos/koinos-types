@@ -34,14 +34,4 @@ struct block_record
    opaque< protocol::block_receipt >     block_receipt;
 };
 
-struct transaction_item
-{
-   protocol::transaction transaction;
-};
-
-struct transaction_record
-{
-   protocol::transaction transaction;
-};
-
 } } // koinos::block_store
