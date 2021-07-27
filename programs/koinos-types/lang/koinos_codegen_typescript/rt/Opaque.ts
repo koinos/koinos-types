@@ -63,7 +63,7 @@ export class Opaque<T extends KoinosClass> {
 
   serialize(blob?: VariableBlob): VariableBlob {
     const vb = blob || new VariableBlob(this.calcSerializedSize());
-    vb.write(this.getBlob().buffer);
+    vb.serialize(this.getBlob());
     if (!blob) vb.resetCursor();
     return vb;
   }
@@ -72,8 +72,8 @@ export class Opaque<T extends KoinosClass> {
     ClassT: KoinosClassBuilder<K>,
     vb: VariableBlob
   ): Opaque<K> {
-    const native = vb.deserialize(ClassT);
-    return new Opaque<K>(ClassT, native);
+    const blob = vb.deserializeVariableBlob();
+    return new Opaque<K>(ClassT, blob);
   }
 
   calcSerializedSize(): number {
