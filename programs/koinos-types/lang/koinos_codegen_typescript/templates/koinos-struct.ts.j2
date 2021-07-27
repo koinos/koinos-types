@@ -1,14 +1,15 @@
-/* Auto generated code
+/* Auto generated code [struct]
  *
  * Changes to this file may cause incorrect behavior and will be lost if
  * the code is regenerated
  */
 {% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "{{dep[1]}}";
 {% endfor%}
-export type {{class_name}}Like = {{class_name}} | { {% for field in decl["fields"]%}
-  {{field["name"]}}?: {{typeref_like(field["tref"])}};{% endfor %}
+export type {{class_name}}JSON = { {% for field in decl["fields"]%}
+  {{field["name"]}}?: {{typeref_json(field["tref"])}};{% endfor %}
   [x: string]: unknown;
 };
+export type {{class_name}}Like = {{class_name}} | {{class_name}}JSON;
 
 export class {{class_name}} {
   {% for field in decl["fields"]%}public {{camel_case(field["name"])}}: {{typeref(field["tref"])}};
@@ -33,24 +34,18 @@ export class {{class_name}} {
   }
 
   static deserialize(vb: VariableBlob): {{class_name}} {
-    {% for field in decl["fields"] %}const {{camel_case(field["name"])}} = vb.{{deserialize_type(field["tref"])}};
-    {% endfor %}return new {{class_name}}(
-      {% if len(decl["fields"]) > 0 %}
-      { 
-        {% for field in decl["fields"] %}{{field["name"]}}: {{camel_case(field["name"])}},
-        {% endfor %}
-      }
-      {% endif %}
-    );
+    const {{camel_case(class_name)}} = new {{class_name}}();
+    {% for field in decl["fields"] %}{{camel_case(class_name)}}.{{camel_case(field["name"])}} = vb.{{deserialize_type(field["tref"])}};
+    {% endfor %}return {{camel_case(class_name)}};
   }
 
   calcSerializedSize(): number {
     return {% for field in decl["fields"] %}this.{{camel_case(field["name"])}}.calcSerializedSize(){{" +" if not loop.last}}{{";" if loop.last}}
   {% endfor %}{{"0;" if len(decl["fields"]) == 0 }} }
 
-  toJSON(): {{class_name}}Like {
+  toJSON(): {{class_name}}JSON {
     return { {% for field in decl["fields"] %}
-      {{field["name"]}}: this.{{camel_case(field["name"])}}.toJSON(){{" as "+typeref_like(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque", "optional"]}},{% endfor %}
+      {{field["name"]}}: this.{{camel_case(field["name"])}}.toJSON(){{" as "+typeref_json(field["tref"]) if field["tref"]["name"][-1] in ["vector", "opaque", "optional"]}},{% endfor %}
     };
   }
 }

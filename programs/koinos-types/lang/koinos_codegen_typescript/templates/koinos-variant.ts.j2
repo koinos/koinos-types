@@ -1,4 +1,4 @@
-/* Auto generated code
+/* Auto generated code [variant]
  *
  * Changes to this file may cause incorrect behavior and will be lost if
  * the code is regenerated
@@ -9,14 +9,19 @@
 export type {{class_name}}Value = {%- for arg in decl["tref"]["targs"] %} {{typeref(arg)}}{{" |" if not loop.last}}
   {%- endfor %};
 
-export type {{class_name}}Like = {{class_name}} | {{class_name}}Value | {
+export type {{class_name}}JSON = {
   type: string;
-  value: {%- for arg in decl["tref"]["targs"] %} {{typeref_like(arg)}}{{" |" if not loop.last}}
+  value: {%- for arg in decl["tref"]["targs"] %} {{typeref_json(arg)}}{{" |" if not loop.last}}
   {%- endfor %}
 }
 
+export type {{class_name}}Like = {{class_name}} | {{class_name}}Value | {{class_name}}JSON;
+
 export class {{class_name}} {
   public value: {{class_name}}Value;
+
+  {%- for arg in decl["tref"]["targs"] %}static {{ts_name("_".join(arg["name"]))}} = "{{"::".join(arg["name"])}}";
+  {%- endfor %}
 
   constructor(
     value: {{class_name}}Like = {
@@ -30,7 +35,7 @@ export class {{class_name}} {
   {%- endfor %}) {
       this.value = value;
     } else {
-      {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if(value.type === "{{"::".join(arg["name"])}}") this.value = new {{typeref(arg)}}(value.value as {{typeref(arg)}}Like);
+      {%- for arg in decl["tref"]["targs"] %}{{"else " if loop.index > 1 }}if(value.type === {{class_name}}.{{ts_name("_".join(arg["name"]))}}) this.value = new {{typeref(arg)}}(value.value as {{typeref(arg)}}JSON);
       {% endfor %}else throw new Error(`Unknown variant type ${value.type}`);
     }
   }
@@ -60,11 +65,11 @@ export class {{class_name}} {
 
   typeToName(): string {
     {%- for arg in decl["tref"]["targs"] %}if (this.value instanceof {{typeref(arg)}})
-      return "{{"::".join(arg["name"])}}";{% endfor %}
+      return {{class_name}}.{{ts_name("_".join(arg["name"]))}};{% endfor %}
     throw new Error("Unknown variant type");
   }
 
-  toJSON(): {{class_name}}Like {
+  toJSON(): {{class_name}}JSON {
     return {
       type: this.typeToName(),
       value: this.value.toJSON(),

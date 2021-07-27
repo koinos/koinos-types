@@ -3,13 +3,15 @@ import { VariableBlob, VariableBlobLike } from "./VariableBlob";
 import { VarInt } from "./VarInt";
 import { NumberLike } from "./Num";
 
+export type MultihashJSON = {
+  id: NumberLike;
+  digest: string;
+};
+
 export type MultihashLike =
   | Multihash
   | VariableBlobLike
-  | {
-      id: NumberLike;
-      digest: VariableBlobLike;
-    };
+  | MultihashJSON;
 
 export class Multihash {
   public id: VarInt;
@@ -71,9 +73,10 @@ export class Multihash {
   }
 
   static deserialize(vb: VariableBlob): Multihash {
-    const id = vb.deserialize(VarInt);
-    const digest = vb.deserialize(VariableBlob);
-    return new Multihash({ id, digest });
+    const multihash = new Multihash();
+    multihash.id = vb.deserialize(VarInt);
+    multihash.digest = vb.deserialize(VariableBlob);
+    return multihash;
   }
 
   calcSerializedSize(): number {

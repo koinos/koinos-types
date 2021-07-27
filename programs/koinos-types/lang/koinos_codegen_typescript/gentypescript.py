@@ -160,6 +160,27 @@ def typeref_like(tref):
         return typeref_like(tref["targs"][0])
     return ts_name(tref["name"][-1]) + "Like"
 
+def typeref_json(tref):
+    if tref["name"][-1] in ['int8', 'uint8', 'int16',
+      'uint16', 'int32', 'uint32', 'int64', 'uint64',
+      'int128', 'uint128', 'int160', 'uint160',
+      'int256', 'uint256', 'block_height_type',
+      'timestamp_type']:
+        return "NumberLike"
+    if tref["name"][-1] in ["string", "multihash"]:
+        return "string"
+    if tref["name"][-1] == "boolean":
+        return "boolean"
+    if tref["name"][-1] in ['variable_blob', 'fixed_blob']:
+        return "string"
+    if tref["name"][-1] == "vector":
+        return typeref_json(tref["targs"][0]) + "[]"
+    if tref["name"][-1] == "opaque":
+        return typeref_json(tref["targs"][0])
+    if tref["name"][-1] == "optional":
+        return typeref_json(tref["targs"][0])
+    return ts_name(tref["name"][-1]) + "JSON"
+
 def typeref_constructor(tref):
     if tref["name"][-1] == "opaque":
         return "Opaque(" + typeref(tref["targs"][0]) +", "
@@ -171,11 +192,11 @@ def typeref_constructor(tref):
 
 def deserialize_type(tref):
     if tref["name"][-1] == "opaque":
-        return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").getNative()"
+        return "deserializeOpaque<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ")"
     if tref["name"][-1] == "optional":
-        return "deserializeOptional<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").value"
+        return "deserializeOptional<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ")"
     if tref["name"][-1] == "vector":
-        return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ").items"
+        return "deserializeVector<" + typeref(tref["targs"][0]) + ">(" + typeref(tref["targs"][0]) + ")"
     return "deserialize(" + typeref(tref) + ")"
 
 def is_basetype(name):
@@ -188,7 +209,7 @@ def is_basetype(name):
       return True
     return False
 
-def insert_type_like_dependency(deps, className, tref, nameRef):
+def insert_type_json_dependency(deps, className, tref, nameRef):
     if tref["name"][-1] in ['int8', 'uint8', 'int16',
       'uint16', 'int32', 'uint32', 'int64', 'uint64',
       'int128', 'uint128', 'int160', 'uint160',
@@ -196,22 +217,27 @@ def insert_type_like_dependency(deps, className, tref, nameRef):
       'timestamp_type']:
         deps = insert_dependency(deps, "NumberLike", { "name": ["koinos", "number"]}, nameRef, False)
     elif tref["name"][-1] == "string":
-        deps = insert_dependency(deps, "StringLike", { "name": ["koinos", "string"]}, nameRef, False)
+        return deps
+    #    deps = insert_dependency(deps, "StringLike", { "name": ["koinos", "string"]}, nameRef, False)
     elif tref["name"][-1] == "boolean":
-        deps = insert_dependency(deps, "BooleanLike", { "name": ["koinos", "boolean"]}, nameRef, False)
+        return deps
+    #    deps = insert_dependency(deps, "BooleanLike", { "name": ["koinos", "boolean"]}, nameRef, False)
     elif tref["name"][-1] in ['variable_blob', 'fixed_blob']:
-        deps = insert_dependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+        return deps
+    #    deps = insert_dependency(deps, "VariableBlobLike", { "name": ["koinos", "variable_blob"]}, nameRef, False)
+    elif tref["name"][-1] in ['multihash']:
+        return deps
     elif tref["name"][-1] == "opaque":
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_type_json_dependency(deps, className, tref["targs"][0], nameRef)
     elif tref["name"][-1] == "optional":
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_type_json_dependency(deps, className, tref["targs"][0], nameRef)
     elif tref["name"][-1] == "vector":
         className = ts_name(tref["targs"][0]["name"][-1])
-        deps = insert_type_like_dependency(deps, className, tref["targs"][0], nameRef)
+        deps = insert_type_json_dependency(deps, className, tref["targs"][0], nameRef)
     else:
-        deps = insert_dependency(deps, className + "Like", tref, nameRef, False)
+        deps = insert_dependency(deps, className + "JSON", tref, nameRef, False)
 
     return deps
 
@@ -233,7 +259,7 @@ def insert_dependency(deps, className, tref, nameRef, insertJsonlike = True):
     
     # typeref_like
     if insertJsonlike:
-        deps = insert_type_like_dependency(deps, className, tref, nameRef)
+        deps = insert_type_json_dependency(deps, className, tref, nameRef)
     return deps
 
 def get_dependencies_struct(decl, nameRef):
@@ -487,6 +513,7 @@ def generate_typescript(schema):
             "typeref": typeref,
             "typeref_constructor": typeref_constructor,
             "typeref_like": typeref_like,
+            "typeref_json": typeref_json,
             "deserialize_type": deserialize_type,
             "len": len,
             "str": str,
@@ -546,6 +573,7 @@ def generate_typescript(schema):
         "dependencies" : dep_parser, 
         "ts_name" : ts_name,
         "typeref_like": typeref_like,
+        "typeref_json": typeref_json,
     }
     result_files["src/" + parser_file] = j2_template_parser.render(ctx)
 
