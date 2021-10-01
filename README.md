@@ -1,5 +1,9 @@
 [![Build Status](https://travis-ci.com/koinos/koinos-types.svg?token=299mUDbUKyJPxqjj5R9G&branch=master)](https://travis-ci.com/koinos/koinos-types) [![Coverage Status](https://coveralls.io/repos/github/koinos/koinos-types/badge.svg?branch=master&t=RyUCbH)](https://coveralls.io/github/koinos/koinos-types?branch=master)
 
+### __This repo has been archived!!!__
+
+Koinos now uses Protocol Buffers in [koinos-proto](https://github.com/koinos/koinos-proto).
+
 # Koinos Types
 
 Koinos Types provides the canonical serialization of Koinos data structures. Using an IDL (Interface Definition Language) the Koinos Types program generates the corresponding API in each of the supported languages.
