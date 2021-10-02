@@ -5,6 +5,8 @@ libraries/pack/gen
 out
 gen
 block.schema
+node_modules
+dist
 
 # Mac files
 .DS_Store

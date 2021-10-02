@@ -1,0 +1,32 @@
+import * as fs from "fs";
+import * as JSONbig from "json-bigint";
+import * as Koinos from "../koinos_protocol";
+
+let t: Koinos.KoinosClass;
+let size: number;
+let b: Koinos.VariableBlob;
+
+const vb = new Koinos.VariableBlob();
+const array: unknown[] = [];
+
+function appendType<T extends Koinos.KoinosClass>(t: Koinos.KoinosClass, ClassT: Koinos.KoinosClassBuilder<T>) {
+  const size = t.calcSerializedSize();
+  const b = t.serialize();
+  if(size !== b.length())
+    throw new Error(`Not all bytes were consumed when deserializing from binary. calcSerializedSize ${size}, size ${b.length()}`);
+  const json = b.deserialize(ClassT).toJSON();
+  
+  // json
+  array.push(JSON.parse(JSONbig.stringify(json)));
+  
+  // binary
+  vb.serialize(new Koinos.Uint32(size));
+  vb.serialize(b);
+}
+
+{% for test in test_cases %}
+appendType(new Koinos.{{ts_name(test.typename)}}({{ test.json }}), Koinos.{{ts_name(test.typename)}});
+{% endfor %}
+
+fs.writeFileSync("test.bin", vb.buffer);
+fs.writeFileSync("test.json", JSON.stringify(array, null, 2));

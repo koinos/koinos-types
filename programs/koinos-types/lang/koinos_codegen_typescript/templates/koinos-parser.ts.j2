@@ -1,0 +1,18 @@
+/* Auto generated code
+ *
+ * Changes to this file may cause incorrect behavior and will be lost if
+ * the code is regenerated
+ */
+{% for dep in dependencies %}import { {{", ".join(dep[0])}} } from "./{{dep[1]}}";
+{% endfor%}
+
+export function parse(type: string, value: unknown) {
+  switch(type) {
+    {% for decl in decls %}case "{{"::".join(decl["name"])}}":
+      return new {{ts_name(decl["name"][-1])}}(value as {{typeref_json(decl)}});
+    {% endfor %}default:
+      throw new Error(`Unknown type ${type}`);
+  }
+}
+
+export default parse;

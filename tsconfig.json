@@ -1,0 +1,19 @@
+{
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "lib": ["ES6", "DOM"],
+    "incremental": true,
+    "strict": false,
+    "outDir": "./dist",
+    "baseUrl": "./"
+  },
+  "include": ["programs/koinos-types/build/koinos_protocol/*"],
+  "exclude": ["node_modules", "dist"]
+}
